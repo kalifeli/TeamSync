@@ -26,6 +26,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ciaoooo() {
+fun ciaooooo() {
     var text = "Benvenuto in TeamSync";
 }

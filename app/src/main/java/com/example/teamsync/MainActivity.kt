@@ -17,7 +17,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TeamSyncTheme {
-               
+                println("ciao")
+                println("porco dio")
+                println("alex frocio")
             }
         }
     }

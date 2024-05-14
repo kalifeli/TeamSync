@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TeamSyncTheme {
                 println("ciao")
+                println("porco dio")
             }
         }
     }

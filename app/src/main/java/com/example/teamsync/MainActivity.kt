@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
                 println("ciao")
                 println("porco dio")
                 println("alex frocio")
+                println("jaks lo vedi?")
             }
         }
     }

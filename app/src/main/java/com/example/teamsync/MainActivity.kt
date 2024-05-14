@@ -17,16 +17,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TeamSyncTheme {
-                println("ciao")
-                println("porco dio")
-                println("alex frocio")
-                println("jaks lo vedi?")
+
             }
         }
     }
 }
 
-@Composable
-fun ciaoooooooooooooo() {
-    var text = "Benvenuto in TeamSync";
-}

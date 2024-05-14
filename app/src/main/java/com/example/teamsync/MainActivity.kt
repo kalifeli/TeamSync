@@ -24,6 +24,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ciao() {
+fun ciaoooo() {
 
 }

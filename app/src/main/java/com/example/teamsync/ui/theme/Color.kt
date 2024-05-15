@@ -1,5 +1,6 @@
 package com.example.teamsync.ui.theme
 
+import androidx.compose.material3.ButtonColors
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -15,3 +16,4 @@ val Grey_Forte = Color(0xFFD9D9D9)
 val Grey = Color(0xFFF6F6F6)
 val White = Color(0xFFFFFFFF)
 val SottotitoliGrey = Color(0xFF79747E)
+

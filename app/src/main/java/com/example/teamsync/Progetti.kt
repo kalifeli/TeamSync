@@ -12,25 +12,31 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -110,6 +116,9 @@ fun Progetti() {
             var isSheetOpen by rememberSaveable {
                 mutableStateOf(false)
             }
+            var filledText by remember{
+                mutableStateOf("")
+            }
 
             IconButton(
                 onClick = { isSheetOpen = true }, modifier = Modifier
@@ -142,8 +151,27 @@ fun Progetti() {
                                 contentDescription = "Aggiungi icona",
                                 modifier = Modifier
                                     .clickable { /*TODO*/ }
-                                    .size(70.dp)
+                                    .size(120.dp)
+                                    .padding(16.dp)
+                                    .align(Alignment.CenterHorizontally)
                             )
+                            TextField(value = filledText,
+                                onValueChange = {filledText = it},
+                                label = {
+                                    Text(text = "Nome Progetto")
+                                },
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                               )
+                            Button(onClick = { /*TODO*/ },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(Color(193, 9, 42)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(text = "Crea Progetto")
+                            }
+                            
                         }
                     }
                 }

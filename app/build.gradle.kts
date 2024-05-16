@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    //id("kotlin-kapt")
+    //id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -68,14 +68,15 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    //implementation("androidx.compose.foundation:foundation:1.4.3")
 
     // Room
-    val room_version = "2.6.1"
+    //val room_version = "2.6.1"
 
-    implementation("androidx.room:room-runtime:$room_version")
+    //implementation("androidx.room:room-runtime:$room_version")
     //kapt("androidx.room:room-compiler:$room_version")
     // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
+    //implementation("androidx.room:room-ktx:$room_version")
 
     // Splash API
     implementation("androidx.core:core-splashscreen:1.0.1")
@@ -90,13 +91,13 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
     //DataStore Preferences
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    //implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Dagger - Hilt
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    //implementation("com.google.dagger:hilt-android:2.44")
+    //kapt("com.google.dagger:hilt-android-compiler:2.44")
+    //kapt("androidx.hilt:hilt-compiler:1.2.0")
+    //implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 
 

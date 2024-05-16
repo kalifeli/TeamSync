@@ -1,0 +1,55 @@
+package com.example.teamsync.util
+
+import androidx.annotation.DrawableRes
+import com.example.teamsync.R
+
+sealed class PaginaDiBenvenuto (
+    @DrawableRes
+    val immagine: Int,
+    val titolo: String,
+    val descrizione: String,
+    @DrawableRes
+    val sfondo: Int
+){
+    // ogni object rappresenta le proprietà di una pagina nella nostra presentazione
+    object PrimaPagina : PaginaDiBenvenuto (
+        immagine = R.drawable.im_pagina_di_benvenuto1,
+        titolo = "Benvenuto in TeamSync",
+        descrizione = "Il modo più semplice e veloce per organizzare i tuoi progetti universitari.",
+        sfondo = R.drawable.sfondo_pagina_di_benvenuto1
+    )
+    object SecondaPagina : PaginaDiBenvenuto (
+        immagine = R.drawable.im_pagina_di_benvenuto2,
+        titolo = "Tieni traccia di tutti i tuoi progetti",
+        descrizione = "",
+        sfondo = R.drawable.sfondo_pagina_di_benvenuto_4
+
+    )
+
+    object TerzaPagina : PaginaDiBenvenuto (
+        immagine = R.drawable.im_pagina_di_benvenuto3,
+        titolo = "Gestisci i task",
+        descrizione = "Crea,assegna e tieni traccia dei tuoi compiti efficacemente, tutto da un'unica schermata intuitiva.",
+        sfondo = R.drawable.sfondo_pagina_di_benvenuto3
+    )
+
+    object QuartaPagina : PaginaDiBenvenuto (
+        immagine = R.drawable.im_pagina_di_benvenuto4,
+        titolo = "Resta sempre aggiornato",
+        descrizione = "Attiva le notifiche di gruppo per non perdere mai un aggiornamento importante o una scadenza imminente nei tuoi progetti di gruppo.",
+        sfondo = R.drawable.sfondo_pagina_di_benvenuto_4
+    )
+    object QuintaPagina : PaginaDiBenvenuto (
+        immagine = R.drawable.im_pagina_di_benvenuto5,
+        titolo = "Aggiungi studenti ai tuoi amici",
+        descrizione = "Costruisci connessioni con nuovi compoagni di corso.",
+        sfondo = R.drawable.sfondo_pagina_di_benvenuto5
+        // rettangolo_bianco
+    )
+    object SestaPagina : PaginaDiBenvenuto (
+        immagine = R.drawable.im_pagina_di_benvenuto6,
+        titolo = "Inizia ora!",
+        descrizione = "Sei solo a un passo dall'essere più organizzato e connesso che mai. Entra ora e trasforma il modo in cui lavori sui tuoi progetti!",
+        sfondo = R.drawable.sfondo_pagina_di_benvenuto6
+    )
+}

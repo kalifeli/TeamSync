@@ -23,7 +23,6 @@ sealed class PaginaDiBenvenuto (
         titolo = "Tieni traccia di tutti i tuoi progetti",
         sottotitolo = "",
         sfondo = R.drawable.sfondo_pagina_di_benvenuto_4
-
     )
 
     object TerzaPagina : PaginaDiBenvenuto (

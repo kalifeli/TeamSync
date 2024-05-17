@@ -87,7 +87,7 @@ fun Preview_PrimaSchermataBenvenuto(){
         modifier = Modifier
             .fillMaxSize()
     ) {
-        com.example.teamsync.screen.PaginaDiBenvenuto(paginaDiBenvenuto = PaginaDiBenvenuto.PrimaPagina)
+        PaginaDiBenvenuto(paginaDiBenvenuto = PaginaDiBenvenuto.PrimaPagina)
     }
 
 }

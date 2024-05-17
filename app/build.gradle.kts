@@ -82,9 +82,9 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Pager and Indicators - Accompanist
-    //val accompanist_version =
-    //implementation("com.google.accompanist:accompanist-pager: $accompanist_version")
-    //implementation("com.google.accompanist:accompanist-pager-indicators:$accompanist_version")
+    val accompanist_version ="0.30.1"
+    implementation("com.google.accompanist:accompanist-pager: $accompanist_version")
+    implementation("com.google.accompanist:accompanist-pager-indicators:$accompanist_version")
 
     //Navigation Compose
     val nav_version = "2.7.7"

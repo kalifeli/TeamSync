@@ -3,6 +3,7 @@ package com.example.teamsync.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -27,15 +33,70 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.PaginaDiBenvenuto
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SchermataDiBenvenuto(
-    navController : NavHostController
+    navController : NavController
 ){
+    val pages = listOf(
+        PaginaDiBenvenuto.PrimaPagina,
+        PaginaDiBenvenuto.SecondaPagina,
+        PaginaDiBenvenuto.TerzaPagina,
+        PaginaDiBenvenuto.QuartaPagina,
+        PaginaDiBenvenuto.QuintaPagina,
+        PaginaDiBenvenuto.SestaPagina
+    )
+    val pagerState = rememberPagerState(0,0F) {
+        6
+    }
+
+    Box (modifier = Modifier.fillMaxSize()){
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.Top
+        ) {posizione ->
+            PaginaDiBenvenuto(paginaDiBenvenuto = pages[posizione])
+        }
+        Row (
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.Center
+        ){
+            repeat(pages.size){iterazione ->
+                val colore = if (pagerState.currentPage == iterazione) Red70 else Grey50
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                        .background(colore)
+                        .size(12.dp)
+                )
+
+            }
+        }
+
+        Bottone_IniziaOra(
+            pagerState = pagerState,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            onClick = {
+                navController.navigate(Schermate.Progetti.route)
+            }
+        )
+
+    }
 
 }
 
@@ -89,7 +150,6 @@ fun PaginaDiBenvenuto (paginaDiBenvenuto: PaginaDiBenvenuto){
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center
-
             )
 
         }
@@ -128,9 +188,14 @@ fun Bottone_IniziaOra(
         }
     }
 }
+@Preview
+@Composable
+fun PreviewSchermataDiBenvenuto() {
+    val navController = rememberNavController()
+    SchermataDiBenvenuto(navController)
+}
 
 
-@Preview(showBackground = true)
 @Composable
 fun Preview_PrimaSchermataBenvenuto(){
     Column(
@@ -140,7 +205,7 @@ fun Preview_PrimaSchermataBenvenuto(){
         PaginaDiBenvenuto(paginaDiBenvenuto = PaginaDiBenvenuto.PrimaPagina)
     }
 }
-@Preview(showBackground = true)
+
 @Composable
 fun Preview_SecondaSchermataBenvenuto(){
     Column(
@@ -150,7 +215,7 @@ fun Preview_SecondaSchermataBenvenuto(){
         PaginaDiBenvenuto(paginaDiBenvenuto = PaginaDiBenvenuto.SecondaPagina)
     }
 }
-@Preview(showBackground = true)
+
 @Composable
 fun Preview_TerzaSchermataBenvenuto(){
     Column(
@@ -160,7 +225,7 @@ fun Preview_TerzaSchermataBenvenuto(){
         PaginaDiBenvenuto(paginaDiBenvenuto = PaginaDiBenvenuto.TerzaPagina)
     }
 }
-@Preview(showBackground = true)
+
 @Composable
 fun Preview_QuartaSchermataBenvenuto(){
     Column(
@@ -170,7 +235,7 @@ fun Preview_QuartaSchermataBenvenuto(){
         PaginaDiBenvenuto(paginaDiBenvenuto = PaginaDiBenvenuto.QuartaPagina)
     }
 }
-@Preview(showBackground = true)
+
 @Composable
 fun Preview_QuintaSchermataBenvenuto(){
     Column(
@@ -180,7 +245,7 @@ fun Preview_QuintaSchermataBenvenuto(){
         PaginaDiBenvenuto(paginaDiBenvenuto = PaginaDiBenvenuto.QuintaPagina)
     }
 }
-@Preview(showBackground = true)
+
 @Composable
 fun Preview_SestaSchermataBenvenuto(){
     Column(

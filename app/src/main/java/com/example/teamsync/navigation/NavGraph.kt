@@ -12,7 +12,7 @@ import com.example.teamsync.screen.SchermataDiBenvenuto
 @Composable
 fun NavGraph(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Schermate.Iscrizione.route) {
+    NavHost(navController = navController, startDestination = Schermate.Benvenuto.route) {
         composable(route = Schermate.Iscrizione.route){
 
         }
@@ -20,7 +20,7 @@ fun NavGraph(){
 
         }
         composable(route = Schermate.Benvenuto.route){
-            SchermataDiBenvenuto(navController = navController)
+            SchermataDiBenvenuto(navController)
         }
         composable(route = Schermate.Progetti.route){
             Progetti()

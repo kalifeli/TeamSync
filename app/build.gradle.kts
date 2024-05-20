@@ -68,7 +68,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    //implementation("androidx.compose.foundation:foundation:1.4.3")
 
     // Room
     //val room_version = "2.6.1"
@@ -80,11 +79,6 @@ dependencies {
 
     // Splash API
     implementation("androidx.core:core-splashscreen:1.0.1")
-
-    // Pager and Indicators - Accompanist
-    val accompanist_version ="0.30.1"
-    implementation("com.google.accompanist:accompanist-pager: $accompanist_version")
-    implementation("com.google.accompanist:accompanist-pager-indicators:$accompanist_version")
 
     //Navigation Compose
     val nav_version = "2.7.7"

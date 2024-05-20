@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +49,7 @@ import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.White
 
 
+@Preview
 @ExperimentalMaterial3Api
 @Composable
 fun Progetti() {
@@ -66,6 +68,7 @@ fun Progetti() {
         ) {
             Text(
                 text = "I Tuoi Progetti",
+                textAlign = TextAlign.Center,
                 fontSize = 24.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.Monospace
@@ -100,9 +103,12 @@ fun Progetti() {
             }
 
             Text(
-                text = "Oops!!! Sembra che non ci siano progetti,\n inizia ora creandone uno",
+                textAlign = TextAlign.Center,
+                text = "Oops!!! Sembra che non ci siano progetti, inizia ora creandone uno.",
                 color = Grey70,
-                modifier = Modifier.offset(y = (-140).dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                    .offset(y = (-140).dp)
             )
 
             val sheetState = rememberModalBottomSheetState()

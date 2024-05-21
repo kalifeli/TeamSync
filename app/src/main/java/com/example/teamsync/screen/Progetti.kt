@@ -8,12 +8,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -66,9 +71,9 @@ fun Progetti() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .align(Alignment.Center)
-                .padding(top = 50.dp),
-            verticalArrangement = Arrangement.Top
+                .padding(top = 60.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "I Tuoi Progetti",
@@ -82,30 +87,25 @@ fun Progetti() {
                 color = Grey70,
                 modifier = Modifier.padding(top = 10.dp)
             )
-            Box(
-                modifier = Modifier
-                    .size(300.dp)
 
-                    .offset(y = (-130).dp)// Riduci il margine inferiore per spostare l'immagine più in alto
-            ) {
-                Image(
+            Image(
                     painterResource(id = R.drawable.linea),
                     contentDescription = "Linea Rossa",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .size(240.dp)
-                    .offset(y = (-150).dp) // Riduci il margine inferiore per spostare l'immagine più in alto
-            ) {
-                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .size(30.dp),
+                    alignment = Alignment.Center,
+            )
+            Spacer(modifier = Modifier.height(60.dp))
+
+            Image(
                     painterResource(id = R.drawable.no_project_illustration),
                     contentDescription = "Immagini di Progetti Vuota",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+                    modifier = Modifier
+                        .size(250.dp)
+                        .align(Alignment.CenterHorizontally) // Centra l'immagine orizzontalmente
 
+            )
             Text(
                 textAlign = TextAlign.Center,
                 text = "Oops!!! Sembra che non ci siano progetti,inizia ora creandone uno.",
@@ -113,8 +113,9 @@ fun Progetti() {
                 modifier = Modifier
                     .padding(16.dp)
                     .padding(horizontal = 20.dp)
-                    .offset(y = (-140).dp)
+
             )
+            Spacer(modifier = Modifier.height(240.dp))
 
             val sheetState = rememberModalBottomSheetState()
             var isSheetOpen by rememberSaveable {
@@ -124,17 +125,17 @@ fun Progetti() {
                 mutableStateOf("")
             }
 
-            FloatingActionButton(
-                containerColor = Red70,
-                shape = FloatingActionButtonDefaults.shape,
-                onClick = { /*TODO*/ }
-            ) {
-               Icon(
-                   imageVector = Icons.Default.Add,
-                   contentDescription = "add project",
-                   tint = Color.White
-               )
-            }
+                FloatingActionButton(
+                    containerColor = Red70,
+                    shape = FloatingActionButtonDefaults.shape,
+                    onClick = { /*TODO*/ }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "add project",
+                        tint = Color.White
+                    )
+                }
             if (isSheetOpen) {
                 ModalBottomSheet(
                     sheetState = sheetState,

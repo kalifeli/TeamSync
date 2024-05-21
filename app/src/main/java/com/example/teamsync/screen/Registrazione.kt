@@ -26,6 +26,8 @@ import com.example.teamsync.R.drawable.registrazione
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Grey20
+import com.example.teamsync.ui.theme.Red70
 
 @Composable
 fun Registrazione(navController: NavHostController) {
@@ -85,6 +87,10 @@ fun Registrazione(navController: NavHostController) {
                         .padding(horizontal = 30.dp)
                 ) {
                     OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = Red70
+                        ),
                         value = "",
                         onValueChange = {},
                         label = { Text("Email") },

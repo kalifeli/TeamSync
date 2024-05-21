@@ -163,35 +163,43 @@ fun LoginScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(60.dp))
 
-                    Row (modifier = Modifier.fillMaxWidth(),
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                    )
-                    {
-                        Text(
-                            text = "Non hai un account? ",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(end = 1.dp)
-                        )
-
-                        Text(
-                            text = "Registrati",
-                            color = Red70,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
                             modifier = Modifier
-                                .clickable { navController.navigate(Schermate.Registrazione.route) },
-                            minLines = 1
-
-
-                        )
+                        ) {
+                            Text(
+                                text = "Non hai un account? ",
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .clickable { navController.navigate(Schermate.Registrazione.route) }
+                        ) {
+                            Text(
+                                text = "Registrati",
+                                textAlign = TextAlign.Center,
+                                color = Red70,
+                            )
+                            Divider(
+                                color = Red70,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .width(70.dp)
+                                    .height(1.dp) // Adjust thickness as needed
+                            )
+                        }
                     }
+
+
+                    
                 }
-
-
-
-
-
-
-                    Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(50.dp))
                 }
             }
         }

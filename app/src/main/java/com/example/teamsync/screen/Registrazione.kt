@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
 
 @Composable
 fun Registrazione(navController: NavHostController) {
@@ -89,7 +90,7 @@ fun Registrazione(navController: NavHostController) {
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,
-                            focusedContainerColor = Red70
+                            focusedContainerColor = White
                         ),
                         value = "",
                         onValueChange = {},
@@ -107,6 +108,10 @@ fun Registrazione(navController: NavHostController) {
 
                     ) {
                         OutlinedTextField(
+                            colors = TextFieldDefaults.colors(
+                                unfocusedContainerColor = Grey20,
+                                focusedContainerColor = White
+                            ),
                             value = "",
                             onValueChange = {},
                             label = { Text("Nome") },
@@ -116,6 +121,10 @@ fun Registrazione(navController: NavHostController) {
                                 .padding(end = 5.dp)
                         )
                         OutlinedTextField(
+                            colors = TextFieldDefaults.colors(
+                                unfocusedContainerColor = Grey20,
+                                focusedContainerColor = White
+                            ),
                             value = "",
                             onValueChange = {},
                             label = { Text("Cognome") },
@@ -130,6 +139,10 @@ fun Registrazione(navController: NavHostController) {
 
 
                     OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = White
+                        ),
                         value = "",
                         onValueChange = {},
                         label = { Text("Password") },
@@ -139,6 +152,10 @@ fun Registrazione(navController: NavHostController) {
                     )
 
                     OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = White
+                        ),
                         value = "",
                         onValueChange = {},
                         label = { Text("Conferma Password") },
@@ -172,27 +189,59 @@ fun Registrazione(navController: NavHostController) {
                     modifier = Modifier.padding(horizontal = 40.dp),
                 ) {
                     Spacer(modifier = Modifier.height(100.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                        ) {
+                            Text(
+                                text = "Hai già un account?  ",
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .clickable { navController.navigate(Schermate.Login.route) }
+                        ) {
+                            Text(
+                                text = "Accedi",
+                                textAlign = TextAlign.Center,
+                                color = Red70,
+                            )
+                            Divider(
+                                color = Red70,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .width(50.dp)
+                                    .height(1.dp) // Adjust thickness as needed
+                            )
+                        }
+                    }
+
+
+
+                    /*
                     Row (modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
-                        )
+                    )
                     {
-                        Text(
-                            text = "Hai già un account? ",
 
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(end = 7.dp)
-                        )
-
-                        Text(
-                            text = "Accedi",
+                        Divider(
+                            color = Red70,
                             modifier = Modifier
-                                .clickable { navController.navigate(Schermate.Login.route) },
-
-                            textAlign = TextAlign.Center
-
+                                .fillMaxWidth()
+                                .height(1.dp) // Adjust thickness as needed
                         )
+
                     }
+
+                     */
+
 
 
                 }

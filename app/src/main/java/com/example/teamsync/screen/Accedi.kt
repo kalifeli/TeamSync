@@ -28,6 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Grey20
+import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
 
 
 @Composable
@@ -96,17 +99,27 @@ fun LoginScreen(navController: NavHostController) {
                         .padding(horizontal = 40.dp),
                 ) {
                     OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = White
+                        ),
                         value = "",
                         onValueChange = {},
                         label = { Text("Email") },
-                        shape = RoundedCornerShape(25.dp)
+                        shape = RoundedCornerShape(25.dp),
+                        maxLines = 1
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = White
+                        ),
                         value = "",
                         onValueChange = {},
                         label = { Text("Password") },
-                        shape = RoundedCornerShape(25.dp)
+                        shape = RoundedCornerShape(25.dp),
+                        maxLines = 1
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -156,15 +169,17 @@ fun LoginScreen(navController: NavHostController) {
                     )
                     {
                         Text(
-                            text = "Non hai ancora un account? ",
+                            text = "Non hai un account? ",
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(end = 1.dp)
                         )
 
                         Text(
                             text = "Registrati",
+                            color = Red70,
                             modifier = Modifier
                                 .clickable { navController.navigate(Schermate.Registrazione.route) },
+                            minLines = 1
 
 
                         )

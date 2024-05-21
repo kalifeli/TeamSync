@@ -188,14 +188,13 @@ fun Bottone_IniziaOra(
         }
     }
 }
-@Preview
 @Composable
 fun PreviewSchermataDiBenvenuto() {
     val navController = rememberNavController()
     SchermataDiBenvenuto(navController)
 }
 
-
+@Preview
 @Composable
 fun Preview_PrimaSchermataBenvenuto(){
     Column(

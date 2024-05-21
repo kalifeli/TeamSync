@@ -16,10 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -42,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.teamsync.R
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
@@ -49,7 +53,7 @@ import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.White
 
 
-@Preview
+
 @ExperimentalMaterial3Api
 @Composable
 fun Progetti() {
@@ -61,10 +65,10 @@ fun Progetti() {
     ) {
         Column(
             modifier = Modifier
-                .offset(y = (-40).dp)
+                .fillMaxSize()
                 .align(Alignment.Center)
                 .padding(top = 50.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
             Text(
                 text = "I Tuoi Progetti",
@@ -104,10 +108,11 @@ fun Progetti() {
 
             Text(
                 textAlign = TextAlign.Center,
-                text = "Oops!!! Sembra che non ci siano progetti, inizia ora creandone uno.",
+                text = "Oops!!! Sembra che non ci siano progetti,inizia ora creandone uno.",
                 color = Grey70,
                 modifier = Modifier
                     .padding(16.dp)
+                    .padding(horizontal = 20.dp)
                     .offset(y = (-140).dp)
             )
 
@@ -119,17 +124,16 @@ fun Progetti() {
                 mutableStateOf("")
             }
 
-            IconButton(
-                onClick = { isSheetOpen = true }, modifier = Modifier
-                    .offset(x = 120.dp, y = 40.dp)
-            )
-            {
-                Icon(
-                    Icons.Default.AddCircle,
-                    contentDescription = null,
-                    tint = Red70,
-                    modifier = Modifier.size(40.dp)
-                )
+            FloatingActionButton(
+                containerColor = Red70,
+                shape = FloatingActionButtonDefaults.shape,
+                onClick = { /*TODO*/ }
+            ) {
+               Icon(
+                   imageVector = Icons.Default.Add,
+                   contentDescription = "add project",
+                   tint = Color.White
+               )
             }
             if (isSheetOpen) {
                 ModalBottomSheet(

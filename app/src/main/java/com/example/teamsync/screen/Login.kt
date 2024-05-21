@@ -150,6 +150,27 @@ fun LoginScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(60.dp))
 
+                    Row (modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    )
+                    {
+                        Text(
+                            text = "Non hai ancora un account? ",
+
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(end = 2.dp)
+                        )
+
+                        Text(
+                            text = "Registrati",
+                            modifier = Modifier
+                                .clickable { navController.navigate(Schermate.Registrazione.route) },
+                            textAlign = TextAlign.Center
+
+                        )
+                    }
+                }
 
 
 
@@ -162,7 +183,7 @@ fun LoginScreen(navController: NavHostController) {
         }
 
     }
-}
+
 
   
 

@@ -157,7 +157,6 @@ fun LoginScreen(navController: NavHostController) {
                     {
                         Text(
                             text = "Non hai ancora un account? ",
-
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(end = 1.dp)
                         )
@@ -166,7 +165,7 @@ fun LoginScreen(navController: NavHostController) {
                             text = "Registrati",
                             modifier = Modifier
                                 .clickable { navController.navigate(Schermate.Registrazione.route) },
-                            textAlign = TextAlign.Center
+
 
                         )
                     }

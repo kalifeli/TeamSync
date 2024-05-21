@@ -159,7 +159,7 @@ fun LoginScreen(navController: NavHostController) {
                             text = "Non hai ancora un account? ",
 
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(end = 2.dp)
+                            modifier = Modifier.padding(end = 1.dp)
                         )
 
                         Text(

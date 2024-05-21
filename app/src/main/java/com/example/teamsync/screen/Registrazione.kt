@@ -24,6 +24,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.teamsync.R.drawable.registrazione
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.navigation.Schermate
 
 @Composable
 fun Registrazione(navController: NavHostController) {
@@ -139,7 +141,7 @@ fun Registrazione(navController: NavHostController) {
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
-                    Button(onClick = { /* Handle login button click */ },
+                    Button(onClick = { navController.navigate(Schermate.Benvenuto.route) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(0.20f),
@@ -164,8 +166,26 @@ fun Registrazione(navController: NavHostController) {
                     modifier = Modifier.padding(horizontal = 40.dp),
                 ) {
                     Spacer(modifier = Modifier.height(100.dp))
-                    Accedi {
-                        navController.navigate("Login")
+                    Row (modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        )
+                    {
+                        Text(
+                            text = "Hai già un account? ",
+
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(end = 7.dp)
+                        )
+
+                        Text(
+                            text = "Accedi",
+                            modifier = Modifier
+                                .clickable { navController.navigate(Schermate.Login.route) },
+
+                            textAlign = TextAlign.Center
+
+                        )
                     }
 
 
@@ -177,17 +197,10 @@ fun Registrazione(navController: NavHostController) {
 }
 
 
-@Composable
-fun Accedi (onClick: () -> Unit) {
-    val nonClickablePart = "Hai già un account? "
-    val clickablePart = "Accedi"
-    Text(
-        text = nonClickablePart + clickablePart,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .fillMaxWidth(),
-        textAlign = TextAlign.Center
 
-    )
+
+@Preview
+@Composable
+fun PreviewAccesso() {
+    Registrazione(navController = (rememberNavController()))
 }

@@ -24,9 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-
-
+import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.navigation.Schermate
 
 
 @Composable
@@ -140,7 +141,7 @@ fun LoginScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(30.dp))
                     Button(
-                        onClick = { navController.navigate("schermata_benvenuto") },
+                        onClick = { navController.navigate(Schermate.Benvenuto.route) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(Color(0xFFC1092A))
                     )
@@ -149,9 +150,11 @@ fun LoginScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(60.dp))
 
-                    IscrivitiOra {
-                        navController.navigate("Registrazione")
-                    }
+
+
+
+
+
 
                     Spacer(modifier = Modifier.height(30.dp))
                 }
@@ -161,18 +164,12 @@ fun LoginScreen(navController: NavHostController) {
     }
 }
 
-    @Composable
-    fun IscrivitiOra(onClick: () -> Unit) {
-        val clickablePart = "Iscriviti ora"
-        val nonClickablePart = "Non hai ancora un account? "
-        Text(
-            text = nonClickablePart + clickablePart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClick() }
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center
+  
 
-        )
-    }
+@Preview
+@Composable
+fun Loginn() {
+    LoginScreen(navController = (rememberNavController()))
+}
+
 

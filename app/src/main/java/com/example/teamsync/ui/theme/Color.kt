@@ -10,5 +10,7 @@ val Grey20 = Color(0xFFF6F6F6)
 val White = Color(0xFFFFFFFF)
 
 
-
-
+val ColorePrioritaAlta = Color(0xFFC1092A)
+val ColorePrioritaMedia = Color(0xFFFFA500)
+val ColorePrioritaBassa = Color(0xFF00C980)
+val ColoreSenzaPriorita = Color(0xFFFFFFFF)

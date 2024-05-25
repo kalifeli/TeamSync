@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,7 +52,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
+import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.Grey70
@@ -61,20 +65,29 @@ import com.example.teamsync.ui.theme.White
 
 @ExperimentalMaterial3Api
 @Composable
-fun Progetti() {
-    val sheetState = rememberModalBottomSheetState()
-    var isSheetOpen by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var filledText by remember {
-        mutableStateOf("")
-    }
+fun Progetti(navController: NavHostController) {
 
     Box(
         modifier = Modifier
             .background(Grey20)
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
+        FloatingActionButton(
+            containerColor = Red70,
+            onClick = {navController.navigate(Schermate.Impostazioni.route) },
+            modifier = Modifier.align(Alignment.TopEnd)
+                .padding(5.dp)
+                .size(42.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "add project",
+                tint = Color.White,
+                modifier = Modifier
+
+
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -96,86 +109,93 @@ fun Progetti() {
             )
 
             Image(
-                painter = painterResource(id = R.drawable.linea),
-                contentDescription = "Linea Rossa",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(30.dp),
-                alignment = Alignment.Center,
+                    painterResource(id = R.drawable.linea),
+                    contentDescription = "Linea Rossa",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .size(30.dp),
+                    alignment = Alignment.Center,
             )
             Spacer(modifier = Modifier.height(60.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.no_project_illustration),
-                contentDescription = "Immagini di Progetti Vuota",
-                modifier = Modifier
-                    .size(250.dp)
-                    .align(Alignment.CenterHorizontally) // Centra l'immagine orizzontalmente
+                    painterResource(id = R.drawable.no_project_illustration),
+                    contentDescription = "Immagini di Progetti Vuota",
+                    modifier = Modifier
+                        .size(250.dp)
+                        .align(Alignment.CenterHorizontally) // Centra l'immagine orizzontalmente
+
             )
             Text(
                 textAlign = TextAlign.Center,
-                text = "Oops!!! Sembra che non ci siano progetti, inizia ora creandone uno.",
+                text = "Oops!!! Sembra che non ci siano progetti,inizia ora creandone uno.",
                 color = Grey70,
                 modifier = Modifier
                     .padding(16.dp)
                     .padding(horizontal = 20.dp)
+
             )
             Spacer(modifier = Modifier.height(240.dp))
-        }
 
-        FloatingActionButton(
-            containerColor = Red70,
-            shape = FloatingActionButtonDefaults.shape,
-            onClick = { isSheetOpen = true },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "add project",
-                tint = Color.White
-            )
-        }
+            val sheetState = rememberModalBottomSheetState()
+            var isSheetOpen by rememberSaveable {
+                mutableStateOf(false)
+            }
+            var filledText by remember{
+                mutableStateOf("")
+            }
 
-        if (isSheetOpen) {
-            ModalBottomSheet(
-                sheetState = sheetState,
-                onDismissRequest = { isSheetOpen = false }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(White)
-                        .padding(35.dp)
+                FloatingActionButton(
+                    containerColor = Red70,
+                    shape = FloatingActionButtonDefaults.shape,
+                    onClick = { /*TODO*/ }
                 ) {
-                    Column(modifier = Modifier.align(Alignment.TopCenter)) {
-                        Image(
-                            painter = painterResource(id = R.drawable.aggiungiicona),
-                            contentDescription = "Aggiungi icona",
-                            modifier = Modifier
-                                .clickable { /*TODO*/ }
-                                .size(120.dp)
-                                .padding(16.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                        TextField(
-                            value = filledText,
-                            onValueChange = { filledText = it },
-                            label = {
-                                Text(text = "Nome Progetto")
-                            },
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                        Button(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(Color(193, 9, 42)),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(text = "Crea Progetto")
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "add project",
+                        tint = Color.White
+                    )
+                }
+            if (isSheetOpen) {
+                ModalBottomSheet(
+                    sheetState = sheetState,
+                    onDismissRequest = { isSheetOpen = false }
+                )
+                {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(White)
+                            .padding(35.dp)
+                    )
+                    {
+                        Column(modifier = Modifier.align(Alignment.TopCenter)) {
+                            Image(
+                                painterResource(id = R.drawable.aggiungiicona),
+                                contentDescription = "Aggiungi icona",
+                                modifier = Modifier
+                                    .clickable { /*TODO*/ }
+                                    .size(120.dp)
+                                    .padding(16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            )
+                            TextField(value = filledText,
+                                onValueChange = {filledText = it},
+                                label = {
+                                    Text(text = "Nome Progetto")
+                                },
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                               )
+                            Button(onClick = { /*TODO*/ },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(Color(193, 9, 42)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(text = "Crea Progetto")
+                            }
+                            
                         }
                     }
                 }
@@ -188,5 +208,5 @@ fun Progetti() {
 @Preview
 @Composable
 fun PreviewProgetti(){
-    Progetti()
+    Progetti(navController = (rememberNavController()))
 }

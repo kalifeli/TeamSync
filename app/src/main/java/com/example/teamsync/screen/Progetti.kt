@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +52,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
@@ -61,13 +64,28 @@ import com.example.teamsync.ui.theme.White
 
 @ExperimentalMaterial3Api
 @Composable
-fun Progetti() {
+fun Progetti(navController: NavHostController) {
 
     Box(
         modifier = Modifier
             .background(Grey20)
             .fillMaxSize(),
     ) {
+        FloatingActionButton(
+            containerColor = Red70,
+            shape = FloatingActionButtonDefaults.shape,
+            onClick = { /*TODO*/ }
+
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "add project",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(30.dp)
+                    .align(Alignment.TopEnd)
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -188,5 +206,5 @@ fun Progetti() {
 @Preview
 @Composable
 fun PreviewProgetti(){
-    Progetti()
+    Progetti(navController = (rememberNavController()))
 }

@@ -5,5 +5,4 @@ data class LeMieAttivita(
     val titolo: String,
     val descrizione: String,
     val priorita: Priorità
-
 )

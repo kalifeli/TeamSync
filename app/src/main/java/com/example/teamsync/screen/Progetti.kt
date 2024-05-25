@@ -55,6 +55,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
+import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.Grey70
@@ -73,17 +74,18 @@ fun Progetti(navController: NavHostController) {
     ) {
         FloatingActionButton(
             containerColor = Red70,
-            shape = FloatingActionButtonDefaults.shape,
-            onClick = { /*TODO*/ }
-
+            onClick = {navController.navigate(Schermate.Impostazioni.route) },
+            modifier = Modifier.align(Alignment.TopEnd)
+                .padding(5.dp)
+                .size(42.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "add project",
                 tint = Color.White,
                 modifier = Modifier
-                    .size(30.dp)
-                    .align(Alignment.TopEnd)
+
+
             )
         }
         Column(

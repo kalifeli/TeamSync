@@ -1,4 +1,4 @@
-package com.example.teamsync.screen
+package com.example.teamsync.caratteristiche.login.ui
 
 import androidx.compose.foundation.layout.*
 

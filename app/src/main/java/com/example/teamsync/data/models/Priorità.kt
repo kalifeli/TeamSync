@@ -11,5 +11,4 @@ enum class Priorità(val colore: Color) {
     MEDIA(ColorePrioritaMedia),
     BASSA(ColorePrioritaBassa),
     NESSUNA(ColoreSenzaPriorita)
-
 }

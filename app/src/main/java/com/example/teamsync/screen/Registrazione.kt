@@ -256,6 +256,6 @@ fun Registrazione(navController: NavHostController) {
 
 @Preview
 @Composable
-fun PreviewAccesso() {
+fun PreviewRegistrazione() {
     Registrazione(navController = (rememberNavController()))
 }

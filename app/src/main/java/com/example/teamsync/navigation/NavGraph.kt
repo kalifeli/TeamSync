@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.screen.Impostazioni
-import com.example.teamsync.screen.LoginScreen
+import com.example.teamsync.caratteristiche.login.ui.LoginScreen
 import com.example.teamsync.screen.Progetti
 import com.example.teamsync.screen.Registrazione
 import com.example.teamsync.screen.SchermataDiBenvenuto
@@ -34,7 +34,7 @@ fun NavGraph(){
         }
 
         composable(route = Schermate.Inizio.route) { Start(navController) }
-        composable(route = Schermate.Login.route) { LoginScreen( navController)}
+        composable(route = Schermate.Login.route) { LoginScreen( navController) }
         composable(route = Schermate.Registrazione.route){ Registrazione(navController)}
         composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewmodel,navController)}
         composable(route= Schermate.Impostazioni.route){Impostazioni(navController)}

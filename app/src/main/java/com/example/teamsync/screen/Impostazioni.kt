@@ -86,9 +86,7 @@ fun Impostazioni(navController: NavHostController) {
 @Composable
 fun ImpostazioniContent(navController: NavHostController) {
     val background: Painter = painterResource(id = R.drawable.bianco)
-    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
-
-        Box(
+    Box(
             modifier = Modifier.fillMaxSize(),
         ) {
             // Immagine di sfondo

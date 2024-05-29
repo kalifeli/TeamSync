@@ -21,18 +21,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.teamsync.R.drawable.registrazione
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 
 @Composable
-fun Registrazione(navController: NavHostController) {
+fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUtente) {
     val background: Painter = painterResource(id = registrazione)
+
+    var matricola by remember {
+        mutableStateOf("")
+    }
+    var email by remember {
+        mutableStateOf("")
+    }
+    var nome by remember {
+        mutableStateOf("")
+    }
+    var cognome by remember {
+        mutableStateOf("")
+    }
+    var password by remember {
+        mutableStateOf("")
+    }
+    var confermaPassword by remember {
+        mutableStateOf("")
+    }
+    var dataNascita by remember {
+        mutableStateOf("")
+    }
+
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -92,11 +120,26 @@ fun Registrazione(navController: NavHostController) {
                             unfocusedContainerColor = Grey20,
                             focusedContainerColor = White
                         ),
-                        value = "",
-                        onValueChange = {},
+                        value = matricola,
+                        onValueChange = {matricola = it},
+                        label = { Text("Matricola: Sxxxxxxx") },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier .fillMaxWidth(),
+                        minLines = 1,
+                        maxLines = 1
+                    )
+                    OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = White
+                        ),
+                        value = email,
+                        onValueChange = {email = it},
                         label = { Text("Email") },
                         shape = RoundedCornerShape(15.dp),
-                        modifier = Modifier .fillMaxWidth()
+                        modifier = Modifier .fillMaxWidth(),
+                        minLines = 1,
+                        maxLines = 1
                     )
 
 
@@ -112,43 +155,45 @@ fun Registrazione(navController: NavHostController) {
                                 unfocusedContainerColor = Grey20,
                                 focusedContainerColor = White
                             ),
-                            value = "",
-                            onValueChange = {},
+                            value = nome,
+                            onValueChange = {nome = it},
                             label = { Text("Nome") },
                             shape = RoundedCornerShape(15.dp),
                             modifier = Modifier
                                 .fillMaxWidth(0.5f)
-                                .padding(end = 5.dp)
+                                .padding(end = 5.dp),
+                            minLines = 1,
+                            maxLines = 1
                         )
                         OutlinedTextField(
                             colors = TextFieldDefaults.colors(
                                 unfocusedContainerColor = Grey20,
                                 focusedContainerColor = White
                             ),
-                            value = "",
-                            onValueChange = {},
+                            value = cognome,
+                            onValueChange = {cognome = it},
                             label = { Text("Cognome") },
                             shape = RoundedCornerShape(15.dp),
                             modifier = Modifier
                                 .fillMaxWidth(1f)
-                                .padding(start = 5.dp)
+                                .padding(start = 5.dp),
+                            minLines = 1,
+                            maxLines = 1
                         )
                     }
 
-
-
-
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,
                             focusedContainerColor = White
                         ),
-                        value = "",
-                        onValueChange = {},
+                        value = password,
+                        onValueChange = {password = it},
                         label = { Text("Password") },
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier.fillMaxWidth(),
-                        // Personalizza il colore del contenitore
+                        minLines = 1,
+                        maxLines = 1
                     )
 
                     OutlinedTextField(
@@ -156,15 +201,21 @@ fun Registrazione(navController: NavHostController) {
                             unfocusedContainerColor = Grey20,
                             focusedContainerColor = White
                         ),
-                        value = "",
-                        onValueChange = {},
+                        value = confermaPassword,
+                        onValueChange = {confermaPassword = it},
                         label = { Text("Conferma Password") },
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier.fillMaxWidth(),
+                        minLines = 1,
+                        maxLines = 1
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
-                    Button(onClick = { navController.navigate(Schermate.Benvenuto.route) },
+                    Button(
+                        onClick = {
+                            viewModelUtente.signUp(matricola,nome, cognome,email,dataNascita,password,confermaPassword)
+                            navController.navigate(Schermate.Benvenuto.route)
+                                  },
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(0.20f),
@@ -188,7 +239,7 @@ fun Registrazione(navController: NavHostController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 40.dp),
                 ) {
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -257,5 +308,5 @@ fun Registrazione(navController: NavHostController) {
 @Preview
 @Composable
 fun PreviewRegistrazione() {
-    Registrazione(navController = (rememberNavController()))
+    Registrazione(navController = (rememberNavController()), ViewModelUtente())
 }

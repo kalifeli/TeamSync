@@ -74,14 +74,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:30.1.0"))
-
-    // Firebase Authentication
-    implementation("com.google.firebase:firebase-auth-ktx")
-
-    // Firestore
-    implementation("com.google.firebase:firebase-firestore-ktx")
+//    // Import the BoM for the Firebase platform
+//    implementation(platform("com.google.firebase:firebase-bom:30.1.0"))
+//
+//    // Firebase Authentication
+//    implementation("com.google.firebase:firebase-auth-ktx")
+//
+//    // Firestore
+//    implementation("com.google.firebase:firebase-firestore-ktx")
 
     // Kotlin Coroutines for Play Services
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1")

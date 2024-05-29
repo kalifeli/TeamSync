@@ -1,4 +1,4 @@
-package com.example.teamsync.screen
+package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
 
 import androidx.compose.foundation.Image
@@ -45,12 +45,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
-import com.example.teamsync.data.models.Todo
-import com.example.teamsync.data.models.getFakeTodo
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.getFakeTodo
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -99,6 +101,7 @@ fun LeMieAttivita(navController: NavHostController){
                     .padding(top = 10.dp)
                     .padding(horizontal = 20.dp)
             )
+            /*
             Image(
                 painterResource(id = R.drawable.linea),
                 contentDescription = "Linea Rossa",
@@ -106,11 +109,19 @@ fun LeMieAttivita(navController: NavHostController){
                     .fillMaxWidth()
                     .size(30.dp),
                 alignment = Alignment.Center,
+            )*/
+            Image(
+                painterResource(id = R.drawable.linea),
+                contentDescription = "Linea",
+                modifier= Modifier
+                    .fillMaxWidth()
+                    .size(30.dp),
+                alignment = Alignment.Center
             )
             Spacer(modifier = Modifier.height(20.dp))
 
             LazyColumn {
-                itemsIndexed(todolist) { index: Int, item: Todo ->
+                itemsIndexed(todolist) { index: Int, item: LeMieAttivita ->
                     TodoItem(item)
                 }
             }
@@ -120,7 +131,9 @@ fun LeMieAttivita(navController: NavHostController){
                     sheetState = sheetState,
                     onDismissRequest = { isSheetOpen = false }
                 ){
-                    Box(modifier = Modifier.fillMaxSize().background(Color.White))
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White))
                 }
             }
 
@@ -144,7 +157,7 @@ fun LeMieAttivita(navController: NavHostController){
 }
 
 @Composable
-fun TodoItem(item : Todo) {
+fun TodoItem(item : LeMieAttivita) {
     Row (modifier = Modifier
         .fillMaxSize()
         .padding(8.dp)
@@ -152,6 +165,16 @@ fun TodoItem(item : Todo) {
         .background(Grey50)
         ) {
         Column(modifier = Modifier.weight(1f)) {
+
+            Text(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                text = item.titolo,
+                textAlign = TextAlign.Center,
+                fontSize = 15.sp)
+            Text(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                text = item.descrizione,
+                color = Grey70)
             Text(
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -160,21 +183,23 @@ fun TodoItem(item : Todo) {
                 fontSize = 10.sp,
                 textAlign = TextAlign.Center
             )
-            Text(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                text = item.titolo,
-                textAlign = TextAlign.Center,
-                fontSize = 15.sp)
-            Text(text = item.desc,
-                textAlign = TextAlign.Center,
-                color = Grey70)
         }
-        IconButton(onClick = {  }) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_delete_24),
-                contentDescription = "Delete",
-                tint = Color.Red
-            )
+        Column (verticalArrangement = Arrangement.spacedBy(8.dp)){
+
+            IconButton(onClick = {  }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_delete_24),
+                    contentDescription = "Delete",
+                    tint = Color.Red
+                )
+            }
+            IconButton(onClick = {  }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_edit_24),
+                    contentDescription = "Delete",
+                    tint = Grey70
+                )
+            }
         }
     }
 }

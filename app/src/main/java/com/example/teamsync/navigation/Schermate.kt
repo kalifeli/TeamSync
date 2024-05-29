@@ -12,4 +12,5 @@ sealed class Schermate(val route: String){
     object Inizio: Schermate("Start")
     object ModificaProfilo: Schermate("ModificaProfilo")
     object Impostazioni: Schermate ("Impostazioni")
+    object Tema: Schermate("tema")
 }

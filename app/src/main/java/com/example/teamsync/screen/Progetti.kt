@@ -148,7 +148,7 @@ fun Progetti(navController: NavHostController) {
                 FloatingActionButton(
                     containerColor = Red70,
                     shape = FloatingActionButtonDefaults.shape,
-                    onClick = { /*TODO*/ }
+                    onClick = { isSheetOpen=true }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -195,7 +195,6 @@ fun Progetti(navController: NavHostController) {
                             ) {
                                 Text(text = "Crea Progetto")
                             }
-                            
                         }
                     }
                 }

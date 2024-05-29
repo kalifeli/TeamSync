@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.teamsync" />
+                  <option name="mobileSdkAppId" value="1:74749629811:android:89f8f4cfcd4d513aafe106" />
+                  <option name="projectId" value="teamsync-97a04" />
+                  <option name="projectNumber" value="74749629811" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

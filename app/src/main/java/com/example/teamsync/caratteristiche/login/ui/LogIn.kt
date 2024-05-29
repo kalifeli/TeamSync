@@ -24,9 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
@@ -34,7 +39,23 @@ import com.example.teamsync.ui.theme.White
 
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    viewModelUtente: ViewModelUtente
+) {
+    var email by remember {
+        mutableStateOf("")
+    }
+    var password by remember {
+        mutableStateOf("")
+    }
+
+    var passwordVisibile by remember {
+        mutableStateOf(false)
+    }
+    var messaggioDiErrore by remember {
+        mutableStateOf("")
+    }
     val background: Painter = painterResource(id = background)
 
     Box(
@@ -49,9 +70,6 @@ fun LoginScreen(navController: NavHostController) {
             contentScale = ContentScale.FillBounds // Scala l'immagine per riempire lo spazio
 
         )
-
-
-
 
         Column(
             modifier = Modifier
@@ -103,8 +121,8 @@ fun LoginScreen(navController: NavHostController) {
                             unfocusedContainerColor = Grey20,
                             focusedContainerColor = White
                         ),
-                        value = "",
-                        onValueChange = {},
+                        value = email,
+                        onValueChange = {email = it},
                         label = { Text("Email") },
                         shape = RoundedCornerShape(25.dp),
                         maxLines = 1
@@ -115,8 +133,8 @@ fun LoginScreen(navController: NavHostController) {
                             unfocusedContainerColor = Grey20,
                             focusedContainerColor = White
                         ),
-                        value = "",
-                        onValueChange = {},
+                        value = password,
+                        onValueChange = {password = it},
                         label = { Text("Password") },
                         shape = RoundedCornerShape(25.dp),
                         maxLines = 1
@@ -154,12 +172,20 @@ fun LoginScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(30.dp))
                     Button(
-                        onClick = { navController.navigate(Schermate.Benvenuto.route) },
+                        onClick = {
+                            viewModelUtente.signIn(email,password)
+                            navController.navigate(Schermate.Benvenuto.route)
+                                  },
+
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(Color(0xFFC1092A))
-                    )
+                    ) {
+                        Text(text = "Accedi")
+                    }
 
-                    { Text(text = "Accedi") }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+
 
                     Spacer(modifier = Modifier.height(60.dp))
 
@@ -179,7 +205,9 @@ fun LoginScreen(navController: NavHostController) {
                         }
                         Box(
                             modifier = Modifier
-                                .clickable { navController.navigate(Schermate.Registrazione.route) }
+                                .clickable {
+                                    navController.navigate(Schermate.Registrazione.route)
+                                }
                         ) {
                             Text(
                                 text = "Registrati",
@@ -211,8 +239,8 @@ fun LoginScreen(navController: NavHostController) {
 
 @Preview
 @Composable
-fun Loginn() {
-    LoginScreen(navController = (rememberNavController()))
+fun Login() {
+    LoginScreen(navController = (rememberNavController()), ViewModelUtente())
 }
 
 

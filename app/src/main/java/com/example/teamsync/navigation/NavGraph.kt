@@ -14,13 +14,14 @@ import com.example.teamsync.screen.Registrazione
 import com.example.teamsync.screen.SchermataDiBenvenuto
 import com.example.teamsync.screen.Start
 import com.example.teamsync.screen.Tema
+import com.example.teamsync.screen.UserProfileScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavGraph(){
     val navController = rememberNavController()
     val viewmodel = ViewModelUtente()
-    NavHost(navController = navController, startDestination = Schermate.Inizio.route) {
+    NavHost(navController = navController, startDestination = Schermate.Login.route) {
         composable(route = Schermate.Iscrizione.route){
 
         }
@@ -37,7 +38,7 @@ fun NavGraph(){
         composable(route = Schermate.Inizio.route) { Start(navController) }
         composable(route = Schermate.Login.route) { LogIn( navController, viewmodel) }
         composable(route = Schermate.Registrazione.route){ Registrazione(navController,viewmodel)}
-        //composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewmodel,navController)}
+        composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewmodel,navController)}
         composable(route= Schermate.Impostazioni.route){Impostazioni(navController)}
         composable(route = Schermate.Tema.route){ Tema(navController)}
     }

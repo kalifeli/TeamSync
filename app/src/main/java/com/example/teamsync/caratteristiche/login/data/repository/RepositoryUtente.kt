@@ -33,5 +33,15 @@ class RepositoryUtente {
         auth.setLanguageCode(lingua)
     }
 
+    suspend fun getUserProfile(userId: String): ProfiloUtente? {
+            val document = firestore.collection("utenti").document(userId).get().await()
+            return document.toObject(ProfiloUtente::class.java)
+        }
 
-}
+        suspend fun updateUserProfile(profiloUtente: ProfiloUtente) {
+            firestore.collection("utenti").document(profiloUtente.id).set(profiloUtente).await()
+        }
+    }
+
+
+

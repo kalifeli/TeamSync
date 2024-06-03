@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -144,7 +143,7 @@ fun ImpostazioniContent(navController: NavHostController) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text =  stringResource(id = R.string.impostazioni),
+                                text =  "Impostazioni",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )

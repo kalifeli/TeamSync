@@ -1,7 +1,6 @@
 package com.example.teamsync.caratteristiche.login.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -41,9 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.teamsync.R
 import com.example.teamsync.R.drawable.background
+import com.example.teamsync.R.drawable.background_black
 import com.example.teamsync.R.drawable.icon
+import com.example.teamsync.R.drawable.logo_white
 import com.example.teamsync.R.drawable.user_icon
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
@@ -286,99 +287,186 @@ fun LoginScreenDark(
     var messaggioDiErrore by remember {
         mutableStateOf("")
     }
+    val background: Painter = painterResource(id = background_black)
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
+        modifier = Modifier.fillMaxSize(),
     ) {
+        // Immagine di sfondo
+        Image(
+            painter = background,
+            contentDescription = "Background Image",
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.FillBounds // Scala l'immagine per riempire lo spazio
+
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = "Icona User Login",
-                modifier = Modifier.size(150.dp)
-            )
-            Spacer(modifier = Modifier.height(40.dp))
-            Text(
-                text = "Accedi",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(25.dp))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
-            ) {
-                OutlinedTextField(
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Grey20,
-                        focusedContainerColor = White
-                    ),
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email", color = Color.White) },
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                OutlinedTextField(
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Grey20,
-                        focusedContainerColor = White
-                    ),
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password", color = Color.White) },
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Text(
-                    text = "Password dimenticata?",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    textAlign = TextAlign.End,
-                    color = Color.White
-                )
-            }
-
-            Button(
-                onClick = {
-                    viewModelUtente.signIn(email, password)
-                    navController.navigate(Schermate.Benvenuto.route)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFFC1092A))
-            ) {
-                Text(text = "Accedi")
-            }
-
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.2f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "Non hai un account? ",
-                    color = Color.White
-                )
-                Text(
-                    text = "Registrati",
-                    color = Red70,
+                Image(
+                    painter = painterResource(id = logo_white),
+                    contentDescription = "Icona Applicazione",
                     modifier = Modifier
-                        .clickable { navController.navigate(Schermate.Registrazione.route) }
+                        .size(70.dp)
+
+
                 )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Image(
+                painter = painterResource(id = user_icon),
+                contentDescription = "Icona User Login",
+                modifier = Modifier.size(150.dp) // Imposta la dimensione dell'immagine
+            )
+            Spacer(modifier = Modifier.height(40.dp))
+            Text(text = "Accedi", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 40.dp),
+                ) {
+                    OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = Color.White
+                        ),
+                        textStyle = LocalTextStyle.current.copy(color = Color.DarkGray),
+                        value = email,
+                        onValueChange = {email = it},
+                        label = { Text("Email", color = Color.DarkGray) },
+                        shape = RoundedCornerShape(25.dp),
+                        maxLines = 1
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = Color.White
+                        ),
+                        textStyle = LocalTextStyle.current.copy(color = Color.DarkGray),
+                        value = password,
+                        onValueChange = {password = it},
+                        label = { Text("Password",color = Color.DarkGray) },
+                        shape = RoundedCornerShape(25.dp,),
+
+                        maxLines = 1
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Password dimenticata?",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.End,
+                        color = Color.White
+                    )
+                }
+
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+                Column(
+
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .padding(horizontal = 40.dp),
+
+                    ) {
+
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Button(
+                        onClick = {
+                            viewModelUtente.signIn(email,password)
+                            navController.navigate(Schermate.Benvenuto.route)
+                        },
+
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White, // Cambia il colore di sfondo del pulsante
+                            contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+
+                    ) {
+                        Text(text = "Accedi", color = Color.DarkGray)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+
+
+                    Spacer(modifier = Modifier.height(60.dp))
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                        ) {
+                            Text(
+                                text = "Non hai un account? ",
+                                textAlign = TextAlign.Center,
+                                color = Color.White
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .clickable {
+                                    navController.navigate(Schermate.Registrazione.route)
+                                }
+                        ) {
+                            Text(
+                                text = "Registrati",
+                                textAlign = TextAlign.Center,
+                                color = Color.White
+                            )
+                            Divider(
+                                color = Color.White,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .width(70.dp)
+                                    .height(1.dp) // Adjust thickness as needed
+                            )
+                        }
+                    }
+
+
+
+                }
+                Spacer(modifier = Modifier.height(50.dp))
             }
         }
     }
@@ -387,7 +475,7 @@ fun LoginScreenDark(
 @Preview
 @Composable
 fun Login() {
-    LoginScreenDark(navController = (rememberNavController()), ViewModelUtente())
+    LoginScreen(navController = (rememberNavController()), ViewModelUtente())
 }
 
 

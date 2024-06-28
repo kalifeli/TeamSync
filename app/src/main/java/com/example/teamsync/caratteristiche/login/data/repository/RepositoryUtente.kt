@@ -1,5 +1,7 @@
 package com.example.teamsync.caratteristiche.login.data.repository
 
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -9,6 +11,7 @@ import kotlinx.coroutines.tasks.await
 class RepositoryUtente {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    
 
     suspend fun signIn(email: String, password: String): FirebaseUser?{
         val result = auth.signInWithEmailAndPassword(email, password).await()
@@ -38,10 +41,13 @@ class RepositoryUtente {
             return document.toObject(ProfiloUtente::class.java)
         }
 
-        suspend fun updateUserProfile(profiloUtente: ProfiloUtente) {
+    suspend fun updateUserProfile(profiloUtente: ProfiloUtente) {
             firestore.collection("utenti").document(profiloUtente.id).set(profiloUtente).await()
-        }
     }
+
+}
+
+
 
 
 

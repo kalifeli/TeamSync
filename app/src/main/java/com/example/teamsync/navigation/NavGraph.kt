@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.caratteristiche.login.ui.LogIn
+import com.example.teamsync.caratteristiche.login.ui.LoginScreen
 import com.example.teamsync.screen.Impostazioni
 import com.example.teamsync.screen.Progetti
 import com.example.teamsync.screen.Registrazione
@@ -22,22 +23,17 @@ fun NavGraph(){
     val navController = rememberNavController()
     val viewmodel = ViewModelUtente()
     NavHost(navController = navController, startDestination = Schermate.Login.route) {
-        composable(route = Schermate.Iscrizione.route){
 
-        }
-        composable(route = Schermate.Accesso.route){
+        composable(route = Schermate.Registrazione.route){ Registrazione(navController,viewmodel)}
+        composable(route = Schermate.Benvenuto.route){ SchermataDiBenvenuto(navController) }
 
-        }
-        composable(route = Schermate.Benvenuto.route){
-            SchermataDiBenvenuto(navController)
-        }
-        composable(route = Schermate.Progetti.route){
-            Progetti(navController)
-        }
+        composable(route = Schermate.Login.route) { LoginScreen( navController, viewmodel) }
+
+        composable(route = Schermate.Progetti.route){ Progetti(navController) }
 
         composable(route = Schermate.Inizio.route) { Start(navController) }
-        composable(route = Schermate.Login.route) { LogIn( navController, viewmodel) }
-        composable(route = Schermate.Registrazione.route){ Registrazione(navController,viewmodel)}
+
+
         composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewmodel,navController)}
         composable(route= Schermate.Impostazioni.route){Impostazioni(navController)}
         composable(route = Schermate.Tema.route){ Tema(navController)}

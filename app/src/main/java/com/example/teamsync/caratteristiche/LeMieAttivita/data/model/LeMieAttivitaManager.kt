@@ -3,6 +3,8 @@ package com.example.teamsync.caratteristiche.LeMieAttivita.data.model
 import com.example.teamsync.data.models.Priorità
 import java.util.Date
 
+
+
 object LeMieAttivitaManager {
     private val leMieAttivitaList = mutableListOf<LeMieAttivita>()
 

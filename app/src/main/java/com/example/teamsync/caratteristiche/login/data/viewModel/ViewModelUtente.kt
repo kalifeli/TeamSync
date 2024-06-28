@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class ViewModelUtente : ViewModel() {
 
-    //prendi un' istanza della classe repository dell'utente, rendila privata perche accedibile solo all'interno di questa classe
+    //istanza della classe repository dell'utente
     private val repositoryUtente = RepositoryUtente()
 
 
@@ -73,6 +73,11 @@ class ViewModelUtente : ViewModel() {
         }
     }
 
+    private fun resetPassword(){
+
+
+    }
+
     private fun passwordCorretta(password: String, confermaPassword: String): Boolean {
         if (password.equals(confermaPassword))
             return true
@@ -81,6 +86,7 @@ class ViewModelUtente : ViewModel() {
     }
 
 
+    // COS'E'??????
     var userProfile by mutableStateOf<ProfiloUtente?>(null)
         private set
 

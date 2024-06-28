@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -35,12 +38,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.R
 import com.example.teamsync.R.drawable.background
 import com.example.teamsync.R.drawable.background_black
 import com.example.teamsync.R.drawable.icon
@@ -53,6 +60,7 @@ import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.TeamSyncTheme
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
+
 
 @Composable
 fun LogIn(navController: NavHostController, viewModelUtente: ViewModelUtente) {
@@ -76,19 +84,10 @@ fun LoginScreen(
     navController: NavHostController,
     viewModelUtente: ViewModelUtente
 ) {
-    var email by remember {
-        mutableStateOf("")
-    }
-    var password by remember {
-        mutableStateOf("")
-    }
-
-    var passwordVisibile by remember {
-        mutableStateOf(false)
-    }
-    var messaggioDiErrore by remember {
-        mutableStateOf("")
-    }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisibile by remember { mutableStateOf(false) }
+    var messaggioDiErrore by remember { mutableStateOf("") }
     val background: Painter = painterResource(id = background)
 
     Box(
@@ -98,10 +97,8 @@ fun LoginScreen(
         Image(
             painter = background,
             contentDescription = "Background Image",
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds // Scala l'immagine per riempire lo spazio
-
         )
 
         Column(
@@ -124,8 +121,6 @@ fun LoginScreen(
                     contentDescription = "Icona Applicazione",
                     modifier = Modifier
                         .size(70.dp)
-
-
                 )
             }
 
@@ -149,6 +144,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .padding(horizontal = 40.dp),
                 ) {
+                    // campo Email Login
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,
@@ -157,10 +153,17 @@ fun LoginScreen(
                         value = email,
                         onValueChange = {email = it},
                         label = { Text("Email") },
+                        leadingIcon = { Icon(
+                            painter = painterResource(id = R.drawable.icona_mail ),
+                            contentDescription = "icona mail",
+                            modifier = Modifier.size(20.dp)
+                        )},
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         shape = RoundedCornerShape(25.dp),
                         maxLines = 1
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    // campo Password Login
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,
@@ -168,10 +171,42 @@ fun LoginScreen(
                         ),
                         value = password,
                         onValueChange = {password = it},
-                        label = { Text("Password") },
+                        label = {
+                            Text("Password") },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.icona_password),
+                                contentDescription = "icona password login",
+                                modifier = Modifier.size(20.dp)
+                            )},
+
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Password
+                        ),
+
+                        visualTransformation = if(passwordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
+
+                        // visualizza o non visualizzare password
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisibile = !passwordVisibile }) {
+                                val icona: Painter = if(passwordVisibile) {
+                                    painterResource(id = R.drawable.icona_password_visibile)
+                                }
+                                else {
+                                    painterResource(id = R.drawable.icona_password_nonvisibile)
+                                }
+
+                                Icon(
+                                    painter = icona,
+                                    contentDescription = "icona visualizzazione password",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        },
                         shape = RoundedCornerShape(25.dp),
                         maxLines = 1
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
@@ -252,13 +287,10 @@ fun LoginScreen(
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .width(70.dp)
-                                    .height(1.dp) // Adjust thickness as needed
+                                    .height(1.dp)
                             )
                         }
                     }
-
-
-                    
                 }
                 Spacer(modifier = Modifier.height(50.dp))
                 }
@@ -369,7 +401,7 @@ fun LoginScreenDark(
                         value = password,
                         onValueChange = {password = it},
                         label = { Text("Password",color = Color.DarkGray) },
-                        shape = RoundedCornerShape(25.dp,),
+                        shape = RoundedCornerShape(25.dp),
 
                         maxLines = 1
                     )

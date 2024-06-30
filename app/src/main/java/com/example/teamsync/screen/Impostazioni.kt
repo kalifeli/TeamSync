@@ -56,7 +56,7 @@ val settingsList1 = listOf(
 
 val settingsList2 = listOf(
     SettingItem(R.drawable.help, "Help & Support",Schermate.Progetti),
-    SettingItem(R.drawable.terms_and_condiction, "Terms and Policies",Schermate.Progetti)
+    SettingItem(R.drawable.terms_and_condiction, "Terms and Policies",Schermate.Terms)
 )
 
 val settingsList3 = listOf(

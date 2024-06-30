@@ -63,24 +63,24 @@ import com.example.teamsync.util.ThemePreferences
 
 
 @Composable
-fun LogIn(navController: NavHostController, viewModelUtente: ViewModelUtente) {
+fun LoginScreen(navController: NavHostController, viewModelUtente: ViewModelUtente) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     // Se il tema è scuro, applichiamo il tema scuro tramite TeamSyncTheme
     if (isDarkTheme) {
         TeamSyncTheme(darkTheme = true) {
             // Contenuto della schermata delle impostazioni
-            LoginScreenDark(navController = navController , viewModelUtente = viewModelUtente)
+            LoginScreenw(navController = navController, viewModelUtente = viewModelUtente )
         }
     } else {
         // Altrimenti, applichiamo il tema predefinito
-       LoginScreen(navController = navController, viewModelUtente = viewModelUtente )
+       LoginScreenw(navController = navController, viewModelUtente = viewModelUtente )
     }
 }
 
 
 @Composable
-fun LoginScreen(
+fun LoginScreenw(
     navController: NavHostController,
     viewModelUtente: ViewModelUtente
 ) {

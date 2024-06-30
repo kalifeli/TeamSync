@@ -104,6 +104,7 @@ class ViewModelUtente : ViewModel() {
         }
     }
 
+
     fun updateUserProfile(profiloUtente: ProfiloUtente) {
         viewModelScope.launch {
             repositoryUtente.updateUserProfile(profiloUtente)

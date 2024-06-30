@@ -73,14 +73,29 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
     var matricola by remember { mutableStateOf(userProfile?.matricola ?: "") }
     var email by remember { mutableStateOf(userProfile?.email ?: "") }
 
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+
+
+
+
     LaunchedEffect(userProfile) {
-        userProfile?.let {
-            nome = it.nome
-            cognome = it.cognome
-            dataDiNascita = it.dataDiNascita
-            matricola = it.matricola
-            email = it.email
+        try {
+            userProfile?.let {
+                nome = userProfile.nome ?: ""
+                cognome = userProfile.cognome ?: ""
+                dataDiNascita = userProfile.dataDiNascita ?: ""
+                matricola = userProfile.matricola ?: ""
+                email = userProfile.email ?: ""
+            }
         }
+        catch (e: Exception) {
+            error = "Errore di connessione: ${e.message}"
+        } finally {
+            loading = false
+        }
+
     }
 
     Column(
@@ -145,50 +160,58 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
             modifier = Modifier.size(70.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = nome,
-            onValueChange = { nome = it },
-            label = { Text("Nome") }
-        )
-        OutlinedTextField(
-            value = cognome,
-            onValueChange = { cognome = it },
-            label = { Text("Cognome") }
-        )
-        OutlinedTextField(
-            value = matricola,
-            onValueChange = { matricola = it },
-            label = { Text("Matricola") }
-        )
-        OutlinedTextField(
-            value = dataDiNascita,
-            onValueChange = { dataDiNascita = it },
-            label = { Text("Data di Nascita") }
-        )
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            val updatedProfile = ProfiloUtente(
-                id = userProfile?.id ?: "",
-                nome = nome,
-                cognome = cognome,
-                dataDiNascita = dataDiNascita,
-                matricola = matricola,
-                email = email
+        if (loading) {
+            Text("Caricamento in corso...", fontSize = 16.sp, color = Color.Gray)
+        } else if (error != null) {
+            Text("Errore: $error", fontSize = 16.sp, color = Color.Red)
+        } else {
+            OutlinedTextField(
+
+                value = nome,
+                onValueChange = { nome = it },
+                label = { Text("Nome") }
             )
-            viewModel.updateUserProfile(updatedProfile)
-            navController.navigate(Schermate.Impostazioni.route)
-        },border = BorderStroke(1.dp, Color.DarkGray),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFE5E5E5), // Cambia il colore di sfondo del pulsante
-                contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
+            OutlinedTextField(
+                value = cognome,
+                onValueChange = { cognome = it },
+                label = { Text("Cognome") }
             )
+            OutlinedTextField(
+                value = matricola,
+                onValueChange = { matricola = it },
+                label = { Text("Matricola") }
+            )
+            OutlinedTextField(
+                value = dataDiNascita,
+                onValueChange = { dataDiNascita = it },
+                label = { Text("Data di Nascita") }
+            )
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    val updatedProfile = ProfiloUtente(
+                        id = userProfile?.id ?: "",
+                        nome = nome,
+                        cognome = cognome,
+                        dataDiNascita = dataDiNascita,
+                        matricola = matricola,
+                        email = email
+                    )
+                    viewModel.updateUserProfile(updatedProfile)
+                    navController.navigate(Schermate.Impostazioni.route)
+                }, border = BorderStroke(1.dp, Color.DarkGray),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFE5E5E5), // Cambia il colore di sfondo del pulsante
+                    contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
+                )
             ) {
-            Text("Salva")
+                Text("Salva")
+            }
         }
     }
 }

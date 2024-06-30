@@ -70,7 +70,7 @@ fun LoginScreen(navController: NavHostController, viewModelUtente: ViewModelUten
     if (isDarkTheme) {
         TeamSyncTheme(darkTheme = true) {
             // Contenuto della schermata delle impostazioni
-            LoginScreenw(navController = navController, viewModelUtente = viewModelUtente )
+            LoginScreenDark(navController = navController, viewModelUtente = viewModelUtente )
         }
     } else {
         // Altrimenti, applichiamo il tema predefinito

@@ -50,14 +50,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.R.drawable.background
+import com.example.teamsync.R.drawable.background_black
 import com.example.teamsync.R.drawable.icon
+import com.example.teamsync.R.drawable.logo_white
 import com.example.teamsync.R.drawable.user_icon
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
-
+import com.example.teamsync.util.ThemePreferences
 
 
 @Composable
@@ -73,19 +75,43 @@ fun LoginScreen(
     val loginRiuscito = viewModelUtente.loginRiuscito.value
     val primoAccesso = viewModelUtente.primoAccesso.value
     val context = LocalContext.current
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val background: Painter = painterResource(id = background)
+    val background_b: Painter = painterResource(id = background_black)
+
+
+
+
+
+
+
 
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        // Immagine di sfondo
-        Image(
-            painter = background,
-            contentDescription = "Background Image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.FillBounds // Scala l'immagine per riempire lo spazio
-        )
+        if(isDarkTheme)
+        {
+            Image(
+                painter = background_b,
+                contentDescription = "Background Image",
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.FillBounds // Scala l'immagine per riempire lo spazio
+
+            )
+        }
+        else
+        {
+            Image(
+                painter = background,
+                contentDescription = "Background Image",
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.FillBounds // Scala l'immagine per riempire lo spazio
+
+            )
+        }
+
 
         Column(
             modifier = Modifier
@@ -102,12 +128,25 @@ fun LoginScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(id = icon),
-                    contentDescription = "Icona Applicazione",
-                    modifier = Modifier
-                        .size(70.dp)
-                )
+                if(isDarkTheme)
+                {
+                    Image(
+                        painter = painterResource(id = logo_white),
+                        contentDescription = "Icona Applicazione",
+                        modifier = Modifier
+                            .size(70.dp)
+                    )
+                }
+                else
+                {
+                    Image(
+                        painter = painterResource(id = icon),
+                        contentDescription = "Icona Applicazione",
+                        modifier = Modifier
+                            .size(70.dp)
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -117,7 +156,10 @@ fun LoginScreen(
                 modifier = Modifier.size(150.dp) // Imposta la dimensione dell'immagine
             )
             Spacer(modifier = Modifier.height(40.dp))
-            Text(text = "Accedi", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+            Text(text = "Accedi", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) White else Color.Black)
+
+
             Spacer(modifier = Modifier.height(25.dp))
 
             Row(
@@ -134,7 +176,9 @@ fun LoginScreen(
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,
-                            focusedContainerColor = White
+                            focusedContainerColor = White,
+
+
                         ),
                         value = email,
                         onValueChange = { email = it },
@@ -203,7 +247,18 @@ fun LoginScreen(
                             navController.navigate(Schermate.RecuperoPassword.route)
                         }
                     ) {
-                        Text(
+                        if(isDarkTheme)
+                            Text(
+                                text = "Password dimenticata?",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.End,
+                                color = Color.White
+                            )
+
+                        else
+                            Text(
                             text = "Password dimenticata?",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -237,7 +292,11 @@ fun LoginScreen(
                             viewModelUtente.login(email, password)
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Red70)
+
+                        colors = if(isDarkTheme) ButtonDefaults.buttonColors(
+                            containerColor = Color.White, // Cambia il colore di sfondo del pulsante
+                            contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
+                        ) else ButtonDefaults.buttonColors(containerColor = Red70)
                     ) {
                         Text(text = "Accedi")
                     }
@@ -254,7 +313,8 @@ fun LoginScreen(
                         Box(modifier = Modifier) {
                             Text(
                                 text = "Non hai un account? ",
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                color = if (isDarkTheme)Color.White else Color.Black
                             )
                         }
                         Box(
@@ -265,10 +325,10 @@ fun LoginScreen(
                             Text(
                                 text = "Registrati",
                                 textAlign = TextAlign.Center,
-                                color = Red70
+                                color = if (isDarkTheme)Color.White else Red70
                             )
                             Divider(
-                                color = Red70,
+                                color = if(isDarkTheme) White else Red70,
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .width(70.dp)
@@ -306,6 +366,7 @@ fun LoginScreen(
 
     }
 }
+
 
 
 

@@ -9,6 +9,8 @@ data class ProfiloUtente(
     var matricola: String = "",
     var dataDiNascita: String = "",
     var email: String = "",
-    var primoAccesso: Boolean = true
+    var primoAccesso: Boolean = true,
+    val immagine: String? = null
+
 )
 

@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -48,6 +49,7 @@ import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
 
 @Composable
 fun PasswordDimenticata(
@@ -58,15 +60,24 @@ fun PasswordDimenticata(
     var emailRecuperoPassword by remember {
         mutableStateOf("")
     }
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
 
     Box(modifier = Modifier.fillMaxSize()){
-        // Immagine di sfondo
-        Image(
+        if(isDarkTheme)
+            Image(
+                painter = painterResource(id = R.drawable.dimenticata_black),
+                contentDescription = "sfondo",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds
+            )
+        else Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = "sfondo",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
         )
+
 
         Column(
             modifier = Modifier
@@ -94,17 +105,21 @@ fun PasswordDimenticata(
                 textAlign = TextAlign.Center,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 16.dp),
+                color = if(isDarkTheme) White else Color.Black
             )
 
             Text(
                 text = "Non Preoccuparti! Cliccando su \"Procedi\", verrà inviato un link per il recupero della password dimenticata all'indirizzo email associato al tuo account TeamSync.",
                 textAlign = TextAlign.Center,
-                color = Grey70,
+
                 fontSize = 16.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 24.dp),
+
+                color = if(isDarkTheme) White else Grey70,
+
             )
 
 
@@ -135,7 +150,11 @@ fun PasswordDimenticata(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Red70, contentColor = White),
+                colors = if(isDarkTheme) ButtonDefaults.buttonColors(
+                    containerColor = Color.White, // Cambia il colore di sfondo del pulsante
+                    contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
+                ) else ButtonDefaults.buttonColors(containerColor = Red70,contentColor = White)
+
             ) {
                 Text(text = "Procedi")
             }

@@ -23,6 +23,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         setContent {
+
+
             TeamSyncTheme {
                 NavGraph()
 
@@ -31,6 +33,8 @@ class MainActivity : ComponentActivity() {
     }
     
 }
+
+
 
 @Composable
 fun AppContent(auth: FirebaseAuth){

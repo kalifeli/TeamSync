@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.login.data.viewModel
 
+import android.net.Uri
 import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
@@ -10,7 +11,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.repository.EmailAlreadyInUseException
+import com.example.teamsync.caratteristiche.login.data.repository.ImageUploader
 import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
@@ -18,6 +21,7 @@ class ViewModelUtente : ViewModel() {
 
     //istanza della classe repository dell'utente
     private val repositoryUtente = RepositoryUtente()
+
     var utenteCorrente by mutableStateOf<FirebaseUser?>(null)
         private set
     var loginRiuscito = mutableStateOf(false)
@@ -38,6 +42,9 @@ class ViewModelUtente : ViewModel() {
         private set
     private var tentativiLoginFalliti = mutableIntStateOf(0)
 
+    private val gestore_immagine = ImageUploader()
+
+    var userProfile: ProfiloUtente? = null
 
     fun login(
         email: String,
@@ -79,7 +86,10 @@ class ViewModelUtente : ViewModel() {
             }
         }
     }
-
+    fun aggiorna_foto_profilo(uri: Uri) : Task<Uri>
+    {
+        return gestore_immagine.uploadImageToFirebaseStorage(uri = uri)
+    }
     fun signUp(
         matricola: String,
         nome: String,
@@ -202,19 +212,19 @@ class ViewModelUtente : ViewModel() {
         erroreVerificaEmail.value = null
     }
 
-    // COS'E'??????
-    var userProfile by mutableStateOf<ProfiloUtente?>(null)
-        private set
+
 
     init {
         getUserProfile()
     }
 
-    private fun getUserProfile() {
+     fun getUserProfile() {
         viewModelScope.launch {
             val currentUser = repositoryUtente.getUtenteAttuale()
             currentUser?.let {
+
                 val profile = repositoryUtente.getUserProfile(it.uid)
+
                 userProfile = profile
             }
         }
@@ -234,6 +244,12 @@ class ViewModelUtente : ViewModel() {
             userProfile = profile
         }
     }
+    fun signOut() {
+        repositoryUtente.signOut()
+    }
+
+
+
 }
 
 

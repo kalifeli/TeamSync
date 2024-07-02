@@ -17,6 +17,7 @@ googleGmsGoogleServices = "4.4.1"
 firebaseFirestore = "25.0.0"
 firebaseAuth = "23.0.0"
 firebaseDatabase = "21.0.0"
+firebaseStorageKtx = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,11 +42,16 @@ androidx-material3-desktop = { group = "androidx.compose.material3", name = "mat
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version = "2.1.0" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 googleGmsGoogleServices = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+
+
+
 
 
 

@@ -1,8 +1,7 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
-import android.content.ContentValues.TAG
-import android.util.Log
-import androidx.annotation.RequiresPermission
+
+import android.widget.Toast;
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -56,7 +56,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
@@ -68,8 +67,6 @@ import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -349,9 +346,11 @@ fun EditTodoDialog(
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
     var dataScadenza by remember { mutableStateOf(SimpleDateFormat("dd/MM/yyyy").format(todoItem.dataScadenza)) }
     var priorità by remember { mutableStateOf(todoItem.priorita) }
+    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.background(Grey70),
         title = { Text("Modifica Attività") },
         text = {
             Column {
@@ -390,7 +389,7 @@ fun EditTodoDialog(
                             )
                         )
                     } else {
-                        // Gestisci il formato data non valido
+                        Toast.makeText( context, "i dati inseriti non sono validi", Toast.LENGTH_SHORT).show();
                     }
                 }
             ) {

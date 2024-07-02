@@ -1,5 +1,6 @@
 package com.example.teamsync.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
@@ -16,19 +17,25 @@ import androidx.compose.material3.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.teamsync.R.drawable.registrazione
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
@@ -60,6 +67,15 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     var dataNascita by remember {
         mutableStateOf("")
     }
+    var passwordVisibile by remember {
+        mutableStateOf(false)
+    }
+    var confermaPasswordVisibile by remember {
+        mutableStateOf(false)
+    }
+    val erroreRegistrazione = viewModelUtente.erroreRegistrazione.value
+    val registrazioneRiuscita = viewModelUtente.registrazioneRiuscita.value
+    val context = LocalContext.current
 
 
     Box(
@@ -123,6 +139,13 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         value = matricola,
                         onValueChange = {matricola = it},
                         label = { Text("Matricola: Sxxxxxxx") },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_badge),
+                                contentDescription = "icona matricola registrazione",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier .fillMaxWidth(),
                         minLines = 1,
@@ -136,6 +159,14 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         value = email,
                         onValueChange = {email = it},
                         label = { Text("Email") },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.icona_mail),
+                                contentDescription = "icona mail",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier .fillMaxWidth(),
                         minLines = 1,
@@ -190,6 +221,36 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         value = password,
                         onValueChange = {password = it},
                         label = { Text("Password") },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.icona_password),
+                                contentDescription = "icona password registrazione",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Password
+                        ),
+
+                        visualTransformation = if (passwordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
+
+                        // visualizza o non visualizzare password
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisibile = !passwordVisibile }) {
+                                val icona: Painter = if (passwordVisibile) {
+                                    painterResource(id = R.drawable.icona_password_visibile)
+                                } else {
+                                    painterResource(id = R.drawable.icona_password_nonvisibile)
+                                }
+
+                                Icon(
+                                    painter = icona,
+                                    contentDescription = "icona visualizzazione conferma password",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        },
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 1,
@@ -204,6 +265,36 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         value = confermaPassword,
                         onValueChange = {confermaPassword = it},
                         label = { Text("Conferma Password") },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.icona_password),
+                                contentDescription = "icona password login",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Password
+                        ),
+
+                        visualTransformation = if (confermaPasswordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
+
+                        // visualizza o non visualizzare password
+                        trailingIcon = {
+                            IconButton(onClick = { confermaPasswordVisibile = !confermaPasswordVisibile }) {
+                                val icona: Painter = if (confermaPasswordVisibile) {
+                                    painterResource(id = R.drawable.icona_password_visibile)
+                                } else {
+                                    painterResource(id = R.drawable.icona_password_nonvisibile)
+                                }
+
+                                Icon(
+                                    painter = icona,
+                                    contentDescription = "icona visualizzazione conferma password",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        },
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 1,
@@ -214,12 +305,11 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                     Button(
                         onClick = {
                             viewModelUtente.signUp(matricola,nome, cognome,email,dataNascita,password,confermaPassword)
-                            navController.navigate(Schermate.Benvenuto.route)
                                   },
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(0.20f),
-                        colors = ButtonDefaults.buttonColors(Color(0xFFC1092A))
+                        colors = ButtonDefaults.buttonColors(Red70)
                     ) {  Text(text = "Avanti") }
 
 
@@ -272,34 +362,24 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                             )
                         }
                     }
-
-
-
-                    /*
-                    Row (modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                    )
-                    {
-
-                        Divider(
-                            color = Red70,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp) // Adjust thickness as needed
-                        )
-
-                    }
-
-                     */
-
-
-
                 }
             }
         }
 
     }
+    LaunchedEffect(erroreRegistrazione) {
+        if(erroreRegistrazione != null ){
+            Toast.makeText(context, erroreRegistrazione, Toast.LENGTH_LONG).show()
+            viewModelUtente.resetErroreRegistrazione()
+        }
+    }
+    LaunchedEffect(registrazioneRiuscita) {
+        if(registrazioneRiuscita){
+            navController.navigate(Schermate.VerificaEmail.route)
+            viewModelUtente.resetRegistrazioneRiuscita()
+        }
+    }
+
 }
 
 

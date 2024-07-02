@@ -41,7 +41,7 @@ sealed class PaginaDiBenvenuto (
     object QuintaPagina : PaginaDiBenvenuto (
         immagine = R.drawable.im_pagina_di_benvenuto5,
         titolo = "Aggiungi studenti ai tuoi amici",
-        sottotitolo = "Costruisci connessioni con nuovi compoagni di corso.",
+        sottotitolo = "Costruisci connessioni con nuovi compagni di corso.",
         sfondo = R.drawable.sfondo_pagina_di_benvenuto1
     )
     object SestaPagina : PaginaDiBenvenuto (

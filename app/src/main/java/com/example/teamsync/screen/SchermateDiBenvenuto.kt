@@ -1,5 +1,6 @@
 package com.example.teamsync.screen
 
+import android.view.View
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -35,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
@@ -44,7 +46,8 @@ import com.example.teamsync.util.PaginaDiBenvenuto
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SchermataDiBenvenuto(
-    navController : NavController
+    navController : NavController,
+    viewModelUtente: ViewModelUtente
 ){
     val pages = listOf(
         PaginaDiBenvenuto.PrimaPagina,
@@ -92,7 +95,11 @@ fun SchermataDiBenvenuto(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
             onClick = {
-                navController.navigate(Schermate.Progetti.route)
+                viewModelUtente.updateFirstLogin()
+                navController.navigate(Schermate.Progetti.route) {
+                    popUpTo(Schermate.Benvenuto.route) { inclusive = true }
+                }
+
             }
         )
 
@@ -191,7 +198,7 @@ fun Bottone_IniziaOra(
 @Composable
 fun PreviewSchermataDiBenvenuto() {
     val navController = rememberNavController()
-    SchermataDiBenvenuto(navController)
+    SchermataDiBenvenuto(navController, viewModelUtente = ViewModelUtente())
 }
 
 @Preview

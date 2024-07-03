@@ -35,15 +35,15 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
     fun addTodo(titolo: String, descrizione: String, dataScad: Date, priorità: Priorità, completato: Boolean) {
         viewModelScope.launch {
             repository.addTodo(titolo, descrizione, dataScad, priorità, completato = false)
-            getAllTodo()  // Refresh the list after adding a new item
+            getAllTodo()
         }
     }
 
-    fun deleteTodo(id: String) {
+    fun deleteTodo(id: String, sezione: Int) {
         viewModelScope.launch {
             try {
                 repository.deleteTodo(id)
-                getAllTodo()  // Aggiorna la lista dopo l'eliminazione
+                if (sezione == 0) getAllTodo() else getAllTodoCompletate()
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
@@ -59,16 +59,15 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
         viewModelScope.launch {
             try {
                 repository.updateTodo(id, titolo, descrizione, dataScad, priorità)
-                getAllTodo()  // Aggiorna la lista dopo l'aggiornamento
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
         }
     }
-    fun completeTodo(id: String){
+    fun completeTodo(id: String, completato: Boolean){
         viewModelScope.launch {
             try {
-                repository.completeTodo(id)
+                repository.completeTodo(id, completato)
                 getAllTodo()
             }catch (e: Exception){
                 //gestire errore

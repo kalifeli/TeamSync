@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -69,7 +69,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
     val openDialog = remember { mutableStateOf(false) }
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
-
+    var sezione : Int
 
     if (addTodoDialog) {
         AddTodoDialog(
@@ -112,7 +112,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
             onSave = { completeTodo ->
                 coroutineScope.launch {
                     // Chiama la funzione completa nel viewModel
-                    viewModel.completeTodo(id = completeTodo.id ?: "")
+                    viewModel.completeTodo(id = completeTodo.id ?: "", completeTodo.completato)
                 }
                 dialogComplete = false // Chiudi il dialogo dopo aver salvato
             },
@@ -160,7 +160,10 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
             Spacer(modifier = Modifier.height(20.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().align(Alignment.Start).padding(0.dp)// Assicura che il Box occupi tutta la larghezza disponibile
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Start)
+                    .padding(0.dp)// Assicura che il Box occupi tutta la larghezza disponibile
             ) {
                 Button(
                     onClick = {
@@ -190,12 +193,14 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                     Text(text = "Non Completate")
                 }
             }
+            if (isClicked.value) sezione = 1 else sezione = 0
+
             LazyColumn {
                 items(viewModel.leMieAttività) { attività ->
                     TodoItem(
                         item = attività,
                         onDelete = {
-                                id -> viewModel.deleteTodo(id)
+                                id -> viewModel.deleteTodo(id, sezione)
                         },
                         onEdit = { item ->
                             currentTodoItem.value = item
@@ -204,11 +209,14 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                         onComplete = { item ->
                             currentTodoItem.value = item
                             dialogComplete = true
-                        }
+                        },
+                        sezione
                     )
                 }
             }
         }
+
+
 
         FloatingActionButton(
             containerColor = Red70,
@@ -232,7 +240,8 @@ fun TodoItem(
     item: LeMieAttivita,
     onDelete: (String) -> Unit,
     onEdit: (LeMieAttivita) -> Unit,
-    onComplete: (LeMieAttivita) -> Unit
+    onComplete: (LeMieAttivita) -> Unit,
+    sezione: Int
 ) {
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -244,13 +253,23 @@ fun TodoItem(
             modifier = Modifier
                 .align(Alignment.CenterVertically) // Aligns the column center vertically
         ) {
-            IconButton(onClick = { onComplete(item) }) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Complete",
-                    tint = Green50,
-                    modifier = Modifier.size(15.dp)
-                )
+                if (!item.completato)
+                {
+                    IconButton(onClick = { onComplete(item) }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Completata",
+                            tint = Green50,
+                            modifier = Modifier.size(15.dp)
+                    )
+                }
+            }else {
+                IconButton(onClick = { onComplete(item) }) {
+                    Icon(imageVector = Icons.Default.Clear,
+                        contentDescription = "Non Completata",
+                        tint = Red70,
+                        modifier = Modifier.size(15.dp))
+                }
             }
         }
         Column(modifier = Modifier

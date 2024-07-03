@@ -26,6 +26,9 @@ class ToDoRepository {
         )
         database.collection("Todo").add(leMieAttivita).await()
     }
+
+
+
     suspend fun getAllTodo(): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", false)
@@ -34,6 +37,10 @@ class ToDoRepository {
             .await()
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
     }
+
+
+
+
     suspend fun getAllTodoCompletate(): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", true)
@@ -42,6 +49,8 @@ class ToDoRepository {
             .await()
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
     }
+
+
     suspend fun deleteTodo(id: String) {
         try {
             database.collection("Todo").document(id).delete().await()
@@ -50,6 +59,8 @@ class ToDoRepository {
             throw Exception("Errore durante l'eliminazione del Todo: ${e.message}")
         }
     }
+
+
     suspend fun updateTodo(
         id: String,
         titolo: String,
@@ -71,10 +82,12 @@ class ToDoRepository {
             throw Exception("Errore durante l'aggiornamento del Todo: ${e.message}")
         }
     }
-    suspend fun completeTodo(id: String){
+
+
+    suspend fun completeTodo(id: String, completato: Boolean){
         database.collection("Todo")
             .document(id)
-            .update("completato", true)
+            .update("completato", !completato)
             .await()
     }
 }

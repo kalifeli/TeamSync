@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.TeamSyncTheme
 import com.example.teamsync.util.ThemePreferences
@@ -55,7 +56,7 @@ val settingsList1 = listOf(
 )
 
 val settingsList2 = listOf(
-    SettingItem(R.drawable.help, "Help & Support",Schermate.Progetti),
+    SettingItem(R.drawable.help, "Help & Support",Schermate.Supporto),
     SettingItem(R.drawable.terms_and_condiction, "Terms and Policies",Schermate.Terms)
 )
 
@@ -275,10 +276,14 @@ fun ImpostazioniContent(navController: NavHostController) {
 
 @Composable
 fun SettingItemRow(setting: SettingItem,navController: NavHostController) {
+
+    val viewmodel = ViewModelUtente()
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFE5E5E5)),
+            .background(if (setting.label == "Logout") Color(0xFFC1092A) else Color(0xFFE5E5E5)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
 
@@ -304,27 +309,56 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically
         ) {}
 
-        // Centra il testo all'interno della Row
-        Row(
-            modifier = Modifier
-                .clickable { navController.navigate(setting.rotta.route) }
-                .weight(12f),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(
-                text = setting.label,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(
-                    top = 10.dp,
-                    bottom = 8.dp
-                )
+        if (setting.label == "Logout") {
 
-            )
+
+
+                // Centra il testo all'interno della Row
+                Row(
+                    modifier = Modifier
+                        .clickable {
+                            viewmodel.signOut()
+                            navController.navigate(setting.rotta.route) }
+                        .weight(12f),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = setting.label,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(
+                            top = 10.dp,
+                            bottom = 8.dp
+                        )
+
+                    )
+                }
+
+
+
+        } else {
+            // Centra il testo all'interno della Row
+            Row(
+                modifier = Modifier
+                    .clickable { navController.navigate(setting.rotta.route) }
+                    .weight(12f),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = setting.label,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(
+                        top = 10.dp,
+                        bottom = 8.dp
+                    )
+
+                )
+            }
+
         }
 
     }
-
 }
 @Composable
 fun ImpostazioniContent_dark(navController: NavHostController) {
@@ -516,10 +550,11 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
 @Composable
 fun SettingItemRow_dark(setting: SettingItem, navController: NavHostController) {
     val darkTextColor = Color.White
+    val viewmodel = ViewModelUtente ()
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF333333)), // Cambia il colore di sfondo
+            .background(if (setting.label == "Logout") Color(0xFFC1092A) else Color(0xFF333333)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
 
@@ -547,7 +582,32 @@ fun SettingItemRow_dark(setting: SettingItem, navController: NavHostController) 
         ) {}
 
         // Centra il testo all'interno della Row
-        Row(
+        if(setting.label == "Logout")
+        {
+            Row(
+                modifier = Modifier
+                    .clickable {
+                        viewmodel.signOut()
+                        navController.navigate(setting.rotta.route) }
+                    .weight(12f),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = setting.label,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(
+                        top = 10.dp,
+                        bottom = 8.dp
+                    ),
+                    color = darkTextColor // Cambia il colore del testo
+                )
+            }
+
+
+        }
+        else
+        { Row(
             modifier = Modifier
                 .clickable { navController.navigate(setting.rotta.route) }
                 .weight(12f),
@@ -564,6 +624,9 @@ fun SettingItemRow_dark(setting: SettingItem, navController: NavHostController) 
                 color = darkTextColor // Cambia il colore del testo
             )
         }
+
+        }
+
 
     }
 }

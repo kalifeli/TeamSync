@@ -1,11 +1,35 @@
 package com.example.teamsync.caratteristiche.login.data.repository
 
+import android.net.Uri
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
+import com.google.android.gms.tasks.Task
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.storage
+
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
+
+
+class ImageUploader {
+
+
+    fun uploadImageToFirebaseStorage(uri: Uri): Task<Uri> {
+        val storageRef = Firebase.storage.reference
+        val imagesRef = storageRef.child("images/${UUID.randomUUID()}")
+
+        return imagesRef.putFile(uri)
+            .continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let { throw it }
+                }
+                imagesRef.downloadUrl
+            }
+    }
+}
 
 class RepositoryUtente {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -89,6 +113,9 @@ class RepositoryUtente {
         val utenteAttuale = auth.currentUser
         utenteAttuale?.reload()?.await()
         return utenteAttuale?.isEmailVerified ?: false
+    }
+    fun signOut() {
+        FirebaseAuth.getInstance().signOut()
     }
 
 }

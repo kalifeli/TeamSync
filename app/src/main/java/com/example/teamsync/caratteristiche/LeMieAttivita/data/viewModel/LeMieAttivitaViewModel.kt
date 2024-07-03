@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.repository.ToDoRepository
@@ -20,15 +19,22 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
         getAllTodo()
     }
 
-    private fun getAllTodo() {
+    fun getAllTodo() {
         viewModelScope.launch {
             leMieAttività = repository.getAllTodo()
         }
     }
 
-    fun addTodo(titolo: String, descrizione: String, dataScad: Date, priorità: Priorità) {
+    fun getAllTodoCompletate() {
         viewModelScope.launch {
-            repository.addTodo(titolo, descrizione, dataScad, priorità)
+            leMieAttività = repository.getAllTodoCompletate()
+        }
+    }
+
+
+    fun addTodo(titolo: String, descrizione: String, dataScad: Date, priorità: Priorità, completato: Boolean) {
+        viewModelScope.launch {
+            repository.addTodo(titolo, descrizione, dataScad, priorità, completato = false)
             getAllTodo()  // Refresh the list after adding a new item
         }
     }
@@ -56,6 +62,16 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
                 getAllTodo()  // Aggiorna la lista dopo l'aggiornamento
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
+            }
+        }
+    }
+    fun completeTodo(id: String){
+        viewModelScope.launch {
+            try {
+                repository.completeTodo(id)
+                getAllTodo()
+            }catch (e: Exception){
+                //gestire errore
             }
         }
     }

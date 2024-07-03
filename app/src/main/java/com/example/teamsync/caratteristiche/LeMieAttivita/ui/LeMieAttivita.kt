@@ -142,7 +142,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
 
             Text(
                 textAlign = TextAlign.Center,
-                text = "Qui troverai le Task che sono assegnate per questo progetto",
+                text = "Qui troverai le Task che sono assegnate per questo progetto.",
                 color = Grey70,
                 modifier = Modifier
                     .padding(top = 10.dp)

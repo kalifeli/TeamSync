@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">TeamSync</string>
+
+    <!--To Do Screen-->
+    <string name="project_tasks_description">Qui troverai le Task che sono assegnate per questo progetto.</string>
+    <string name="bottoneNonCompletate">Non Completate</string>
+    <string name="bottoneCompletate">Completate</string>
+    <string name="titoloEdit">Titolo</string>
+    <string name="descrizioneEdit">Descrizione</string>
+    <string name="dataEdit">Data Scadenza</string>
+    <string name="datiErrati">Per favore verifica i dati inseriti, non sono validi</string>
+    <string name="salvaEdit">Salva</string>
+    <string name="annullaEdit">Annulla</string>
+    <string name="aggiungiTodo">Aggiungi una nuova ToDo</string>
+    <string name="inserisciTitolo">Inserisci Titolo</string>
+    <string name="inserisciDescrizione">Inserisci Descrizione</string>
+    <string name="inserisciData">Data Scadenza (dd/MM/yyyy)</string>
+    <string name="selPriorita">Seleziona Priorità</string>
+    <string name="conferma">Conferma</string>
+    <string name="completaTodo">Sei sicuro di aver completato questa task?</string>
+    <string name="noncompletaTodo">Sei sicuro di non aver completato questa task?</string>
+    <string name="eliminaTodoTitle">Elimina ToDo</string>
+    <string name="eliminaTodoDescrizione">Sei sicuro di voler eliminare questo To Do?</string>
+
+    <!--Impostazioni Screen-->
+    <string name="modificaProfilo">Modifica Profilo</string>
+    <string name="Notifiche">Notifiche</string>
+    <string name="Lingua">Lingue</string>
+    <string name="Tema">Tema</string>
+
+
+
+
+</resources>

@@ -1,3 +1,33 @@
 <resources>
-    <string name="app_name">TeamSync</string>
+    <string name="app_name" translatable="false">TeamSync</string>
+
+    <!--To Do Screen-->
+    <string name="project_tasks_description">Here you will find the tasks assigned for this project.</string>
+    <string name="bottoneNonCompletate">Incomplete</string>
+    <string name="bottoneCompletate">Completed</string>
+    <string name="titoloEdit">Title</string>
+    <string name="descrizioneEdit">Description</string>
+    <string name="dataEdit">Expiry Date</string>
+    <string name="datiErrati">Please check your input; the entered data is not valid.</string>
+    <string name="salvaEdit">Save</string>
+    <string name="annullaEdit">Cancel</string>
+    <string name="aggiungiTodo">Add New ToDo</string>
+    <string name="inserisciTitolo">Insert Title</string>
+    <string name="inserisciDescrizione">Insert Description</string>
+    <string name="inserisciData">Expiry Date (dd/MM/yyyy)</string>
+    <string name="selPriorita">Select Priority</string>
+    <string name="conferma">Confirm</string>
+    <string name="completaTodo">Are you sure you have completed this task?</string>
+    <string name="noncompletaTodo">Are you sure you did not complete this task?</string>
+    <string name="eliminaTodoTitle">Delete ToDo</string>
+    <string name="eliminaTodoDescrizione">Are you sure you would like to delete this To Do?</string>
+
+    <!--Impostazioni Screen-->
+    <string name="modificaProfilo">Edit Profile</string>
+    <string name="Notifiche">Notifications</string>
+    <string name="Lingua">Language</string>
+    <string name="Tema">Theme</string>
+
+
+
 </resources>

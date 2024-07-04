@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,7 +69,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
     val openDialog = remember { mutableStateOf(false) }
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
-    var sezione by remember {mutableIntStateOf(1)}
+    var sezione by remember { mutableIntStateOf(1) }
 
     if (addTodoDialog) {
         AddTodoDialog(
@@ -143,7 +144,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
 
             Text(
                 textAlign = TextAlign.Center,
-                text = "Qui troverai le Task che sono assegnate per questo progetto.",
+                text = stringResource(id = R.string.project_tasks_description),
                 color = Grey70,
                 modifier = Modifier
                     .padding(top = 10.dp)
@@ -179,7 +180,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                         if (isClicked1.value) Red70 else Grey35
                     )
                 ) {
-                    Text(text = "Completate")
+                    Text(text = stringResource(id = R.string.bottoneCompletate))
                 }
                 Button(
                     onClick = {
@@ -195,7 +196,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                     ),
 
                     ) {
-                    Text(text = "Non Completate")
+                    Text(text = stringResource(id = R.string.bottoneNonCompletate))
                 }
             }
             //bottone non completate sezione = 1 else 0
@@ -335,7 +336,7 @@ fun TodoItem(
                         },
                             colors = ButtonDefaults.buttonColors(Red70),
                         ) {
-                            Text("Conferma")
+                            Text(stringResource(id = R.string.conferma))
                         }
                     },
                     dismissButton = {
@@ -343,11 +344,11 @@ fun TodoItem(
                             onClick = {dialogDelete = false},
                             colors = ButtonDefaults.buttonColors(Grey50),
                         ) {
-                            Text("Annulla")
+                            Text(stringResource(id = R.string.annullaEdit))
                         }
                     },
-                    title = { Text("Elimina To Do") },
-                    text = { Text("Sei sicuro di voler eliminare questo To Do?") },
+                    title = { Text(stringResource(id = R.string.eliminaTodoTitle)) },
+                    text = { Text(stringResource(id = R.string.eliminaTodoDescrizione)) },
                     containerColor = Grey35,
                 )
             }
@@ -361,6 +362,7 @@ fun TodoItem(
         }
     }
 }
+
 @Composable
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
@@ -383,7 +385,7 @@ fun EditTodoDialog(
                 TextField(
                     value = titolo,
                     onValueChange = { titolo = it },
-                    label = { Text("Titolo", color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
@@ -392,7 +394,7 @@ fun EditTodoDialog(
                 TextField(
                     value = descrizione,
                     onValueChange = { descrizione = it },
-                    label = { Text("Descrizione", color = Color.Black) },
+                    label = { Text((stringResource(id = R.string.descrizioneEdit)), color = Color.Black) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
@@ -401,7 +403,7 @@ fun EditTodoDialog(
                 TextField(
                     value = dataScadenza,
                     onValueChange = { dataScadenza = it },
-                    label = { Text("Data Scadenza", color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.dataEdit), color = Color.Black) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
@@ -428,11 +430,11 @@ fun EditTodoDialog(
                             )
                         )
                     } else {
-                        Toast.makeText( context, "i dati inseriti non sono validi", Toast.LENGTH_SHORT).show()
+                        Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {
-                Text("Salva")
+                Text(stringResource(id = R.string.salvaEdit))
             }
         },
         dismissButton = {
@@ -440,7 +442,7 @@ fun EditTodoDialog(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(Grey70)
             ) {
-                Text("Annulla")
+                Text(stringResource(id = R.string.annullaEdit))
             }
         }
     )
@@ -465,7 +467,7 @@ fun AddTodoDialog(
         onDismissRequest = onDismiss,
         containerColor = Grey35,
         textContentColor = Grey50,
-        title = { Text("Aggiungi Nuova Attività") },
+        title = { Text(stringResource(id = R.string.aggiungiTodo)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -476,29 +478,29 @@ fun AddTodoDialog(
                 TextField(
                     value = titolo,
                     onValueChange = { titolo = it },
-                    label = { Text("Titolo", color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
                     textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                    placeholder = { Text("Inserisci il titolo") }
+                    placeholder = { Text(stringResource(id = R.string.titoloEdit)) }
                 )
                 TextField(
                     value = descrizione,
                     onValueChange = { descrizione = it },
-                    label = { Text("Descrizione", color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.descrizioneEdit), color = Color.Black) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
                     textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                    placeholder = { Text("Inserisci la descrizione") }
+                    placeholder = { Text(stringResource(id = R.string.inserisciDescrizione)) }
                 )
                 TextField(
                     value = dataScadenza,
                     onValueChange = { dataScadenza = it },
-                    label = { Text("Data Scadenza (dd/MM/yyyy)", color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.inserisciData), color = Color.Black) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
@@ -513,7 +515,7 @@ fun AddTodoDialog(
                     TextField(
                         value = priorita.name,
                         onValueChange = {},
-                        label = { Text("Seleziona Priorità", color = Color.Black) },
+                        label = { Text(stringResource(id = R.string.selPriorita), color = Color.Black) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Grey35,
                             unfocusedContainerColor = Grey50,
@@ -575,17 +577,17 @@ fun AddTodoDialog(
                             onDismiss()
                         }
                     } else {
-                        Toast.makeText(context, "i dati inseriti non sono validi", Toast.LENGTH_SHORT).show()
+                        Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {
-                Text("Aggiungi Attività", color = Color.White)
+                Text(stringResource(id = R.string.aggiungiTodo), color = Color.White)
             }
         },
         dismissButton = {
             Button(onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(Grey70)) {
-                Text("Annulla")
+                Text(stringResource(id = R.string.annullaEdit))
             }
         }
     )
@@ -603,11 +605,11 @@ fun CompleteDialog(
             containerColor = Grey35,
             onDismissRequest = onDismiss,
             title = {
-                Text(text = "Conferma")
+                Text(text = stringResource(id = R.string.conferma))
             },
 
             text = {
-                Text(text = "Sei sicuro di aver completato questa task?")
+                Text(text = stringResource(id = R.string.completaTodo))
             },
             confirmButton = {
                 Button(
@@ -616,7 +618,7 @@ fun CompleteDialog(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
                 ) {
-                    Text(text = "Conferma", color = Color.White) // Testo bianco sul pulsante rosso
+                    Text(text = stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
                 }
             },
             dismissButton = {
@@ -626,7 +628,7 @@ fun CompleteDialog(
                     // Colore di sfondo del pulsante di annullamento
                 ) {
                     Text(
-                        text = "Annulla",
+                        text = stringResource(id = R.string.annullaEdit),
                         color = Color.White
                     ) // Testo nero sul pulsante grigio chiaro
                 }
@@ -637,11 +639,11 @@ fun CompleteDialog(
             containerColor = Grey35,
             onDismissRequest = onDismiss,
             title = {
-                Text(text = "Conferma")
+                Text(text = stringResource(id = R.string.conferma))
             },
 
             text = {
-                Text(text = "Sei sicuro di non aver completato questa task?")
+                Text(text =  stringResource(id = R.string.noncompletaTodo))
             },
             confirmButton = {
                 Button(
@@ -650,7 +652,7 @@ fun CompleteDialog(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
                 ) {
-                    Text(text = "Conferma", color = Color.White) // Testo bianco sul pulsante rosso
+                    Text(text =  stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
                 }
             },
             dismissButton = {
@@ -660,7 +662,7 @@ fun CompleteDialog(
                     // Colore di sfondo del pulsante di annullamento
                 ) {
                     Text(
-                        text = "Annulla",
+                        text = stringResource(id = R.string.annullaEdit),
                         color = Color.White
                     ) // Testo nero sul pulsante grigio chiaro
                 }

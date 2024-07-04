@@ -61,7 +61,7 @@ import java.util.Locale
 @ExperimentalMaterial3Api
 @Composable
 fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaViewModel) {
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
+
     val coroutineScope = rememberCoroutineScope()
     var addTodoDialog by remember { mutableStateOf(false) }
     val currentTodoItem = remember { mutableStateOf<LeMieAttivita?>(null) }
@@ -69,7 +69,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
     val openDialog = remember { mutableStateOf(false) }
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
-    var sezione : Int
+    var sezione by remember {mutableStateOf(1)}
 
     if (addTodoDialog) {
         AddTodoDialog(
@@ -99,7 +99,8 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                     titolo = updatedItem.titolo,
                     descrizione = updatedItem.descrizione,
                     dataScad = updatedItem.dataScadenza,
-                    priorità = updatedItem.priorita
+                    priorità = updatedItem.priorita,
+                    sezione
                 )
                 openDialog.value = false
             }
@@ -108,11 +109,12 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
 
     if (dialogComplete && currentTodoItem.value != null) {
         CompleteDialog(
+            sezione,
             onDismiss = { dialogComplete = false },
             onSave = { completeTodo ->
                 coroutineScope.launch {
                     // Chiama la funzione completa nel viewModel
-                    viewModel.completeTodo(id = completeTodo.id ?: "", completeTodo.completato)
+                    viewModel.completeTodo(id = completeTodo.id ?: "", completeTodo.completato, sezione)
                 }
                 dialogComplete = false // Chiudi il dialogo dopo aver salvato
             },
@@ -168,12 +170,14 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                 Button(
                     onClick = {
                         viewModel.getAllTodoCompletate()
-                        isClicked1.value = !isClicked1.value
-                        isClicked.value = !isClicked.value},
+                        isClicked1.value = true
+                        isClicked.value = false
+                        sezione = 0
+                    },
                     modifier = Modifier
                         .padding(start = 16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        if(isClicked1.value ) Red70 else Grey35
+                        if (isClicked1.value) Red70 else Grey35
                     )
                 ) {
                     Text(text = "Completate")
@@ -181,26 +185,29 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                 Button(
                     onClick = {
                         viewModel.getAllTodo()
-                        isClicked.value = !isClicked.value
-                              isClicked1.value = !isClicked1.value},
+                        isClicked.value = true
+                        isClicked1.value = false
+                        sezione = 1
+                    },
                     modifier = Modifier
                         .padding(start = 16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        if(isClicked.value ) Red70 else Grey35
+                        if (isClicked.value) Red70 else Grey35
                     ),
 
-                ) {
+                    ) {
                     Text(text = "Non Completate")
                 }
             }
-            if (isClicked.value) sezione = 1 else sezione = 0
+            //bottone non completate sezione = 1 else 0
+
 
             LazyColumn {
                 items(viewModel.leMieAttività) { attività ->
                     TodoItem(
                         item = attività,
-                        onDelete = {
-                                id -> viewModel.deleteTodo(id, sezione)
+                        onDelete = { id ->
+                            viewModel.deleteTodo(id, sezione)
                         },
                         onEdit = { item ->
                             currentTodoItem.value = item
@@ -217,24 +224,26 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
         }
 
 
-
-        FloatingActionButton(
-            containerColor = Red70,
-            shape = FloatingActionButtonDefaults.shape,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(8.dp),
-            onClick = { addTodoDialog = true }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "add Todo",
-                tint = Color.White
-            )
+        if (sezione == 1) {
+            FloatingActionButton(
+                containerColor = Red70,
+                shape = FloatingActionButtonDefaults.shape,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp),
+                onClick = { addTodoDialog = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "add Todo",
+                    tint = Color.White
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoItem(
     item: LeMieAttivita,
@@ -243,6 +252,10 @@ fun TodoItem(
     onComplete: (LeMieAttivita) -> Unit,
     sezione: Int
 ) {
+
+    var dialogDelete by remember { mutableStateOf(false) }
+
+
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(8.dp)
@@ -306,11 +319,38 @@ fun TodoItem(
             }
         }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            IconButton(onClick = { onDelete(item.id ?: "") }) {
+            IconButton(onClick = {dialogDelete = true}
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_delete_24),
                     contentDescription = "Delete",
                     tint = Color.Red
+                )
+            }
+            if (dialogDelete){
+                AlertDialog(
+                    onDismissRequest = { dialogDelete = false },
+                    confirmButton = {
+                        Button(onClick = {
+                            onDelete(item.id ?: "")
+                            dialogDelete = false
+                        },
+                            colors = ButtonDefaults.buttonColors(Red70),
+                        ) {
+                            Text("Conferma")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {dialogDelete = false},
+                            colors = ButtonDefaults.buttonColors(Grey50),
+                        ) {
+                            Text("Annulla")
+                        }
+                    },
+                    title = { Text("Elimina To Do") },
+                    text = { Text("Sei sicuro di voler eliminare questo To Do?") },
+                    containerColor = Grey35,
                 )
             }
             IconButton(onClick = { onEdit(item) }) {
@@ -554,39 +594,80 @@ fun AddTodoDialog(
 
 @Composable
 fun CompleteDialog(
+    sezione: Int,
     onDismiss: () -> Unit,
     onSave: (LeMieAttivita) -> Unit,
     item: LeMieAttivita
 ) {
-    AlertDialog(
-        containerColor = Grey35,
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = "Conferma")
-        },
-        text = {
-            Text(text = "Sei sicuro di aver completato questa task?")
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onSave(item)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
-            ) {
-                Text(text = "Conferma", color = Color.White) // Testo bianco sul pulsante rosso
+    if (sezione == 1) {
+        AlertDialog(
+            containerColor = Grey35,
+            onDismissRequest = onDismiss,
+            title = {
+                Text(text = "Conferma")
+            },
+
+            text = {
+                Text(text = "Sei sicuro di aver completato questa task?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onSave(item)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
+                ) {
+                    Text(text = "Conferma", color = Color.White) // Testo bianco sul pulsante rosso
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Grey70)
+                    // Colore di sfondo del pulsante di annullamento
+                ) {
+                    Text(
+                        text = "Annulla",
+                        color = Color.White
+                    ) // Testo nero sul pulsante grigio chiaro
+                }
             }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(Grey70)
-             // Colore di sfondo del pulsante di annullamento
-            ) {
-                Text(text = "Annulla", color = Color.White) // Testo nero sul pulsante grigio chiaro
+        )
+    }else{
+        AlertDialog(
+            containerColor = Grey35,
+            onDismissRequest = onDismiss,
+            title = {
+                Text(text = "Conferma")
+            },
+
+            text = {
+                Text(text = "Sei sicuro di non aver completato questa task?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onSave(item)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
+                ) {
+                    Text(text = "Conferma", color = Color.White) // Testo bianco sul pulsante rosso
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Grey70)
+                    // Colore di sfondo del pulsante di annullamento
+                ) {
+                    Text(
+                        text = "Annulla",
+                        color = Color.White
+                    ) // Testo nero sul pulsante grigio chiaro
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

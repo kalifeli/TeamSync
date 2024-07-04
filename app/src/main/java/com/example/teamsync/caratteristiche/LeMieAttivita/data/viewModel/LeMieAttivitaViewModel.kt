@@ -43,7 +43,7 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
         viewModelScope.launch {
             try {
                 repository.deleteTodo(id)
-                if (sezione == 0) getAllTodo() else getAllTodoCompletate()
+                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
@@ -54,21 +54,23 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
         titolo: String,
         descrizione: String,
         dataScad: Date,
-        priorità: Priorità
+        priorità: Priorità,
+        sezione: Int
     ) {
         viewModelScope.launch {
             try {
                 repository.updateTodo(id, titolo, descrizione, dataScad, priorità)
+                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
         }
     }
-    fun completeTodo(id: String, completato: Boolean){
+    fun completeTodo(id: String, completato: Boolean, sezione: Int){
         viewModelScope.launch {
             try {
                 repository.completeTodo(id, completato)
-                getAllTodo()
+                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             }catch (e: Exception){
                 //gestire errore
             }

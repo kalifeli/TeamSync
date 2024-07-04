@@ -5,7 +5,6 @@ import com.example.teamsync.data.models.Priorità
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.util.Date
-import com.google.firebase.Timestamp
 
 
 
@@ -15,13 +14,13 @@ class ToDoRepository {
     suspend fun addTodo(titolo: String,
                         descrizione: String,
                         dataScad: Date,
-                        priorità: Priorità,
+                        priorita: Priorità,
                         completato: Boolean) {
         val leMieAttivita = LeMieAttivita(
             titolo = titolo,
             descrizione = descrizione,
             dataScadenza = dataScad,
-            priorita = priorità,
+            priorita = priorita,
             completato = false,
         )
         database.collection("Todo").add(leMieAttivita).await()
@@ -66,7 +65,7 @@ class ToDoRepository {
         titolo: String,
         descrizione: String,
         dataScad: Date,
-        priorità: Priorità
+        priorita: Priorità
     ) {
         try {
             val updatedTodo = LeMieAttivita(
@@ -74,7 +73,7 @@ class ToDoRepository {
                 titolo = titolo,
                 descrizione = descrizione,
                 dataScadenza = dataScad,
-                priorita = priorità
+                priorita = priorita
             )
             database.collection("Todo").document(id).set(updatedTodo).await()
         } catch (e: Exception) {

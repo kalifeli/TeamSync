@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,7 +68,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
     val openDialog = remember { mutableStateOf(false) }
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
-    var sezione by remember {mutableStateOf(1)}
+    var sezione by remember {mutableIntStateOf(1)}
 
     if (addTodoDialog) {
         AddTodoDialog(
@@ -99,7 +98,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                     titolo = updatedItem.titolo,
                     descrizione = updatedItem.descrizione,
                     dataScad = updatedItem.dataScadenza,
-                    priorità = updatedItem.priorita,
+                    priorita = updatedItem.priorita,
                     sezione
                 )
                 openDialog.value = false
@@ -203,9 +202,9 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
 
 
             LazyColumn {
-                items(viewModel.leMieAttività) { attività ->
+                items(viewModel.leMieAttivita) { attivita ->
                     TodoItem(
-                        item = attività,
+                        item = attivita,
                         onDelete = { id ->
                             viewModel.deleteTodo(id, sezione)
                         },
@@ -243,7 +242,6 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoItem(
     item: LeMieAttivita,
@@ -372,7 +370,7 @@ fun EditTodoDialog(
     var titolo by remember { mutableStateOf(todoItem.titolo) }
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
     var dataScadenza by remember { mutableStateOf(SimpleDateFormat("dd/MM/yyyy").format(todoItem.dataScadenza)) }
-    var priorità by remember { mutableStateOf(todoItem.priorita) }
+    val priorita by remember { mutableStateOf(todoItem.priorita) }
     val context = LocalContext.current
 
     AlertDialog(
@@ -426,11 +424,11 @@ fun EditTodoDialog(
                                 titolo = titolo,
                                 descrizione = descrizione,
                                 dataScadenza = date,
-                                priorita = priorità
+                                priorita = priorita
                             )
                         )
                     } else {
-                        Toast.makeText( context, "i dati inseriti non sono validi", Toast.LENGTH_SHORT).show();
+                        Toast.makeText( context, "i dati inseriti non sono validi", Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {
@@ -456,7 +454,7 @@ fun AddTodoDialog(
     var titolo by remember { mutableStateOf("") }
     var descrizione by remember { mutableStateOf("") }
     var dataScadenza by remember { mutableStateOf("") }
-    var priorità by remember { mutableStateOf(Priorità.BASSA) }
+    var priorita by remember { mutableStateOf(Priorità.BASSA) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -513,7 +511,7 @@ fun AddTodoDialog(
                 // Componente DropdownMenu per la priorità
                 Box(modifier = Modifier.fillMaxWidth()) {
                     TextField(
-                        value = priorità.name,
+                        value = priorita.name,
                         onValueChange = {},
                         label = { Text("Seleziona Priorità", color = Color.Black) },
                         colors = TextFieldDefaults.colors(
@@ -538,12 +536,13 @@ fun AddTodoDialog(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier.width(150.dp)
                     ) {
-                        Priorità.values().forEach { p ->
+                        //per gli enum si usa entries
+                        Priorità.entries.forEach { p ->
                             DropdownMenuItem(
                                 text = { Text(p.name, color = p.colore) },
                                 colors = MenuDefaults.itemColors(Grey50),
                                 onClick = {
-                                    priorità = p
+                                    priorita = p
                                     expanded = false
                                 }
                             )
@@ -570,7 +569,7 @@ fun AddTodoDialog(
                                     titolo = titolo,
                                     descrizione = descrizione,
                                     dataScadenza = date,
-                                    priorita = priorità
+                                    priorita = priorita
                                 )
                             )
                             onDismiss()

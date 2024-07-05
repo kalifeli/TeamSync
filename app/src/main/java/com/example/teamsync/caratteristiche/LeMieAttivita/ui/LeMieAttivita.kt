@@ -161,12 +161,26 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
             )
             Spacer(modifier = Modifier.height(20.dp))
 
+            ElevatedCard(
+                elevation = CardDefaults.cardElevation(
+                defaultElevation = 3.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .align(Alignment.Start)
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 10.dp),
+                colors = CardDefaults.cardColors(Grey35)
+                ) {
+
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Start)
-                    .padding(0.dp)// Assicura che il Box occupi tutta la larghezza disponibile
             ) {
+
+
                 Button(
                     onClick = {
                         viewModel.getAllTodoCompletate()
@@ -670,6 +684,8 @@ fun CompleteDialog(
         )
     }
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview

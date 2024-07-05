@@ -3,7 +3,7 @@ package com.example.teamsync.navigation
 sealed class Schermate(val route: String){
 
     object Benvenuto : Schermate("schermata_benvenuto")
-    object Progetti: Schermate("schermata_progetti")
+    object ItuoiProgetti: Schermate("schermata_progetti")
 
     object Login: Schermate("Login")
     object RecuperoPassword: Schermate("schermata_RecuperoPassword")
@@ -16,5 +16,6 @@ sealed class Schermate(val route: String){
     object Tema: Schermate("tema")
     object Terms: Schermate("terms")
     object Supporto: Schermate("supporto")
+    object Caricamento: Schermate("caricamento")
 
 }

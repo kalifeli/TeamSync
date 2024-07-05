@@ -96,7 +96,7 @@ fun SchermataDiBenvenuto(
                 .padding(16.dp),
             onClick = {
                 viewModelUtente.updateFirstLogin()
-                navController.navigate(Schermate.Progetti.route) {
+                navController.navigate(Schermate.ItuoiProgetti.route) {
                     popUpTo(Schermate.Benvenuto.route) { inclusive = true }
                 }
 

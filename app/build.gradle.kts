@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,6 +81,8 @@ dependencies {
     implementation (libs.coil.compose)
     //Navigation Compose
     implementation(libs.androidx.navigation.compose)
+    //Material3
+    implementation(libs.material3)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
@@ -88,10 +91,6 @@ dependencies {
 
     // Splash API
     implementation(libs.androidx.core.splashscreen)
-
-    //Navigation Compose
-
-    implementation(libs.androidx.navigation.compose)
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
@@ -105,7 +104,10 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     //Navigation Compose
-
     implementation(libs.androidx.navigation.compose)
+
+    // Lottie Animation
+    implementation (libs.lottie.compose)
+
 
 }

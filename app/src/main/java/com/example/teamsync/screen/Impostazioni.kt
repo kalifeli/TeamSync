@@ -47,11 +47,11 @@ data class SettingItem(val icon: Int, val label: String, val rotta: Schermate)
 
 val settingsList1 = listOf(
     SettingItem(R.drawable.person_icon, "Modifica Profilo",Schermate.ModificaProfilo ),
-    SettingItem(R.drawable.notifiche, "Notifiche",Schermate.Progetti),
-    SettingItem(R.drawable.lingua, "Lingua",Schermate.Progetti),
+    SettingItem(R.drawable.notifiche, "Notifiche",Schermate.ItuoiProgetti),
+    SettingItem(R.drawable.lingua, "Lingua",Schermate.ItuoiProgetti),
     SettingItem(R.drawable.tema, "Tema",Schermate.Tema),
-    SettingItem(R.drawable.task, "Task", Schermate.Progetti),
-    SettingItem(R.drawable.to_do_list, "To-Do List",Schermate.Progetti),
+    SettingItem(R.drawable.task, "Task", Schermate.ItuoiProgetti),
+    SettingItem(R.drawable.to_do_list, "To-Do List",Schermate.ItuoiProgetti),
 
 )
 
@@ -127,7 +127,7 @@ fun ImpostazioniContent(navController: NavHostController) {
                             modifier = Modifier
                                 .size(35.dp)
                                 .background(Color.Black,RoundedCornerShape(20.dp)) // Imposta il rettangolo di sfondo a nero
-                                .clickable { navController.navigate(Schermate.Progetti.route) },
+                                .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -406,7 +406,7 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
                                 Color.White,
                                 RoundedCornerShape(20.dp)
                             ) // Imposta il rettangolo di sfondo a nero
-                            .clickable { navController.navigate(Schermate.Progetti.route) },
+                            .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

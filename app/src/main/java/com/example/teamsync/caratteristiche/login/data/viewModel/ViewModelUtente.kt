@@ -16,6 +16,7 @@ import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUten
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.delay
 
 class ViewModelUtente : ViewModel() {
 
@@ -46,6 +47,10 @@ class ViewModelUtente : ViewModel() {
 
     var userProfile: ProfiloUtente? = null
 
+    init {
+        getUserProfile()
+    }
+
     fun login(
         email: String,
         password: String,
@@ -62,7 +67,10 @@ class ViewModelUtente : ViewModel() {
             erroreLogin.value = "Per favore, inserisci la password."
             return
         }
-
+        if(tentativiLoginFalliti.intValue > 3){
+            erroreLogin.value = "Hai dimenticato la password?"
+            return
+        }
 
         viewModelScope.launch {
             try {
@@ -73,7 +81,7 @@ class ViewModelUtente : ViewModel() {
                     val isFirstLogin = repositoryUtente.isFirstLogin(utente.uid)
                     primoAccesso.value = isFirstLogin
                     loginRiuscito.value = true
-
+                    Log.d("ViewModelUtente", "primoAccesso : ${primoAccesso.value}")
                 }else{
                     erroreLogin.value = "L'email non è stata verificata. Per favore, verifica il tuo indirizzo email."
                 }
@@ -81,15 +89,13 @@ class ViewModelUtente : ViewModel() {
                 tentativiLoginFalliti.intValue += 1
                 erroreLogin.value = "Email o password errate. Controlla le tue credenziali e riprova."
             }
-            if(tentativiLoginFalliti.intValue > 3){
-                erroreLogin.value = "Hai dimenticato la password?"
-            }
         }
     }
     fun aggiorna_foto_profilo(uri: Uri) : Task<Uri>
     {
         return gestore_immagine.uploadImageToFirebaseStorage(uri = uri)
     }
+
     fun signUp(
         matricola: String,
         nome: String,
@@ -212,11 +218,6 @@ class ViewModelUtente : ViewModel() {
         erroreVerificaEmail.value = null
     }
 
-
-
-    init {
-        getUserProfile()
-    }
 
      fun getUserProfile() {
         viewModelScope.launch {

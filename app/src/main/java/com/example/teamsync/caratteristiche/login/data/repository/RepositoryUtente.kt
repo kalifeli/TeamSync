@@ -96,10 +96,6 @@ class RepositoryUtente {
             throw e
         }
     }
-    //Andrebbe tolta
-    suspend fun setPreferenzeLinguaEmail(){
-        auth.useAppLanguage()
-    }
 
     suspend fun getUserProfile(userId: String): ProfiloUtente? {
             val document = firestore.collection("utenti").document(userId).get().await()

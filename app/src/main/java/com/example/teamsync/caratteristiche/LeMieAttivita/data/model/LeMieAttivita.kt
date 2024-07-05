@@ -2,7 +2,6 @@ package com.example.teamsync.caratteristiche.LeMieAttivita.data.model
 
 import com.example.teamsync.data.models.Priorità
 import com.google.firebase.firestore.DocumentId
-import java.util.Calendar
 import java.util.Date
 
 

@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.teamsync.R
 import com.example.teamsync.ui.theme.Grey35
-import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.White
 import java.text.SimpleDateFormat
 import java.util.Date

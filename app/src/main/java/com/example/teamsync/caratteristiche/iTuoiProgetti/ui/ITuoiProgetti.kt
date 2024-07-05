@@ -183,7 +183,7 @@ fun ITuoiProgetti(
 
                Spacer(modifier = Modifier.height(8.dp))
 
-               SezioneITUoiProgetti(progetti = progetti)
+               SezioneITUoiProgetti(navController = navController, progetti = progetti)
 
                Row(
                    modifier = Modifier

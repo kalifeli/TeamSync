@@ -4,12 +4,13 @@ package com.example.teamsync.navigation
 import Termini
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.internal.composableLambda
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
+import com.example.teamsync.caratteristiche.LeMieAttivita.ui.LeMieAttivitaUI
 import com.example.teamsync.caratteristiche.faq.ui.Faq
 import com.example.teamsync.caratteristiche.faq.ui.Supporto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
@@ -31,6 +32,7 @@ fun NavGraph(){
     val navController = rememberNavController()
     val viewModelUtente = ViewModelUtente()
     val viewModelProgetto = ViewModelProgetto()
+    val viewModelLeMieAttivita = LeMieAttivitaViewModel()
     NavHost(navController = navController, startDestination = Schermate.Login.route) {
 
         composable(route = Schermate.Registrazione.route){ Registrazione(navController,viewModelUtente)}
@@ -43,6 +45,7 @@ fun NavGraph(){
 
         composable(route = Schermate.ItuoiProgetti.route){ ITuoiProgetti(navController, viewModelProgetto, viewModelUtente) }
 
+        composable(route = Schermate.LeMieAttivita.route) { LeMieAttivitaUI(navController, viewModelLeMieAttivita) }
         composable(route = Schermate.Inizio.route) { Start(navController) }
 
 

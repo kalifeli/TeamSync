@@ -16,10 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 
 @Composable
-fun SezioneITUoiProgetti(progetti: List<Progetto>){
+fun SezioneITUoiProgetti(
+    progetti: List<Progetto>,
+    navController: NavController
+){
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -37,7 +42,7 @@ fun SezioneITUoiProgetti(progetti: List<Progetto>){
     ) {
         items(progetti) { progetto ->
             if(progetti.isNotEmpty()) {
-                ITuoiProgettiItem(progetto = progetto)
+                ITuoiProgettiItem(navController = navController,progetto = progetto)
             }else{
                 Text(
                     text = "Non partecipi ancora a nessun progetto! Creane uno cliccando il \"+\" o partecipa ad un progetto esistente",
@@ -52,5 +57,5 @@ fun SezioneITUoiProgetti(progetti: List<Progetto>){
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewSezioneITuoiProgetti(){
-    SezioneITUoiProgetti(progetti = emptyList())
+    SezioneITUoiProgetti(navController = rememberNavController(), progetti = emptyList())
 }

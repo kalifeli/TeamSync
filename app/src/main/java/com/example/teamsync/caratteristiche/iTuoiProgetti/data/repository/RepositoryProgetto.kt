@@ -1,6 +1,5 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository
 
-import android.util.Log
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser

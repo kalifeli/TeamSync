@@ -11,7 +11,8 @@ import com.example.teamsync.data.models.Priorità
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel() {
+class LeMieAttivitaViewModel() : ViewModel() {
+    val repositoryLeMieAttivita = ToDoRepository()
     var leMieAttivita by mutableStateOf<List<LeMieAttivita>>(emptyList())
         private set
 
@@ -21,20 +22,20 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
 
     fun getAllTodo() {
         viewModelScope.launch {
-            leMieAttivita = repository.getAllTodo()
+            leMieAttivita = repositoryLeMieAttivita.getAllTodo()
         }
     }
 
     fun getAllTodoCompletate() {
         viewModelScope.launch {
-            leMieAttivita = repository.getAllTodoCompletate()
+            leMieAttivita = repositoryLeMieAttivita.getAllTodoCompletate()
         }
     }
 
 
     fun addTodo(titolo: String, descrizione: String, dataScad: Date, priorita: Priorità, completato: Boolean) {
         viewModelScope.launch {
-            repository.addTodo(titolo, descrizione, dataScad, priorita, completato = false)
+            repositoryLeMieAttivita.addTodo(titolo, descrizione, dataScad, priorita, completato = false)
             getAllTodo()
         }
     }
@@ -42,7 +43,7 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
     fun deleteTodo(id: String, sezione: Int) {
         viewModelScope.launch {
             try {
-                repository.deleteTodo(id)
+                repositoryLeMieAttivita.deleteTodo(id)
                 if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
@@ -59,7 +60,7 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
     ) {
         viewModelScope.launch {
             try {
-                repository.updateTodo(id, titolo, descrizione, dataScad, priorita)
+                repositoryLeMieAttivita.updateTodo(id, titolo, descrizione, dataScad, priorita)
                 if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
@@ -69,7 +70,7 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
     fun completeTodo(id: String, completato: Boolean, sezione: Int){
         viewModelScope.launch {
             try {
-                repository.completeTodo(id, completato)
+                repositoryLeMieAttivita.completeTodo(id, completato)
                 if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             }catch (e: Exception){
                 //gestire errore

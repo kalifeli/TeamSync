@@ -60,7 +60,7 @@ import java.util.Locale
 
 @ExperimentalMaterial3Api
 @Composable
-fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaViewModel) {
+fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaViewModel) {
 
     val coroutineScope = rememberCoroutineScope()
     var addTodoDialog by remember { mutableStateOf(false) }
@@ -675,5 +675,5 @@ fun CompleteDialog(
 @Preview
 @Composable
 fun PreviewLeMieAttivita() {
-    LeMieAttivita(navController = rememberNavController(), viewModel = LeMieAttivitaViewModel(ToDoRepository()))
+    LeMieAttivitaUI(navController = rememberNavController(), viewModel = LeMieAttivitaViewModel())
 }

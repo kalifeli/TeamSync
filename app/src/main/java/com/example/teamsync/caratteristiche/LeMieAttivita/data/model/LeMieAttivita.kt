@@ -11,7 +11,8 @@ data class LeMieAttivita(
     val titolo: String = "",
     val descrizione: String = "",
     val dataScadenza: Date = Date(),  // Data di scadenza
-    val priorita: Priorità = Priorità.NESSUNA // Priorità dell'attività
+    val priorita: Priorità = Priorità.NESSUNA ,// Priorità dell'attività
+    val completato: Boolean = false
 ) {
     // Costruttore vuoto richiesto da Firestore per deserializzare l'oggetto
     constructor() : this(null, "", "", Date(), Priorità.NESSUNA)

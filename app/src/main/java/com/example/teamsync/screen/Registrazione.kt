@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -157,7 +158,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
 
 
             Spacer(modifier = Modifier.height(40.dp))
-            Text(text = "Iscriviti", fontSize = 35.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) Color.White else  Color.Black)
+            Text(text = stringResource(id = R.string.iscriviti), fontSize = 35.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) Color.White else  Color.Black)
             Spacer(modifier = Modifier.height(40.dp))
 
             Row(
@@ -177,7 +178,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         ),
                         value = matricola,
                         onValueChange = {matricola = it},
-                        label = { Text("Matricola: Sxxxxxxx") },
+                        label = { Text(stringResource(id = R.string.matricola)) },
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_badge),
@@ -227,7 +228,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                             ),
                             value = nome,
                             onValueChange = {nome = it},
-                            label = { Text("Nome") },
+                            label = { Text(stringResource(id = R.string.nome)) },
                             shape = RoundedCornerShape(15.dp),
                             modifier = Modifier
                                 .fillMaxWidth(0.5f)
@@ -242,7 +243,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                             ),
                             value = cognome,
                             onValueChange = {cognome = it},
-                            label = { Text("Cognome") },
+                            label = { Text(stringResource(id = R.string.cognome)) },
                             shape = RoundedCornerShape(15.dp),
                             modifier = Modifier
                                 .fillMaxWidth(1f)
@@ -303,7 +304,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         ),
                         value = confermaPassword,
                         onValueChange = {confermaPassword = it},
-                        label = { Text("Conferma Password") },
+                        label = { Text(stringResource(id = R.string.confermaPassword)) },
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.icona_password),
@@ -352,7 +353,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                             containerColor = Color.White, // Cambia il colore di sfondo del pulsante
                             contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
                         ) else ButtonDefaults.buttonColors(Red70)
-                    ) {  Text(text = "Avanti") }
+                    ) {  Text(text = stringResource(id = R.string.next)) }
 
 
                 }
@@ -382,7 +383,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                             modifier = Modifier
                         ) {
                             Text(
-                                text = "Hai già un account?  ",
+                                text = stringResource(id = R.string.accountgia),
                                 textAlign = TextAlign.Center,
                                 color = if(isDarkTheme) White else Color.Black
                             )
@@ -392,7 +393,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                                 .clickable { navController.navigate(Schermate.Login.route) }
                         ) {
                             Text(
-                                text = "Accedi",
+                                text = "Login",
                                 textAlign = TextAlign.Center,
                                 color = if(isDarkTheme) White else Red70
                             )

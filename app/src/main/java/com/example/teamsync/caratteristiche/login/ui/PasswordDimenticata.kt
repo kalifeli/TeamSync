@@ -35,8 +35,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -101,7 +103,7 @@ fun PasswordDimenticata(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Hai dimenticato la password?",
+                text = stringResource(id = R.string.passwordDimenticata),
                 textAlign = TextAlign.Center,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -110,7 +112,7 @@ fun PasswordDimenticata(
             )
 
             Text(
-                text = "Non Preoccuparti! Cliccando su \"Procedi\", verrà inviato un link per il recupero della password dimenticata all'indirizzo email associato al tuo account TeamSync.",
+                text = stringResource(id = R.string.nonPreoccuparti),
                 textAlign = TextAlign.Center,
 
                 fontSize = 16.sp,
@@ -156,7 +158,7 @@ fun PasswordDimenticata(
                 ) else ButtonDefaults.buttonColors(containerColor = Red70,contentColor = White)
 
             ) {
-                Text(text = "Procedi")
+                Text(text = stringResource(id = R.string.procedi))
             }
             Spacer(modifier = Modifier.height(20.dp))
         }

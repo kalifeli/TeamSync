@@ -39,6 +39,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,12 +56,12 @@ data class MenuItemData(val icon: ImageVector, val text: String)
 
 // Lista di dati per i rettangoli
 val items = listOf(
-    MenuItemData(Icons.Default.Info, "Introduzione"),
-    MenuItemData(Icons.Default.Create, "Funzionalità"),
-    MenuItemData(Icons.Default.Lock, "Sicurezza"),
-    MenuItemData(Icons.Default.AccountCircle, "Privacy"),
-    MenuItemData(Icons.Default.Build, "Avanzate"),
-    MenuItemData(Icons.Default.List, "Altro")
+    MenuItemData(Icons.Default.Info, R.string.introduzione.toString()),
+    MenuItemData(Icons.Default.Create, R.string.funzionalità.toString()),
+    MenuItemData(Icons.Default.Lock, R.string.sicurezza.toString()),
+    MenuItemData(Icons.Default.AccountCircle, R.string.privacy.toString()),
+    MenuItemData(Icons.Default.Build, R.string.avanzate.toString()),
+    MenuItemData(Icons.Default.List, R.string.altro.toString())
 )
 
 @Composable
@@ -150,7 +151,7 @@ fun Supporto(navController: NavHostController) {
                     ) {
                         Text(
                             color = textColor,
-                            text = "Supporto",
+                            text = stringResource(id = R.string.supporto),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -177,7 +178,7 @@ fun Supporto(navController: NavHostController) {
                 ) {
                     items(items.size / 2) { index ->
                         val menuItem = items[index]
-                        MenuItem(icon = menuItem.icon, text = menuItem.text, navController = navController)
+                        MenuItem(icon = menuItem.icon, text = stringResource(id = menuItem.text.toInt()), navController = navController)
                     }
                 }
 
@@ -188,7 +189,7 @@ fun Supporto(navController: NavHostController) {
                 ) {
                     items(items.size / 2) { index ->
                         val menuItem = items[index + items.size / 2]
-                        MenuItem(icon = menuItem.icon, text = menuItem.text, navController = navController)
+                        MenuItem(icon = menuItem.icon, text = stringResource(id = menuItem.text.toInt()), navController = navController)
                     }
                 }
             }
@@ -218,7 +219,7 @@ fun MenuItem(icon: ImageVector, text: String, navController: NavHostController) 
 
                 .pointerInput(Unit) {
                     detectTapGestures(
-                        onTap = {navController.navigate("dettaglio_progetto/$text") }
+                        onTap = { navController.navigate("dettaglio_progetto/$text") }
                     )
                 }
         )

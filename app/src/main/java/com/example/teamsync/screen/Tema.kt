@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,7 +68,7 @@ fun TemaContent(navController: NavHostController, ) {
 
     val context = LocalContext.current
     var selectedOption by remember {
-        mutableStateOf(if (ThemePreferences.getTheme(context)) "Scuro" else "Chiaro")
+        mutableStateOf(if (ThemePreferences.getTheme(context)) R.string.scuro else R.string.chiaro )
     }
 
     Box(
@@ -103,7 +104,10 @@ fun TemaContent(navController: NavHostController, ) {
                     Box(
                         modifier = Modifier
                             .size(35.dp)
-                            .background(Color.White,RoundedCornerShape(20.dp)) // Imposta il rettangolo di sfondo a nero
+                            .background(
+                                Color.White,
+                                RoundedCornerShape(20.dp)
+                            ) // Imposta il rettangolo di sfondo a nero
                             .clickable { navController.navigate(Schermate.Impostazioni.route) },
                         contentAlignment = Alignment.Center
                     ) {
@@ -122,7 +126,7 @@ fun TemaContent(navController: NavHostController, ) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Tema",
+                            text = stringResource(id = R.string.tema),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -140,7 +144,14 @@ fun TemaContent(navController: NavHostController, ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomEnd = 12.dp, bottomStart = 20.dp))
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = 20.dp,
+                                topEnd = 20.dp,
+                                bottomEnd = 12.dp,
+                                bottomStart = 20.dp
+                            )
+                        )
                 ) {
                     Row(
                         modifier = Modifier
@@ -152,7 +163,7 @@ fun TemaContent(navController: NavHostController, ) {
                     ) {
 
                         Text(
-                            text = "Chiaro",
+                            text = stringResource(id = R.string.chiaro),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 20.dp)
@@ -164,10 +175,10 @@ fun TemaContent(navController: NavHostController, ) {
 
 
                         RadioButton(
-                            selected = selectedOption == "Chiaro",
+                            selected = selectedOption == R.string.chiaro,
                             onClick = {
-                                selectedOption = "Chiaro"
-                                ThemePreferences.saveTheme(context, selectedOption == "Scuro")
+                                selectedOption = R.string.chiaro
+                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro)
                                 navController.navigate(Schermate.Tema.route)
                             },
                         )
@@ -188,7 +199,7 @@ fun TemaContent(navController: NavHostController, ) {
                     ) {
 
                         Text(
-                            text = "Scuro",
+                            text = stringResource(id = R.string.scuro),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 20.dp)
@@ -198,10 +209,10 @@ fun TemaContent(navController: NavHostController, ) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {}
                         RadioButton(
-                            selected = selectedOption == "Scuro",
+                            selected = selectedOption == R.string.scuro,
                             onClick = {
-                                selectedOption = "Scuro"
-                                ThemePreferences.saveTheme(context, selectedOption == "Scuro")
+                                selectedOption = R.string.scuro
+                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro)
                                 navController.navigate(Schermate.Tema.route)
                             }
                         )
@@ -228,8 +239,9 @@ fun TemaContent_dark(navController: NavHostController) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
-        .background(color = Color.DarkGray),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.DarkGray),
     ) {
         // Immagine di sfondo
 
@@ -256,7 +268,10 @@ fun TemaContent_dark(navController: NavHostController) {
                     Box(
                         modifier = Modifier
                             .size(35.dp)
-                            .background(Color.Black,RoundedCornerShape(20.dp)) // Imposta il rettangolo di sfondo a nero
+                            .background(
+                                Color.Black,
+                                RoundedCornerShape(20.dp)
+                            ) // Imposta il rettangolo di sfondo a nero
                             .clickable { navController.navigate(Schermate.Impostazioni.route) },
                         contentAlignment = Alignment.Center
                     ) {
@@ -274,7 +289,7 @@ fun TemaContent_dark(navController: NavHostController) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Tema",
+                            text = stringResource(id = R.string.tema),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White // Cambia il colore del testo per il tema scuro
@@ -293,7 +308,14 @@ fun TemaContent_dark(navController: NavHostController) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomEnd = 12.dp, bottomStart = 20.dp))
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = 20.dp,
+                                topEnd = 20.dp,
+                                bottomEnd = 12.dp,
+                                bottomStart = 20.dp
+                            )
+                        )
                 ) {
                     Row(
                         modifier = Modifier
@@ -304,7 +326,7 @@ fun TemaContent_dark(navController: NavHostController) {
                         horizontalArrangement = Arrangement.Start
                     ) {
                         Text(
-                            text = "Chiaro",
+                            text = stringResource(id = R.string.chiaro),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 20.dp),
@@ -315,10 +337,10 @@ fun TemaContent_dark(navController: NavHostController) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {}
                         RadioButton(
-                            selected = selectedOption == "Chiaro",
+                            selected = selectedOption == R.string.chiaro.toString(),
                             onClick = {
-                                selectedOption = "Chiaro"
-                                ThemePreferences.saveTheme(context, selectedOption == "Scuro")
+                                selectedOption =R.string.chiaro.toString()
+                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro.toString())
                                 navController.navigate(Schermate.Tema.route)
                             },
                             colors = RadioButtonDefaults.colors(
@@ -341,7 +363,7 @@ fun TemaContent_dark(navController: NavHostController) {
                         horizontalArrangement = Arrangement.Start
                     ) {
                         Text(
-                            text = "Scuro",
+                            text = stringResource(id = R.string.scuro),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 20.dp),
@@ -352,10 +374,10 @@ fun TemaContent_dark(navController: NavHostController) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {}
                         RadioButton(
-                            selected = selectedOption == "Scuro",
+                            selected = selectedOption == R.string.scuro.toString(),
                             onClick = {
-                                selectedOption = "Scuro"
-                                ThemePreferences.saveTheme(context, selectedOption == "Scuro")
+                                selectedOption = R.string.scuro.toString()
+                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro.toString())
                                 navController.navigate(Schermate.Tema.route)
 
                             },

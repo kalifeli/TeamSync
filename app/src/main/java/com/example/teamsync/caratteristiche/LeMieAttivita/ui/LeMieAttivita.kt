@@ -1,54 +1,39 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
-
-import android.widget.Toast;
+import android.widget.Toast
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -63,7 +48,9 @@ import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivi
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.repository.ToDoRepository
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.data.models.Priorità
+import com.example.teamsync.ui.theme.Green50
 import com.example.teamsync.ui.theme.Grey20
+import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
@@ -74,17 +61,33 @@ import java.util.Locale
 @ExperimentalMaterial3Api
 @Composable
 fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaViewModel) {
-    val sheetState = rememberModalBottomSheetState()
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-    var titolo by remember { mutableStateOf("") }
-    var descrizione by remember { mutableStateOf("") }
-    var dataScad by remember { mutableStateOf("") }
-    var priorita by remember { mutableStateOf(Priorità.NESSUNA) }
 
     val coroutineScope = rememberCoroutineScope()
-
-    val openDialog = remember { mutableStateOf(false) }
+    var addTodoDialog by remember { mutableStateOf(false) }
     val currentTodoItem = remember { mutableStateOf<LeMieAttivita?>(null) }
+    var dialogComplete by remember { mutableStateOf(false) }
+    val openDialog = remember { mutableStateOf(false) }
+    val isClicked = remember { mutableStateOf(true) }
+    val isClicked1 = remember { mutableStateOf(false) }
+    var sezione by remember { mutableIntStateOf(1) }
+
+    if (addTodoDialog) {
+        AddTodoDialog(
+            onDismiss = { addTodoDialog = false },
+            onSave = { newTodo ->
+                coroutineScope.launch {
+                    viewModel.addTodo(
+                        newTodo.titolo,
+                        newTodo.descrizione,
+                        newTodo.dataScadenza,
+                        newTodo.priorita,
+                        newTodo.completato
+                    )
+                    addTodoDialog = false
+                }
+            }
+        )
+    }
 
     if (openDialog.value && currentTodoItem.value != null) {
         EditTodoDialog(
@@ -96,12 +99,29 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
                     titolo = updatedItem.titolo,
                     descrizione = updatedItem.descrizione,
                     dataScad = updatedItem.dataScadenza,
-                    priorità = updatedItem.priorita
+                    priorita = updatedItem.priorita,
+                    sezione
                 )
                 openDialog.value = false
             }
         )
     }
+
+    if (dialogComplete && currentTodoItem.value != null) {
+        CompleteDialog(
+            sezione,
+            onDismiss = { dialogComplete = false },
+            onSave = { completeTodo ->
+                coroutineScope.launch {
+                    // Chiama la funzione completa nel viewModel
+                    viewModel.completeTodo(id = completeTodo.id ?: "", completeTodo.completato, sezione)
+                }
+                dialogComplete = false // Chiudi il dialogo dopo aver salvato
+            },
+            item = currentTodoItem.value!! // Passa l'elemento su cui agire
+        )
+    }
+
     Box(
         modifier = Modifier
             .background(Grey20)
@@ -110,7 +130,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 60.dp),
+                .padding(top = 30.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -124,7 +144,7 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
 
             Text(
                 textAlign = TextAlign.Center,
-                text = "Qui troverai le Task che sono assegnate per questo progetto",
+                text = stringResource(id = R.string.project_tasks_description),
                 color = Grey70,
                 modifier = Modifier
                     .padding(top = 10.dp)
@@ -141,181 +161,195 @@ fun LeMieAttivita(navController: NavHostController, viewModel: LeMieAttivitaView
             )
             Spacer(modifier = Modifier.height(20.dp))
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Start)
+                    .padding(0.dp)// Assicura che il Box occupi tutta la larghezza disponibile
+            ) {
+                Button(
+                    onClick = {
+                        viewModel.getAllTodoCompletate()
+                        isClicked1.value = true
+                        isClicked.value = false
+                        sezione = 0
+                    },
+                    modifier = Modifier
+                        .padding(start = 16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        if (isClicked1.value) Red70 else Grey35
+                    )
+                ) {
+                    Text(text = stringResource(id = R.string.bottoneCompletate))
+                }
+                Button(
+                    onClick = {
+                        viewModel.getAllTodo()
+                        isClicked.value = true
+                        isClicked1.value = false
+                        sezione = 1
+                    },
+                    modifier = Modifier
+                        .padding(start = 16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        if (isClicked.value) Red70 else Grey35
+                    ),
+
+                    ) {
+                    Text(text = stringResource(id = R.string.bottoneNonCompletate))
+                }
+            }
+            //bottone non completate sezione = 1 else 0
+
+
             LazyColumn {
-                items(viewModel.leMieAttività) { attività ->
-                    TodoItem(item = attività,
-                        onDelete = {
-                            id -> viewModel.deleteTodo(id)
-                        } ,
+                items(viewModel.leMieAttivita) { attivita ->
+                    TodoItem(
+                        item = attivita,
+                        onDelete = { id ->
+                            viewModel.deleteTodo(id, sezione)
+                        },
                         onEdit = { item ->
                             currentTodoItem.value = item
-                            openDialog.value = true  // Mostra il dialogo di modifica
-                        })
-
+                            openDialog.value = true
+                        },
+                        onComplete = { item ->
+                            currentTodoItem.value = item
+                            dialogComplete = true
+                        },
+                        sezione
+                    )
                 }
             }
         }
 
-        FloatingActionButton(
-            containerColor = Red70,
-            shape = FloatingActionButtonDefaults.shape,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(8.dp),
-            onClick = { isSheetOpen = true }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "add Todo",
-                tint = Color.White
-            )
-        }
 
-        if (isSheetOpen) {
-            ModalBottomSheet(
-                sheetState = sheetState,
-                onDismissRequest = { isSheetOpen = false }
+        if (sezione == 1) {
+            FloatingActionButton(
+                containerColor = Red70,
+                shape = FloatingActionButtonDefaults.shape,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp),
+                onClick = { addTodoDialog = true }
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White)
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedTextField(
-                            value = titolo,
-                            onValueChange = { titolo = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Titolo") },
-                            textStyle = TextStyle(fontSize = 18.sp, color = Color.Black)
-                        )
-
-                        OutlinedTextField(
-                            value = descrizione,
-                            onValueChange = { descrizione = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Descrizione") },
-                            textStyle = TextStyle(fontSize = 18.sp, color = Color.Black)
-                        )
-
-                        OutlinedTextField(
-                            value = dataScad,
-                            onValueChange = { dataScad = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Data di Scadenza (dd-mm-yyyy)") },
-                            textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-
-                        Text("Priorità", style = TextStyle(fontSize = 18.sp, color = Color.Black))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Priorità.values().forEach { p ->
-                                RadioButton(
-                                    selected = (priorita == p),
-                                    onClick = { priorita = p },
-                                    colors = RadioButtonDefaults.colors(selectedColor = p.colore)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(p.name, color = p.colore)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Button(
-                                onClick = {
-                                    val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.ITALY)
-                                    val date = try {
-                                        sdf.parse(dataScad)
-                                    } catch (e: Exception) {
-                                        null
-                                    }
-
-                                    if (date != null) {
-                                        coroutineScope.launch {
-                                            viewModel.addTodo(
-                                                titolo,
-                                                descrizione,
-                                                date,
-                                                priorita
-                                            )
-                                            isSheetOpen = false
-                                        }
-                                    } else {
-                                        // Handle invalid date format
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFFF0000), // Background color
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Text("Aggiungi Attività", color = Color.White)
-                            }
-                        }
-                    }
-                }
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "add Todo",
+                    tint = Color.White
+                )
             }
         }
     }
 }
 
-
 @Composable
-fun TodoItem(item: LeMieAttivita, onDelete: (String) -> Unit, onEdit:(LeMieAttivita) -> Unit) {
+fun TodoItem(
+    item: LeMieAttivita,
+    onDelete: (String) -> Unit,
+    onEdit: (LeMieAttivita) -> Unit,
+    onComplete: (LeMieAttivita) -> Unit,
+    sezione: Int
+) {
+
+    var dialogDelete by remember { mutableStateOf(false) }
+
 
     Row(modifier = Modifier
-        .fillMaxSize()
+        .fillMaxWidth()
         .padding(8.dp)
         .clip(RoundedCornerShape(8.dp))
-        .background(Grey50)
+        .background(Grey35)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterVertically) // Aligns the column center vertically
+        ) {
+                if (!item.completato)
+                {
+                    IconButton(onClick = { onComplete(item) }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Completata",
+                            tint = Green50,
+                            modifier = Modifier.size(15.dp)
+                    )
+                }
+            }else {
+                IconButton(onClick = { onComplete(item) }) {
+                    Icon(imageVector = Icons.Default.Clear,
+                        contentDescription = "Non Completata",
+                        tint = Red70,
+                        modifier = Modifier.size(15.dp))
+                }
+            }
+        }
+        Column(modifier = Modifier
+            .weight(1f)
+            .padding(vertical = 8.dp)) {
             Text(
-                modifier = Modifier.padding(horizontal = 10.dp),
+                modifier = Modifier.padding(end = 10.dp),
                 text = item.titolo,
                 textAlign = TextAlign.Center,
                 fontSize = 15.sp
             )
             Text(
-                modifier = Modifier.padding(horizontal = 10.dp),
+                modifier = Modifier
+                    .padding(end = 10.dp),
                 text = item.descrizione,
                 color = Grey70
             )
             Text(
                 modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .padding(top = 4.dp),
+                    .padding(end = 10.dp)
+                    .padding(top = 4.dp, bottom = 6.dp),
                 text = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(item.dataScadenza),
                 fontSize = 10.sp,
                 textAlign = TextAlign.Center
             )
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .padding(top = 4.dp),
 
-                text = "Priorità: ${item.priorita.toString()}",
-                fontSize = 10.sp,
-                textAlign = TextAlign.Center
-            )
+            Canvas(modifier = Modifier
+                .size(16.dp)) {
+                drawCircle(
+                    color = item.priorita.colore,
+                    radius = size.minDimension / 2
+                )
+                
+            }
         }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            IconButton(onClick = {
-                onDelete(item.id ?: "")
-            }) {
+            IconButton(onClick = {dialogDelete = true}
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_delete_24),
                     contentDescription = "Delete",
                     tint = Color.Red
+                )
+            }
+            if (dialogDelete){
+                AlertDialog(
+                    onDismissRequest = { dialogDelete = false },
+                    confirmButton = {
+                        Button(onClick = {
+                            onDelete(item.id ?: "")
+                            dialogDelete = false
+                        },
+                            colors = ButtonDefaults.buttonColors(Red70),
+                        ) {
+                            Text(stringResource(id = R.string.conferma))
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {dialogDelete = false},
+                            colors = ButtonDefaults.buttonColors(Grey50),
+                        ) {
+                            Text(stringResource(id = R.string.annullaEdit))
+                        }
+                    },
+                    title = { Text(stringResource(id = R.string.eliminaTodoTitle)) },
+                    text = { Text(stringResource(id = R.string.eliminaTodoDescrizione)) },
+                    containerColor = Grey35,
                 )
             }
             IconButton(onClick = { onEdit(item) }) {
@@ -329,13 +363,6 @@ fun TodoItem(item: LeMieAttivita, onDelete: (String) -> Unit, onEdit:(LeMieAttiv
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun PreviewLeMieAttivita() {
-    LeMieAttivita(navController = rememberNavController(), viewModel = LeMieAttivitaViewModel(ToDoRepository()))
-}
-
 @Composable
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
@@ -345,29 +372,42 @@ fun EditTodoDialog(
     var titolo by remember { mutableStateOf(todoItem.titolo) }
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
     var dataScadenza by remember { mutableStateOf(SimpleDateFormat("dd/MM/yyyy").format(todoItem.dataScadenza)) }
-    var priorità by remember { mutableStateOf(todoItem.priorita) }
+    val priorita by remember { mutableStateOf(todoItem.priorita) }
     val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        modifier = Modifier.background(Grey70),
         title = { Text("Modifica Attività") },
+        containerColor = Grey35,
+        textContentColor = Grey50,
         text = {
             Column {
                 TextField(
                     value = titolo,
                     onValueChange = { titolo = it },
-                    label = { Text("Titolo") }
+                    label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Grey35,
+                        unfocusedContainerColor = Grey50,
+                    ),
                 )
                 TextField(
                     value = descrizione,
                     onValueChange = { descrizione = it },
-                    label = { Text("Descrizione") }
+                    label = { Text((stringResource(id = R.string.descrizioneEdit)), color = Color.Black) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Grey35,
+                        unfocusedContainerColor = Grey50,
+                    ),
                 )
                 TextField(
                     value = dataScadenza,
                     onValueChange = { dataScadenza = it },
-                    label = { Text("Data Scadenza") }
+                    label = { Text(stringResource(id = R.string.dataEdit), color = Color.Black) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Grey35,
+                        unfocusedContainerColor = Grey50,
+                    ),
                 )
                 // Gestisci la priorità se necessario
                 // puoi usare un RadioButton o un DropdownMenu per gestire la priorità
@@ -375,6 +415,7 @@ fun EditTodoDialog(
         },
         confirmButton = {
             Button(
+                colors = ButtonDefaults.buttonColors(Red70),
                 onClick = {
                     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY)
                     val date = sdf.parse(dataScadenza)
@@ -385,21 +426,254 @@ fun EditTodoDialog(
                                 titolo = titolo,
                                 descrizione = descrizione,
                                 dataScadenza = date,
-                                priorita = priorità
+                                priorita = priorita
                             )
                         )
                     } else {
-                        Toast.makeText( context, "i dati inseriti non sono validi", Toast.LENGTH_SHORT).show();
+                        Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {
-                Text("Salvaaaaaaaa")
+                Text(stringResource(id = R.string.salvaEdit))
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Annulla")
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(Grey70)
+            ) {
+                Text(stringResource(id = R.string.annullaEdit))
             }
         }
     )
+}
+
+@Composable
+fun AddTodoDialog(
+    onDismiss: () -> Unit,
+    onSave: (LeMieAttivita) -> Unit
+) {
+    var titolo by remember { mutableStateOf("") }
+    var descrizione by remember { mutableStateOf("") }
+    var dataScadenza by remember { mutableStateOf("") }
+    var priorita by remember { mutableStateOf(Priorità.BASSA) }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    // Stato per gestire l'apertura/chiusura del menu a discesa
+    var expanded by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Grey35,
+        textContentColor = Grey50,
+        title = { Text(stringResource(id = R.string.aggiungiTodo)) },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                TextField(
+                    value = titolo,
+                    onValueChange = { titolo = it },
+                    label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Grey35,
+                        unfocusedContainerColor = Grey50,
+                    ),
+                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    placeholder = { Text(stringResource(id = R.string.titoloEdit)) }
+                )
+                TextField(
+                    value = descrizione,
+                    onValueChange = { descrizione = it },
+                    label = { Text(stringResource(id = R.string.descrizioneEdit), color = Color.Black) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Grey35,
+                        unfocusedContainerColor = Grey50,
+                    ),
+                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    placeholder = { Text(stringResource(id = R.string.inserisciDescrizione)) }
+                )
+                TextField(
+                    value = dataScadenza,
+                    onValueChange = { dataScadenza = it },
+                    label = { Text(stringResource(id = R.string.inserisciData), color = Color.Black) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Grey35,
+                        unfocusedContainerColor = Grey50,
+                    ),
+                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    placeholder = { Text("dd/MM/yyyy") }
+                )
+
+                // Componente DropdownMenu per la priorità
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    TextField(
+                        value = priorita.name,
+                        onValueChange = {},
+                        label = { Text(stringResource(id = R.string.selPriorita), color = Color.Black) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Grey35,
+                            unfocusedContainerColor = Grey50,
+                        ),
+                        textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.width(150.dp)
+                    ) {
+                        //per gli enum si usa entries
+                        Priorità.entries.forEach { p ->
+                            DropdownMenuItem(
+                                text = { Text(p.name, color = p.colore) },
+                                colors = MenuDefaults.itemColors(Grey50),
+                                onClick = {
+                                    priorita = p
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                colors = ButtonDefaults.buttonColors(Red70),
+                onClick = {
+                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY)
+                    val date = try {
+                        sdf.parse(dataScadenza)
+                    } catch (e: Exception) {
+                        null
+                    }
+
+                    if (date != null) {
+                        coroutineScope.launch {
+                            onSave(
+                                LeMieAttivita(
+                                    titolo = titolo,
+                                    descrizione = descrizione,
+                                    dataScadenza = date,
+                                    priorita = priorita
+                                )
+                            )
+                            onDismiss()
+                        }
+                    } else {
+                        Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            ) {
+                Text(stringResource(id = R.string.aggiungiTodo), color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(Grey70)) {
+                Text(stringResource(id = R.string.annullaEdit))
+            }
+        }
+    )
+}
+
+@Composable
+fun CompleteDialog(
+    sezione: Int,
+    onDismiss: () -> Unit,
+    onSave: (LeMieAttivita) -> Unit,
+    item: LeMieAttivita
+) {
+    if (sezione == 1) {
+        AlertDialog(
+            containerColor = Grey35,
+            onDismissRequest = onDismiss,
+            title = {
+                Text(text = stringResource(id = R.string.conferma))
+            },
+
+            text = {
+                Text(text = stringResource(id = R.string.completaTodo))
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onSave(item)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
+                ) {
+                    Text(text = stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Grey70)
+                    // Colore di sfondo del pulsante di annullamento
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.annullaEdit),
+                        color = Color.White
+                    ) // Testo nero sul pulsante grigio chiaro
+                }
+            }
+        )
+    }else{
+        AlertDialog(
+            containerColor = Grey35,
+            onDismissRequest = onDismiss,
+            title = {
+                Text(text = stringResource(id = R.string.conferma))
+            },
+
+            text = {
+                Text(text =  stringResource(id = R.string.noncompletaTodo))
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onSave(item)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
+                ) {
+                    Text(text =  stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Grey70)
+                    // Colore di sfondo del pulsante di annullamento
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.annullaEdit),
+                        color = Color.White
+                    ) // Testo nero sul pulsante grigio chiaro
+                }
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun PreviewLeMieAttivita() {
+    LeMieAttivita(navController = rememberNavController(), viewModel = LeMieAttivitaViewModel(ToDoRepository()))
 }

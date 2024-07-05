@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.repository.ToDoRepository
@@ -13,31 +12,38 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel() {
-    var leMieAttività by mutableStateOf<List<LeMieAttivita>>(emptyList())
+    var leMieAttivita by mutableStateOf<List<LeMieAttivita>>(emptyList())
         private set
 
     init {
         getAllTodo()
     }
 
-    private fun getAllTodo() {
+    fun getAllTodo() {
         viewModelScope.launch {
-            leMieAttività = repository.getAllTodo()
+            leMieAttivita = repository.getAllTodo()
         }
     }
 
-    fun addTodo(titolo: String, descrizione: String, dataScad: Date, priorità: Priorità) {
+    fun getAllTodoCompletate() {
         viewModelScope.launch {
-            repository.addTodo(titolo, descrizione, dataScad, priorità)
-            getAllTodo()  // Refresh the list after adding a new item
+            leMieAttivita = repository.getAllTodoCompletate()
         }
     }
 
-    fun deleteTodo(id: String) {
+
+    fun addTodo(titolo: String, descrizione: String, dataScad: Date, priorita: Priorità, completato: Boolean) {
+        viewModelScope.launch {
+            repository.addTodo(titolo, descrizione, dataScad, priorita, completato = false)
+            getAllTodo()
+        }
+    }
+
+    fun deleteTodo(id: String, sezione: Int) {
         viewModelScope.launch {
             try {
                 repository.deleteTodo(id)
-                getAllTodo()  // Aggiorna la lista dopo l'eliminazione
+                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
@@ -48,14 +54,25 @@ class LeMieAttivitaViewModel(private val repository: ToDoRepository) : ViewModel
         titolo: String,
         descrizione: String,
         dataScad: Date,
-        priorità: Priorità
+        priorita: Priorità,
+        sezione: Int
     ) {
         viewModelScope.launch {
             try {
-                repository.updateTodo(id, titolo, descrizione, dataScad, priorità)
-                getAllTodo()  // Aggiorna la lista dopo l'aggiornamento
+                repository.updateTodo(id, titolo, descrizione, dataScad, priorita)
+                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
+            }
+        }
+    }
+    fun completeTodo(id: String, completato: Boolean, sezione: Int){
+        viewModelScope.launch {
+            try {
+                repository.completeTodo(id, completato)
+                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
+            }catch (e: Exception){
+                //gestire errore
             }
         }
     }

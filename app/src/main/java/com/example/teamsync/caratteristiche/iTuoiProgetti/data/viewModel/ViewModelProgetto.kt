@@ -26,6 +26,7 @@ class ViewModelProgetto : ViewModel() {
         utenteCorrenteId.value?.let {
             caricaProgettiUtente(it)
         }
+
     }
     fun aggiornaUtenteCorrente() {
         utenteCorrenteId.value = repositoryProgetto.getUtenteCorrente()?.uid

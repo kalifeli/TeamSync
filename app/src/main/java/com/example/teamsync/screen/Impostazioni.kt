@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,22 +47,22 @@ import com.example.teamsync.util.ThemePreferences
 data class SettingItem(val icon: Int, val label: String, val rotta: Schermate)
 
 val settingsList1 = listOf(
-    SettingItem(R.drawable.person_icon, "Modifica Profilo",Schermate.ModificaProfilo ),
-    SettingItem(R.drawable.notifiche, "Notifiche",Schermate.Progetti),
-    SettingItem(R.drawable.lingua, "Lingua",Schermate.Progetti),
-    SettingItem(R.drawable.tema, "Tema",Schermate.Tema),
-    SettingItem(R.drawable.task, "Task", Schermate.Progetti),
-    SettingItem(R.drawable.to_do_list, "To-Do List",Schermate.Progetti),
+    SettingItem(R.drawable.person_icon, R.string.modificaProfilo.toString(),Schermate.ModificaProfilo ),
+    SettingItem(R.drawable.notifiche, R.string.Notifiche.toString(),Schermate.Progetti),
+    SettingItem(R.drawable.lingua, R.string.Lingua.toString(),Schermate.Progetti),
+    SettingItem(R.drawable.tema, R.string.tema.toString(),Schermate.Tema),
+    SettingItem(R.drawable.task, R.string.task.toString(), Schermate.Progetti),
+    SettingItem(R.drawable.to_do_list, R.string.todolist.toString(),Schermate.Progetti),
 
 )
 
 val settingsList2 = listOf(
-    SettingItem(R.drawable.help, "Help & Support",Schermate.Supporto),
-    SettingItem(R.drawable.terms_and_condiction, "Terms and Policies",Schermate.Terms)
+    SettingItem(R.drawable.help, R.string.help.toString(),Schermate.Supporto),
+    SettingItem(R.drawable.terms_and_condiction, R.string.terms.toString(),Schermate.Terms)
 )
 
 val settingsList3 = listOf(
-    SettingItem(R.drawable.logout, "Logout",Schermate.Login)
+    SettingItem(R.drawable.logout, R.string.logout.toString() ,Schermate.Login)
 )
 
 
@@ -126,7 +127,10 @@ fun ImpostazioniContent(navController: NavHostController) {
                         Box(
                             modifier = Modifier
                                 .size(35.dp)
-                                .background(Color.Black,RoundedCornerShape(20.dp)) // Imposta il rettangolo di sfondo a nero
+                                .background(
+                                    Color.Black,
+                                    RoundedCornerShape(20.dp)
+                                ) // Imposta il rettangolo di sfondo a nero
                                 .clickable { navController.navigate(Schermate.Progetti.route) },
                             contentAlignment = Alignment.Center
                         ) {
@@ -144,7 +148,7 @@ fun ImpostazioniContent(navController: NavHostController) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text =  "Impostazioni",
+                                text =  stringResource(id = R.string.impostazioni),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -203,7 +207,7 @@ fun ImpostazioniContent(navController: NavHostController) {
                         .padding(bottom = 10.dp),
                 ) {
                     Text(
-                        text = "Supporto",
+                        text = stringResource(id = R.string.supporto),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
 
@@ -237,7 +241,7 @@ fun ImpostazioniContent(navController: NavHostController) {
                         .padding(bottom = 10.dp),
                 ) {
                     Text(
-                        text = "Azioni",
+                        text = stringResource(id = R.string.azioni),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
 
@@ -283,7 +287,7 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (setting.label == "Logout") Color(0xFFC1092A) else Color(0xFFE5E5E5)),
+            .background(if (setting.label == R.string.logout.toString()) Color(0xFFC1092A) else Color(0xFFE5E5E5)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
 
@@ -309,7 +313,7 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically
         ) {}
 
-        if (setting.label == "Logout") {
+        if (setting.label == R.string.logout.toString()) {
 
 
 
@@ -318,12 +322,13 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController) {
                     modifier = Modifier
                         .clickable {
                             viewmodel.signOut()
-                            navController.navigate(setting.rotta.route) }
+                            navController.navigate(setting.rotta.route)
+                        }
                         .weight(12f),
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
-                        text = setting.label,
+                        text = stringResource(id = setting.label.toInt()),
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(
@@ -345,7 +350,7 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController) {
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = setting.label,
+                    text = stringResource(id = setting.label.toInt()),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(
@@ -369,7 +374,8 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
     val darkTextColor = Color.White
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(color = Color.DarkGray)
     ) {
         // Immagine di sfondo
@@ -423,7 +429,7 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Impostazioni",
+                            text = stringResource(id = R.string.impostazioni),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = darkTextColor // Cambia il colore del testo
@@ -483,7 +489,7 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
                     .padding(bottom = 10.dp),
             ) {
                 Text(
-                    text = "Supporto",
+                    text = stringResource(id = R.string.supporto),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = darkTextColor // Cambia il colore del testo per il tema scuro
@@ -517,7 +523,7 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
                     .padding(bottom = 10.dp),
             ) {
                 Text(
-                    text = "Azioni",
+                    text = stringResource(id = R.string.azioni),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = darkTextColor // Cambia il colore del testo per il tema scuro
@@ -554,7 +560,7 @@ fun SettingItemRow_dark(setting: SettingItem, navController: NavHostController) 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (setting.label == "Logout") Color(0xFFC1092A) else Color(0xFF333333)),
+            .background(if (setting.label == R.string.logout.toString()) Color(0xFFC1092A) else Color(0xFF333333)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
 
@@ -582,18 +588,19 @@ fun SettingItemRow_dark(setting: SettingItem, navController: NavHostController) 
         ) {}
 
         // Centra il testo all'interno della Row
-        if(setting.label == "Logout")
+        if(setting.label == R.string.logout.toString())
         {
             Row(
                 modifier = Modifier
                     .clickable {
                         viewmodel.signOut()
-                        navController.navigate(setting.rotta.route) }
+                        navController.navigate(setting.rotta.route)
+                    }
                     .weight(12f),
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = setting.label,
+                    text = stringResource(id = setting.label.toInt()),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(
@@ -614,7 +621,7 @@ fun SettingItemRow_dark(setting: SettingItem, navController: NavHostController) 
             horizontalArrangement = Arrangement.Start
         ) {
             Text(
-                text = setting.label,
+                text = stringResource(id = setting.label.toInt()),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(

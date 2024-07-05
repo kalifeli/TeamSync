@@ -37,6 +37,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -309,7 +310,7 @@ fun Faq(navController: NavHostController, sezioneFaq: String) {
 
             }
             if (loading) {
-                Text("Caricamento in corso...", fontSize = 16.sp, color = Color.Gray)
+                Text(stringResource(id = R.string.caricamento), fontSize = 16.sp, color = Color.Gray)
             } else if (error != null) {
                 Text("Errore: $error", fontSize = 16.sp, color = Color.Red)
             } else {

@@ -24,10 +24,81 @@
     <string name="eliminaTodoDescrizione">Sei sicuro di voler eliminare questo To Do?</string>
 
     <!--Impostazioni Screen-->
+    <string name="impostazioni">Impostazioni</string>
     <string name="modificaProfilo">Modifica Profilo</string>
     <string name="Notifiche">Notifiche</string>
     <string name="Lingua">Lingue</string>
     <string name="Tema">Tema</string>
+    <string name="azioni">Azioni</string>
+    <string name="task">Task</string>
+    <string name="todolist">To Do List</string>
+    <string name="help">Help &amp; Support</string>
+    <string name="terms">Terms and Policies</string>
+    <string name="logout">Logout</string>
+
+
+
+    <!--Registrazione Screen-->
+    <string name="iscriviti">Iscriviti</string>
+    <string name="matricola">Matricola : Sxxxxxxx</string>
+    <string name="nome">Nome</string>
+    <string name="cognome">Cognome</string>
+    <string name="confermaPassword">Conferma Password</string>
+    <string name="next">Avanti</string>
+    <string name="accountgia">Hai gia un account? </string>
+
+    <!--Schermata Benvenuto Screen-->
+    <string name="benvenuto">Benvenuto in TeamSync </string>
+    <string name="benvenutosottotitolo">Il modo più semplice e veloce per organizzare i tuoi progetti universitari. </string>
+    <string name="benvenutotitolo2">Tieni traccia di tutti i tuoi progetti </string>
+    <string name="benvenutosottotitolo2"> </string>
+    <string name="benvenutotitolo3">Gestisci i task </string>
+    <string name="benvenutosottotitolo3">Crea,assegna e tieni traccia dei tuoi compiti efficacemente, tutto da un unica schermata intuitiva. </string>
+    <string name="benvenutotitolo4">Resta sempre aggiornato </string>
+    <string name="benvenutosottotitolo4">Attiva le notifiche di gruppo per non perdere mai un aggiornamento importante o una scadenza imminente nei tuoi progetti di gruppo. </string>
+    <string name="benvenutotitolo5">Aggiungi studenti ai tuoi amici </string>
+    <string name="benvenutosottotitolo5">Costruisci connessioni con nuovi compagni di corso. </string>
+    <string name="benvenutotitolo6">Inizia Ora! </string>
+    <string name="benvenutosottotitolo6">Sei solo a un passo dall essere più organizzato e connesso che mai. Entra ora e trasforma il modo in cui lavori sui tuoi progetti! </string>
+
+    <!--User Profile Screen-->
+    <string name="modificaProfiloScreen">Modifica Profilo </string>
+    <string name="caricamento">Caricamento in corso... </string>
+    <string name="matricola1">Matricola </string>
+    <string name="dataDiNascita">Data di Nascita </string>
+    <string name="caricaImmagine">Cambia Immagine</string>
+    <string name="rimuoviImmagine">Rimuovi Immagine</string>
+
+    <!--Login Screen-->
+    <string name="accedi">Accedi </string>
+    <string name="passwordDimenticata">Password dimenticata? </string>
+    <string name="nonHaiAccount">Non hai un account? </string>
+    <string name="registrati">Registrati </string>
+
+    <!--Password dimenticata Screen-->
+    <string name="nonPreoccuparti">Non Preoccuparti! Cliccando su "Procedi", verrà inviato un link per il recupero della password dimenticata all\' indirizzo email associato al tuo account TeamSync.</string>
+    <string name="procedi">Procedi </string>
+
+    <!--Verifica Email Screen-->
+    <string name="controllaEmail">Per favore, controlla la tua email e segui le istruzioni per verificare il tuo account. La verifica dell\'email è necessaria per accedere alla nostra applicazione. </string>
+    <string name="verifica">Passaggi per verificare il tuo account:\n\n1. Apri l\'email che ti abbiamo inviato.\n2. Clicca sul link di verifica contenuto nell\'email.\n3. Torna alla nostra applicazione e accedi con le tue credenziali. </string>
+    <string name="hoCapito">Ho Capito </string>
+
+    <!--Help&Support Screen-->
+    <string name="supporto">Supporto </string>
+    <string name="introduzione">Introduzione </string>
+    <string name="funzionalità">Funzionalità </string>
+    <string name="sicurezza">Sicurezza </string>
+    <string name="avanzate">Avanzate </string>
+    <string name="altro">Altro </string>
+    <string name="privacy">Privacy </string>
+
+    <!--Tema Screen-->
+    <string name="tema">Tema </string>
+    <string name="chiaro">Chiaro </string>
+    <string name="scuro">Scuro </string>
+
+
 
 
 

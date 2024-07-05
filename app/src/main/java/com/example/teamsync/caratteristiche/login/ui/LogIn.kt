@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -157,7 +158,7 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(40.dp))
 
-            Text(text = "Accedi", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) White else Color.Black)
+            Text(text = stringResource(id = R.string.accedi), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) White else Color.Black)
 
 
             Spacer(modifier = Modifier.height(25.dp))
@@ -249,7 +250,7 @@ fun LoginScreen(
                     ) {
                         if(isDarkTheme)
                             Text(
-                                text = "Password dimenticata?",
+                                text = stringResource(id = R.string.passwordDimenticata),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.fillMaxWidth(),
@@ -259,7 +260,7 @@ fun LoginScreen(
 
                         else
                             Text(
-                            text = "Password dimenticata?",
+                            text = stringResource(id = R.string.passwordDimenticata),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.fillMaxWidth(),
@@ -298,7 +299,7 @@ fun LoginScreen(
                             contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
                         ) else ButtonDefaults.buttonColors(containerColor = Red70)
                     ) {
-                        Text(text = "Accedi")
+                        Text(text = stringResource(id = R.string.accedi))
                     }
 
 
@@ -312,7 +313,7 @@ fun LoginScreen(
                     ) {
                         Box(modifier = Modifier) {
                             Text(
-                                text = "Non hai un account? ",
+                                text = stringResource(id = R.string.nonHaiAccount),
                                 textAlign = TextAlign.Center,
                                 color = if (isDarkTheme)Color.White else Color.Black
                             )
@@ -323,7 +324,7 @@ fun LoginScreen(
                             }
                         ) {
                             Text(
-                                text = "Registrati",
+                                text = stringResource(id = R.string.registrati),
                                 textAlign = TextAlign.Center,
                                 color = if (isDarkTheme)Color.White else Red70
                             )

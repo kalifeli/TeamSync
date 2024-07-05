@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,7 +72,7 @@ fun VerificaEmail(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 24.dp),
-                text = "Per favore, controlla la tua email e segui le istruzioni per verificare il tuo account. La verifica dell'email è necessaria per accedere alla nostra applicazione.",
+                text = stringResource(id = R.string.controllaEmail),
                 color = Color.White,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
@@ -82,13 +83,7 @@ fun VerificaEmail(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 24.dp),
-                text = """
-                    Passaggi per verificare il tuo account:
-
-                    1. Apri l'email che ti abbiamo inviato.
-                    2. Clicca sul link di verifica contenuto nell'email.
-                    3. Torna alla nostra applicazione e accedi con le tue credenziali.
-                """.trimIndent(),
+                text = stringResource(id = R.string.verifica).trimIndent(),
                 color = Color.White,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
@@ -102,7 +97,7 @@ fun VerificaEmail(
                 colors = ButtonDefaults.buttonColors(White)
             ) {
                 Text(
-                    text = "Ho capito",
+                    text = stringResource(id = R.string.hoCapito),
                     color = Color.Black
                 )
 

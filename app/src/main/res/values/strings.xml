@@ -23,10 +23,86 @@
     <string name="eliminaTodoDescrizione">Are you sure you would like to delete this To Do?</string>
 
     <!--Impostazioni Screen-->
+    <string name="impostazioni">Settings</string>
     <string name="modificaProfilo">Edit Profile</string>
     <string name="Notifiche">Notifications</string>
     <string name="Lingua">Language</string>
     <string name="Tema">Theme</string>
+    <string name="azioni">Actions</string>
+    <string name="task">Task</string>
+    <string name="todolist">To Do List</string>
+    <string name="help">Help &amp; Support</string>
+    <string name="terms">Terms and Policies</string>
+    <string name="logout">Logout</string>
+
+
+
+    <!--Registrazione Screen-->
+    <string name="iscriviti">Sign Up</string>
+    <string name="matricola">Student ID : Sxxxxxxx</string>
+    <string name="nome">Name</string>
+    <string name="cognome">Surname</string>
+    <string name="confermaPassword">Confirm Password</string>
+    <string name="next">Next</string>
+    <string name="accountgia">Do You Already Have an Account? </string>
+
+    <!--Schermata Benvenuto Screen-->
+    <string name="benvenuto">Welcome to TeamSync </string>
+    <string name="benvenutosottotitolo">The Easiest and Fastest Way to Organize Your University Projects </string>
+    <string name="benvenutotitolo2">Keep Track of All Your Projects </string>
+    <string name="benvenutosottotitolo2"> </string>
+    <string name="benvenutotitolo3">Manage Tasks </string>
+    <string name="benvenutosottotitolo3">Create, Assign, and Track Your Tasks Effectively, All from One Intuitive Screen. </string>
+    <string name="benvenutotitolo4">Stay Updated </string>
+    <string name="benvenutosottotitolo4">Turn On Group Notifications to Never Miss an Important Update or Upcoming Deadline. </string>
+    <string name="benvenutotitolo5">Add Students to Your Friends List </string>
+    <string name="benvenutosottotitolo5">Build Connections with New Classmates. </string>
+    <string name="benvenutotitolo6">Start Now ! </string>
+    <string name="benvenutosottotitolo6">You’re Just One Step Away from Being More Organized and Connected Than Ever Before. Join Now and Transform the Way You Work on Your Projects! </string>
+
+    <!--User Profile Screen-->
+    <string name="modificaProfiloScreen">Edit Profile </string>
+    <string name="caricamento">Loading... </string>
+    <string name="matricola1">Student ID </string>
+    <string name="dataDiNascita">Date of Birth </string>
+    <string name="caricaImmagine">Change Image</string>
+    <string name="rimuoviImmagine">Delete Image</string>
+
+    <!--Login Screen-->
+    <string name="accedi">Login </string>
+    <string name="passwordDimenticata">Forgot Password?</string>
+    <string name="nonHaiAccount">Do not have an account?</string>
+    <string name="registrati">Sign Up </string>
+
+    <!--Password dimenticata Screen-->
+    <string name="nonPreoccuparti">Don\'t worry! By clicking \'Proceed\', a link to recover your forgotten password will be sent to the email address associated with your TeamSync account.</string>
+    <string name="procedi">Proceed </string>
+
+    <!--Verifica Email Screen-->
+    <string name="controllaEmail">"Please check your email and follow the instructions to verify your account. Email verification is required to access our application."</string>
+    <string name="verifica">Steps to Verify Your Account:\n\n1. Open the email we sent you.\n2. Click the verification link in the email.\n3. Return to our application and log in with your credentials.</string>
+    <string name="hoCapito">I Understood</string>
+
+    <!--Help&Support Screen-->
+    <string name="supporto">Support </string>
+    <string name="introduzione">Introduction </string>
+    <string name="funzionalità">Features </string>
+    <string name="sicurezza">Sicurity </string>
+    <string name="avanzate">Advanced</string>
+    <string name="altro">Other </string>
+    <string name="privacy">Privacy </string>
+
+
+    <!--Tema Screen-->
+    <string name="tema">Theme </string>
+    <string name="chiaro">Bright </string>
+    <string name="scuro">Dark </string>
+
+
+
+
+
+
 
 
 

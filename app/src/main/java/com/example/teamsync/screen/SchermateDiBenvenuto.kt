@@ -1,6 +1,5 @@
 package com.example.teamsync.screen
 
-import android.view.View
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -30,12 +29,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey50
@@ -141,7 +142,7 @@ fun PaginaDiBenvenuto (paginaDiBenvenuto: PaginaDiBenvenuto){
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
-                text = paginaDiBenvenuto.titolo,
+                text = stringResource(id = paginaDiBenvenuto.titolo.toInt()),
                 color = Color.White,
                 fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                 fontWeight = FontWeight.ExtraBold,
@@ -152,7 +153,7 @@ fun PaginaDiBenvenuto (paginaDiBenvenuto: PaginaDiBenvenuto){
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp)
                     .padding(vertical = 10.dp),
-                text = paginaDiBenvenuto.sottotitolo,
+                text = stringResource(id = paginaDiBenvenuto.sottotitolo.toInt()),
                 color = Color.White,
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                 fontWeight = FontWeight.Light,
@@ -190,7 +191,7 @@ fun Bottone_IniziaOra(
                 ),
                 onClick = onClick,
             ) {
-                Text(text = "Inizia Ora")
+                Text(text = stringResource(id = R.string.benvenutotitolo6))
             }
         }
     }
@@ -212,6 +213,7 @@ fun Preview_PrimaSchermataBenvenuto(){
     }
 }
 
+@Preview
 @Composable
 fun Preview_SecondaSchermataBenvenuto(){
     Column(
@@ -222,6 +224,7 @@ fun Preview_SecondaSchermataBenvenuto(){
     }
 }
 
+@Preview
 @Composable
 fun Preview_TerzaSchermataBenvenuto(){
     Column(
@@ -232,6 +235,7 @@ fun Preview_TerzaSchermataBenvenuto(){
     }
 }
 
+@Preview
 @Composable
 fun Preview_QuartaSchermataBenvenuto(){
     Column(
@@ -242,6 +246,7 @@ fun Preview_QuartaSchermataBenvenuto(){
     }
 }
 
+@Preview
 @Composable
 fun Preview_QuintaSchermataBenvenuto(){
     Column(
@@ -252,6 +257,7 @@ fun Preview_QuintaSchermataBenvenuto(){
     }
 }
 
+@Preview
 @Composable
 fun Preview_SestaSchermataBenvenuto(){
     Column(

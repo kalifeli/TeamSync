@@ -45,6 +45,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -194,7 +195,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Modifica Profilo",
+                    text = stringResource(id = R.string.modificaProfiloScreen),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray // Cambia il colore del testo
@@ -217,7 +218,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                     .size(125.dp)
                     .pointerInput(Unit) {
                         detectTapGestures(
-                            onTap = {showMenu = true  }
+                            onTap = { showMenu = true }
                         )
                     },
 
@@ -239,7 +240,8 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                             ),
 
                             contentDescription = "Immagine Profilo",
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
                                 .clip(RoundedCornerShape(20.dp)),
 
                             contentScale = ContentScale.Crop,
@@ -272,7 +274,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
         Spacer(modifier = Modifier.height(20.dp))
 
         if (loading) {
-            Text("Caricamento in corso...", fontSize = 16.sp, color = Color.Gray)
+            Text(stringResource(id = R.string.caricamento), fontSize = 16.sp, color = Color.Gray)
         } else if (error != null) {
             Text("Errore: $error", fontSize = 16.sp, color = Color.Red)
         } else {
@@ -280,22 +282,22 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
                 value = nome,
                 onValueChange = { nome = it },
-                label = { Text("Nome") }
+                label = { Text(stringResource(id = R.string.nome)) }
             )
             OutlinedTextField(
                 value = cognome,
                 onValueChange = { cognome = it },
-                label = { Text("Cognome") }
+                label = { Text(stringResource(id = R.string.cognome)) }
             )
             OutlinedTextField(
                 value = matricola,
                 onValueChange = { matricola = it },
-                label = { Text("Matricola") }
+                label = { Text(stringResource(id = R.string.matricola1)) }
             )
             OutlinedTextField(
                 value = dataDiNascita,
                 onValueChange = { dataDiNascita = it },
-                label = { Text("Data di Nascita") }
+                label = { Text(stringResource(id = R.string.dataDiNascita)) }
             )
             OutlinedTextField(
                 value = email,
@@ -329,11 +331,11 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                     contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
                 )
             ) {
-                Text("Salva")
+                Text(stringResource(id = R.string.salvaEdit))
             }
             Spacer(modifier = Modifier.height(8.dp))
             if (loading1) {
-                Text("Caricamento in corso...", fontSize = 16.sp, color = Color.Black)
+                Text(stringResource(id = R.string.caricamento), fontSize = 16.sp, color = Color.Black)
             }
             Spacer(modifier = Modifier.height(20.dp))
             DropdownMenu(
@@ -343,14 +345,14 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                 offset = DpOffset(x = 110.dp, y = 0.dp)
             ) {
                 DropdownMenuItem(
-                    text = { Text("Cambia Immagine") },
+                    text = { Text(stringResource(id = R.string.caricaImmagine)) },
                     onClick = {
                         showMenu = false
                         launcher.launch("image/*")
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Rimuovi Immagine") },
+                    text = { Text(stringResource(id = R.string.rimuoviImmagine)) },
                     onClick = {
                         showMenu = false
                         imageUri = null
@@ -472,7 +474,8 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
 
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(color = Color.DarkGray),
         ) {
             Column(
@@ -519,7 +522,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Modifica Profilo",
+                            text = stringResource(id = R.string.modificaProfiloScreen),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = darkTextColor // Cambia il colore del testo
@@ -543,7 +546,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         .size(125.dp)
                         .pointerInput(Unit) {
                             detectTapGestures(
-                                onTap = {showMenu = true  }
+                                onTap = { showMenu = true }
                             )
                         },
 
@@ -563,7 +566,8 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                                 }
                             ),
                             contentDescription = "Immagine Profilo",
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
                                 .clip(RoundedCornerShape(20.dp)),
 
                             contentScale = ContentScale.Crop,
@@ -603,22 +607,22 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         value = nome,
                         onValueChange = { nome = it },
 
-                        label = { Text("Nome", color = darkTextColor) }
+                        label = { Text(stringResource(id = R.string.nome), color = darkTextColor) }
                     )
                     OutlinedTextField(
                         value = cognome,
                         onValueChange = { cognome = it },
-                        label = { Text("Cognome", color = darkTextColor) }
+                        label = { Text((stringResource(id = R.string.cognome)), color = darkTextColor) }
                     )
                     OutlinedTextField(
                         value = matricola,
                         onValueChange = { matricola = it },
-                        label = { Text("Matricola", color = darkTextColor) }
+                        label = { Text((stringResource(id = R.string.matricola1)), color = darkTextColor) }
                     )
                     OutlinedTextField(
                         value = dataDiNascita,
                         onValueChange = { dataDiNascita = it },
-                        label = { Text("Data di Nascita", color = darkTextColor) }
+                        label = { Text(stringResource(id = R.string.dataDiNascita), color = darkTextColor) }
                     )
                     OutlinedTextField(
                         value = email,
@@ -653,11 +657,11 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
                     )
                 ) {
-                    Text("Salva")
+                    Text(stringResource(id = R.string.salvaEdit))
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 if (loading1) {
-                    Text("Caricamento in corso...", fontSize = 16.sp, color = Color.White)
+                    Text(stringResource(id = R.string.caricamento), fontSize = 16.sp, color = Color.White)
                 }
 
                 DropdownMenu(
@@ -667,7 +671,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                     offset = DpOffset(x = 110.dp, y = 100.dp)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Cambia Immagine") },
+                        text = { Text(stringResource(id = R.string.caricaImmagine)) },
                         onClick = {
                             showMenu = false
                             launcher.launch("image/*")
@@ -675,7 +679,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                     )
 
                     DropdownMenuItem(
-                        text = { Text("Rimuovi Immagine") },
+                        text = { Text(stringResource(id = R.string.rimuoviImmagine)) },
                         onClick = {
                             showMenu = false
                             imageUri = null

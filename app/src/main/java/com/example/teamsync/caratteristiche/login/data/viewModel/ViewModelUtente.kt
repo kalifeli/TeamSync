@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.login.data.viewModel
 
+import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import android.util.Patterns
@@ -22,6 +23,8 @@ class ViewModelUtente : ViewModel() {
 
     //istanza della classe repository dell'utente
     private val repositoryUtente = RepositoryUtente()
+
+
 
     var utenteCorrente by mutableStateOf<FirebaseUser?>(null)
         private set
@@ -232,6 +235,61 @@ class ViewModelUtente : ViewModel() {
     }
 
 
+
+    fun ottieni_utente(id: String, callback: (ProfiloUtente?) -> Unit) {
+        repositoryUtente.get_user_sincrono(id) { profile ->
+            callback(profile)
+        }
+
+    }
+
+
+
+
+
+    fun finisci_amicizia(id_u: String, id_a: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                // Rimuovi id_u dalla lista degli amici di id_a
+                repositoryUtente.rimuoviAmico(id_a, id_u)
+
+                // Rimuovi id_a dalla lista degli amici di id_u
+                repositoryUtente.rimuoviAmico(id_u, id_a)
+
+                // Callback di successo
+                onSuccess()
+
+                // Esegui altre azioni se necessario dopo aver rimosso l'amicizia
+            } catch (e: Exception) {
+                Log.e("ViewModelUtente", "Errore durante il tentativo di rimuovere l'amicizia", e)
+                // Gestisci l'errore se necessario
+            }
+        }
+    }
+
+    fun fai_amicizia(id_u: String, id_a: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                // Aggiungi id_u alla lista degli amici di id_a
+                repositoryUtente.aggiungiAmico(id_a, id_u)
+
+                // Aggiungi id_a alla lista degli amici di id_u
+                repositoryUtente.aggiungiAmico(id_u, id_a)
+
+                // Callback di successo
+                onSuccess()
+
+                // Esegui altre azioni se necessario dopo aver fatto amicizia
+            } catch (e: Exception) {
+                Log.e("ViewModelUtente", "Errore durante il tentativo di fare amicizia", e)
+                // Gestisci l'errore se necessario
+            }
+        }
+    }
+
+
+
+
     fun updateUserProfile(profiloUtente: ProfiloUtente) {
         viewModelScope.launch {
             repositoryUtente.updateUserProfile(profiloUtente)
@@ -251,6 +309,85 @@ class ViewModelUtente : ViewModel() {
 
 
 
-}
+    fun filterAmici(query: String, callback: UserProfileCallback) {
+        var risultati = mutableListOf<String>()
+
+        val lista_nomi = mutableListOf<String>()
+        val lista_cognomi = mutableListOf<String>()
+        val lista_matricole = mutableListOf<String>()
+        val lista_email = mutableListOf<String>()
+
+        viewModelScope.launch {
+            try {
+                val lista = repositoryUtente.getallutenti()
+
+
+
+                for (persona in lista) {
+                    val oggetto_persona = repositoryUtente.getUserProfile(persona)
+                    Log.d("SIngola Persona", "Id: $oggetto_persona")
+
+                    lista_nomi.add(oggetto_persona?.nome.toString())
+                    lista_email.add(oggetto_persona?.email.toString())
+                    lista_cognomi.add(oggetto_persona?.cognome.toString())
+                    lista_matricole.add(oggetto_persona?.matricola.toString())
+
+
+                }
+
+                aggiungiElementiFiltrati(lista_nomi,lista, risultati, query)
+                aggiungiElementiFiltrati(lista_email,lista, risultati, query)
+                aggiungiElementiFiltrati(lista_cognomi,lista, risultati, query)
+                aggiungiElementiFiltrati(lista_matricole,lista, risultati, query)
+
+
+
+                callback(rimuovi_self(risultati))
+            }catch (e: Exception) {
+                Log.e(TAG, "Errore durante il recupero degli utenti", e)
+            }
+
+        }
+
+    }
+    fun aggiungiElementiFiltrati(
+        lista_elementi: List<String>,
+        lista_id: List<String>,
+        risultati: MutableList<String>,
+
+        query: String
+    ) {
+        var contatore = 0
+        for (elemento in lista_elementi) {
+            if (elemento.contains(query, ignoreCase = true) && !risultati.contains(lista_id[contatore])) {
+                risultati.add(lista_id[contatore])
+            }
+            contatore++
+        }
+    }
+
+    fun rimuovi_self( lista_elementi: List<String>,): List<String> {
+        val id = userProfile?.id
+
+        if(lista_elementi.contains(id))
+            return lista_elementi.filter { it != id }
+        else
+            return lista_elementi
+    }
+    }
+
+
+
+typealias UserProfileCallback = (List<String>) -> Unit
+
+
+
+
+
+
+
+
+
+
 
 

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
@@ -118,10 +119,22 @@ fun ITuoiProgetti(
                                text = { Text(text = "Profilo") },
                                onClick = {
                                    expended = false
-                               /*TODO: implementa navigazione alla schermata del profilo*/
+
+                                   navController.navigate(Schermate.Profilo.route)
                                },
                                leadingIcon = {
                                    Icon(Icons.Default.Person, contentDescription = "icona profilo utente")
+                               },
+                               modifier = Modifier.background(Grey20)
+                           )
+                           DropdownMenuItem(
+                               text = { Text(text = "Notifiche") },
+                               onClick = {
+                                   expended = false
+                                   navController.navigate(Schermate.Notifiche.route)
+                               },
+                               leadingIcon = {
+                                   Icon(Icons.Default.Notifications, contentDescription = "icona Impostazioni")
                                },
                                modifier = Modifier.background(Grey20)
                            )

@@ -9,6 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.Profilo.ui.NotificationScreen
+import com.example.teamsync.caratteristiche.ProfiloAmici.ProfiloSchermata
+import com.example.teamsync.caratteristiche.ProfiloAmici.ProfiloUtenteCliccato
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.LeMieAttivitaUI
 import com.example.teamsync.caratteristiche.faq.ui.Faq
@@ -30,6 +34,8 @@ import com.example.teamsync.screen.UserProfileScreen
 @Composable
 fun NavGraph(){
     val navController = rememberNavController()
+    val viewmodel = ViewModelUtente()
+
     val viewModelUtente = ViewModelUtente()
     val viewModelProgetto = ViewModelProgetto()
     val viewModelLeMieAttivita = LeMieAttivitaViewModel()
@@ -47,13 +53,16 @@ fun NavGraph(){
 
         composable(route = Schermate.LeMieAttivita.route) { LeMieAttivitaUI(navController, viewModelLeMieAttivita) }
         composable(route = Schermate.Inizio.route) { Start(navController) }
-
+        composable(route = Schermate.Notifiche.route) { NotificationScreen(viewmodel, navController) }
 
         composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewModelUtente,navController)}
         composable(route= Schermate.Impostazioni.route){Impostazioni(navController)}
         composable(route = Schermate.Tema.route){ Tema(navController)}
         composable(route = Schermate.Terms.route) {Termini(navController)}
         composable(route = Schermate.Supporto.route) { Supporto(navController)}
+        composable(route = Schermate.Profilo.route) { ProfiloSchermata(viewmodel, navController) }
+
+
 
         // Composable per la nuova schermata DettaglioProgetto
         composable(
@@ -63,9 +72,31 @@ fun NavGraph(){
             // Recupera il parametro projectId dalla rotta
             val projectId = backStackEntry.arguments?.getString("sezioneFaq")
 
-            // Chiamata alla schermata DettaglioProgetto con il parametro
+
             Faq(navController = navController, sezioneFaq = projectId ?: "")
         }
+
+        composable(
+            route = "utente/{id}/{amicizia}/{provenienza}",
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType },
+                navArgument("amicizia") { type = NavType.StringType },
+                navArgument("provenienza") { type = NavType.StringType },// Aggiungi qui l'argomento "amicizia"
+            )
+        ) { backStackEntry ->
+            // Recupera i parametri "id" e "amicizia" dalla rotta
+            val id_u = backStackEntry.arguments?.getString("id")
+            val amici = backStackEntry.arguments?.getString("amicizia")
+            val provenienza = backStackEntry.arguments?.getString("provenienza")
+
+
+            if (id_u != null) {
+                if (provenienza != null) {
+                    ProfiloUtenteCliccato(viewModel = viewmodel, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche())
+                }
+            }
+        }
+
     }
 }
 

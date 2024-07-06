@@ -51,6 +51,7 @@ fun SezioneITUoiProgetti(
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 16.dp
             ),
+
             modifier = Modifier
                 .fillMaxWidth()
                 .height(140.dp),

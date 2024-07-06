@@ -181,14 +181,16 @@ fun ITuoiProgetti(
                SezioneProfiloUtente(navController, viewModelUtente)
 
 
-               Spacer(modifier = Modifier.height(8.dp))
+               Spacer(modifier = Modifier.height(16.dp))
 
                SezioneITUoiProgetti(navController = navController, progetti = progetti)
 
+               Spacer(modifier = Modifier.height(16.dp))
+
+
                Row(
                    modifier = Modifier
-                       .fillMaxSize()
-                       .padding(padding),
+                       .fillMaxSize(),
                    horizontalArrangement = Arrangement.spacedBy(32.dp)
                ) {
                    SezioneProgressiProgetti(progress = 0.55f, completedProjects = 3)

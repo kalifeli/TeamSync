@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.ui.theme.Red70
 

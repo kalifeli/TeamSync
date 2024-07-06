@@ -50,7 +50,7 @@ class RepositoryUtente {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val utente = result.user ?: return null
 
-            val profiloUtente = ProfiloUtente(utente.uid, nome, cognome, dataNascita, email)
+            val profiloUtente = ProfiloUtente(utente.uid, nome, cognome, matricola, dataNascita, email)
             firestore.collection("utenti").document(utente.uid).set(profiloUtente).await()
 
             return utente

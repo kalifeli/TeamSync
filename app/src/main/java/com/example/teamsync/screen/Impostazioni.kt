@@ -287,7 +287,7 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (setting.label == R.string.logout.toString()) Color(0xFFC1092A) else Color(0xFFE5E5E5)),
+            .background(if (setting.label == "Logout") Color(0xFFC1092A) else Color(0xFFE5E5E5)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
 

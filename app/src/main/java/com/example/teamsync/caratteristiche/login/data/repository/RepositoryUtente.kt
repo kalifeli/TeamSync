@@ -8,8 +8,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
-
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
@@ -50,7 +50,7 @@ class RepositoryUtente {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val utente = result.user ?: return null
 
-            val profiloUtente = ProfiloUtente(utente.uid, matricola, nome, cognome, dataNascita, email)
+            val profiloUtente = ProfiloUtente(utente.uid, nome, cognome, matricola, dataNascita, email)
             firestore.collection("utenti").document(utente.uid).set(profiloUtente).await()
 
             return utente
@@ -87,6 +87,7 @@ class RepositoryUtente {
         return utenteCorrente
     }
 
+
     suspend fun sendEmailVerification(){
         auth.useAppLanguage()
         try {
@@ -97,14 +98,52 @@ class RepositoryUtente {
         }
     }
 
-    suspend fun getUserProfile(userId: String): ProfiloUtente? {
+     suspend fun getUserProfile(userId: String): ProfiloUtente? {
             val document = firestore.collection("utenti").document(userId).get().await()
             return document.toObject(ProfiloUtente::class.java)
     }
 
+    fun get_user_sincrono(userId: String, callback: (ProfiloUtente?) -> Unit) {
+         firestore.collection("utenti").document(userId).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val profile = documentSnapshot.toObject(ProfiloUtente::class.java)
+                callback(profile)
+            }
+            .addOnFailureListener {
+                // Gestione dell'errore, ad esempio log o callback con null
+                callback(null)
+            }
+    }
+
+
     suspend fun updateUserProfile(profiloUtente: ProfiloUtente) {
             firestore.collection("utenti").document(profiloUtente.id).set(profiloUtente).await()
     }
+
+    suspend fun getallutenti(): List<String> {
+        val utentiCollection = Firebase.firestore.collection("utenti")
+
+        return try {
+            val querySnapshot = utentiCollection.get().await()
+            val utentiList = mutableListOf<String>()
+
+            for (document in querySnapshot.documents) {
+                // Assuming 'name' is a field in your Firestore documents
+                val nomeUtente = document.getString("id")
+                if (nomeUtente != null) {
+                    utentiList.add(nomeUtente)
+                }
+            }
+
+            utentiList
+        } catch (e: Exception) {
+            // Gestisci eventuali eccezioni qui
+            emptyList() // o altra gestione dell'errore desiderata
+        }
+    }
+
+
+
     suspend fun isEmailVerified(): Boolean {
         val utenteAttuale = auth.currentUser
         utenteAttuale?.reload()?.await()
@@ -113,6 +152,45 @@ class RepositoryUtente {
     fun signOut() {
         FirebaseAuth.getInstance().signOut()
     }
+
+    suspend fun aggiungiAmico(userId: String, amicoId: String) {
+        try {
+            val userRef = firestore.collection("utenti").document(userId)
+            val snapshot = userRef.get().await()
+            val userProfile = snapshot.toObject(ProfiloUtente::class.java)
+
+            // Verifica se il profilo esiste e aggiungi amicoId alla lista degli amici se non è già presente
+            userProfile?.let {
+                val updatedAmici = it.amici.toMutableList()
+                if (!updatedAmici.contains(amicoId)) {
+                    updatedAmici.add(amicoId)
+                    userRef.update("amici", updatedAmici).await()
+                }
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+    suspend fun rimuoviAmico(userId: String, amicoId: String) {
+        try {
+            val userRef = firestore.collection("utenti").document(userId)
+            val snapshot = userRef.get().await()
+            val userProfile = snapshot.toObject(ProfiloUtente::class.java)
+
+            // Verifica se il profilo esiste e rimuovi amicoId dalla lista degli amici se presente
+            userProfile?.let {
+                val updatedAmici = it.amici.toMutableList()
+                if (updatedAmici.contains(amicoId)) {
+                    updatedAmici.remove(amicoId)
+                    userRef.update("amici", updatedAmici).await()
+                }
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+
 
 }
 

@@ -86,9 +86,13 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
     var matricola by remember { mutableStateOf(userProfile?.matricola ?: "") }
     var email by remember { mutableStateOf(userProfile?.email ?: "") }
 
+    var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList<String>()) }
     var loading1 by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+
+    val primoaccesso by remember { mutableStateOf(userProfile?.primoAccesso ?: false) }
+
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val launcher =
@@ -113,6 +117,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                 dataDiNascita = it.dataDiNascita ?: ""
                 matricola = it.matricola ?: ""
                 email = it.email ?: ""
+                amici = it.amici
             }
         } catch (e: Exception) {
             error = "Errore di connessione: ${e.message}"
@@ -136,7 +141,9 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         dataDiNascita = dataDiNascita,
                         matricola = matricola,
                         email = email,
-                        immagine = imageUrl.toString()
+                        immagine = imageUrl.toString(),
+                        amici = amici,
+                        primoAccesso = primoaccesso
                     )
                 viewModel.updateUserProfile(updatedProfile)
 
@@ -178,7 +185,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         Color.White,
                         RoundedCornerShape(20.dp)
                     ) // Imposta il rettangolo di sfondo a nero
-                    .clickable { navController.navigate(Schermate.Impostazioni.route) },
+                    .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -318,7 +325,9 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         dataDiNascita = dataDiNascita,
                         matricola = matricola,
                         email = email,
-                        immagine = userProfile?.immagine
+                        immagine = userProfile?.immagine,
+                        primoAccesso = primoaccesso,
+                        amici = amici
 
                     )
                     viewModel.updateUserProfile(updatedProfile)
@@ -394,8 +403,8 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
         var matricola by remember { mutableStateOf(userProfile?.matricola ?: "") }
         var email by remember { mutableStateOf(userProfile?.email ?: "") }
 
-
-
+    var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList<String>()) }
+    var primoaccesso by remember { mutableStateOf(userProfile?.primoAccesso ?: false) }
     var loading1 by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -422,6 +431,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                 dataDiNascita = it.dataDiNascita ?: ""
                 matricola = it.matricola ?: ""
                 email = it.email ?: ""
+                amici = it.amici
             }
         } catch (e: Exception) {
             error = "Errore di connessione: ${e.message}"
@@ -445,7 +455,10 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         dataDiNascita = dataDiNascita,
                         matricola = matricola,
                         email = email,
-                        immagine = imageUrl.toString()
+                        immagine = imageUrl.toString(),
+                        primoAccesso = primoaccesso,
+                        amici = amici
+
                     )
                 viewModel.updateUserProfile(updatedProfile)
 
@@ -522,7 +535,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = stringResource(id = R.string.modificaProfiloScreen),
+                            text = "Modifica Profilo",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = darkTextColor // Cambia il colore del testo
@@ -644,7 +657,9 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                             dataDiNascita = dataDiNascita,
                             matricola = matricola,
                             email = email,
-                            immagine = userProfile?.immagine
+                            immagine = userProfile?.immagine,
+                            amici = amici,
+                            primoAccesso = primoaccesso
 
                         )
                         viewModel.updateUserProfile(updatedProfile)

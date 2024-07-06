@@ -17,5 +17,7 @@ sealed class Schermate(val route: String){
     object Terms: Schermate("terms")
     object Supporto: Schermate("supporto")
     object LeMieAttivita: Schermate("LeMieAttivita")
+    object Profilo: Schermate("Profilo")
+    object Notifiche: Schermate("Notifiche")
 
 }

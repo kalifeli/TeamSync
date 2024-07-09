@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class RepositoryProgetto {
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -23,7 +24,7 @@ class RepositoryProgetto {
         }
     }
 
-    suspend fun aggiungiProgetto(progetto: Progetto): String {
+    suspend fun creaProgetto(progetto: Progetto): String {
         return try {
             val documentRef = firestore.collection("progetti").add(progetto).await()
             documentRef.id
@@ -32,7 +33,7 @@ class RepositoryProgetto {
         }
     }
 
-    suspend fun aggiungiPartecipante(progettoId: String?, userId: String) {
+    suspend fun aggiungiPartecipante(progettoId: String?, userId: String?) {
         try {
             val progettoRef = firestore.collection("progetti").document(progettoId ?: "")
             progettoRef.update("partecipanti", FieldValue.arrayUnion(userId)).await()
@@ -48,9 +49,29 @@ class RepositoryProgetto {
             throw  e
         }
     }
+    fun generaCodiceProgetto(): String{
+        return UUID.randomUUID().toString().substring(0, 8)
+    }
+    suspend fun getProgettoIdByCodice(codice: String): String?{
+         return try {
+            val progetto = firestore.collection("progetti")
+                .whereEqualTo("codice", codice)
+                .get()
+                .await()
+                .toObjects(Progetto::class.java)
+             if(progetto.isNotEmpty()) {
+                 progetto[0].id
+             }else{
+                 null
+             }
+        }catch (e: Exception){
+            null
+        }
+    }
 
     fun logout(){
         auth.signOut()
     }
+
 }
 

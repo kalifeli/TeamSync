@@ -366,7 +366,7 @@ fun LoginScreen(
                 delay(2000)
                 viewModelProgetto.aggiornaUtenteCorrente()
                 viewModelProgetto.utenteCorrenteId.value?.let {
-                    viewModelProgetto.caricaProgettiUtente(it)
+                    viewModelProgetto.caricaProgettiUtente(it, false)
                 }
                 navController.navigate(Schermate.ItuoiProgetti.route)
             }

@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -59,6 +59,9 @@ import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.TeamSyncTheme
 import com.example.teamsync.util.ThemePreferences
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
@@ -82,11 +85,11 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
     var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
     var cognome by remember { mutableStateOf(userProfile?.cognome ?: "") }
-    var dataDiNascita by remember { mutableStateOf(userProfile?.dataDiNascita ?: "") }
+    var dataDiNascita by remember { mutableStateOf(userProfile?.dataDiNascita ?: Date()) }
     var matricola by remember { mutableStateOf(userProfile?.matricola ?: "") }
     var email by remember { mutableStateOf(userProfile?.email ?: "") }
 
-    var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList<String>()) }
+    var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList()) }
     var loading1 by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -112,11 +115,11 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
     LaunchedEffect(userProfile) {
         try {
             userProfile?.let {
-                nome = it.nome ?: ""
-                cognome = it.cognome ?: ""
-                dataDiNascita = it.dataDiNascita ?: ""
-                matricola = it.matricola ?: ""
-                email = it.email ?: ""
+                nome = it.nome
+                cognome = it.cognome
+                dataDiNascita = it.dataDiNascita
+                matricola = it.matricola
+                email = it.email
                 amici = it.amici
             }
         } catch (e: Exception) {
@@ -135,7 +138,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
                 val updatedProfile =
                     userProfile?.copy(immagine = imageUrl.toString()) ?: ProfiloUtente(
-                        id = "", // Assicurati di gestire il caso in cui userProfile sia null
+                        id = "",
                         nome = nome,
                         cognome = cognome,
                         dataDiNascita = dataDiNascita,
@@ -149,10 +152,10 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
 
             } catch (e: Exception) {
-                // Gestisci eventuali errori durante il caricamento dell'immagine
+                // Gestisce eventuali errori durante il caricamento dell'immagine
                 error = "Errore durante il caricamento dell'immagine: ${e.message}"
             } finally {
-                // Aggiorna lo stato di caricamento o gestisci altri aspetti dell'UI
+                // Aggiorna lo stato di caricamento e gestisce altri aspetti dell'UI
                 loading1 = false
                 loading = false
                 navController.navigate(Schermate.ModificaProfilo.route)
@@ -189,7 +192,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "close_impostazioni",
                     tint = Color.DarkGray // Assicurati che l'icona sia visibile impostando il colore a bianco
                 )
@@ -270,14 +273,6 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
             }
 
-
-
-
-
-
-
-
-
         Spacer(modifier = Modifier.height(20.dp))
 
         if (loading) {
@@ -302,8 +297,9 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                 label = { Text(stringResource(id = R.string.matricola1)) }
             )
             OutlinedTextField(
-                value = dataDiNascita,
-                onValueChange = { dataDiNascita = it },
+                value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dataDiNascita),
+                onValueChange = {},
+                readOnly = true,
                 label = { Text(stringResource(id = R.string.dataDiNascita)) }
             )
             OutlinedTextField(
@@ -394,16 +390,16 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
 @Composable
     fun UserProfileScreen_dark(viewModel: ViewModelUtente, navController: NavHostController) {
-        viewModel.getUserProfile()
-        val userProfile = viewModel.userProfile
-        val darkTextColor = Color.White
-        var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
-        var cognome by remember { mutableStateOf(userProfile?.cognome ?: "") }
-        var dataDiNascita by remember { mutableStateOf(userProfile?.dataDiNascita ?: "") }
-        var matricola by remember { mutableStateOf(userProfile?.matricola ?: "") }
-        var email by remember { mutableStateOf(userProfile?.email ?: "") }
+        viewModel.getUserProfile() // ????????
+    val userProfile = viewModel.userProfile
+    val darkTextColor = Color.White
+    var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
+    var cognome by remember { mutableStateOf(userProfile?.cognome ?: "") }
+    var dataDiNascita by remember { mutableStateOf(userProfile?.dataDiNascita ?: Date()) }
+    var matricola by remember { mutableStateOf(userProfile?.matricola ?: "") }
+    var email by remember { mutableStateOf(userProfile?.email ?: "") }
 
-    var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList<String>()) }
+    var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList()) }
     var primoaccesso by remember { mutableStateOf(userProfile?.primoAccesso ?: false) }
     var loading1 by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(true) }
@@ -426,11 +422,11 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
     LaunchedEffect(userProfile) {
         try {
             userProfile?.let {
-                nome = it.nome ?: ""
-                cognome = it.cognome ?: ""
-                dataDiNascita = it.dataDiNascita ?: ""
-                matricola = it.matricola ?: ""
-                email = it.email ?: ""
+                nome = it.nome
+                cognome = it.cognome
+                dataDiNascita = it.dataDiNascita
+                matricola = it.matricola
+                email = it.email
                 amici = it.amici
             }
         } catch (e: Exception) {
@@ -449,7 +445,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
                 val updatedProfile =
                     userProfile?.copy(immagine = imageUrl.toString()) ?: ProfiloUtente(
-                        id = "", // Assicurati di gestire il caso in cui userProfile sia null
+                        id = "",
                         nome = nome,
                         cognome = cognome,
                         dataDiNascita = dataDiNascita,
@@ -522,7 +518,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "close_impostazioni",
                             tint = Color.DarkGray // Assicurati che l'icona sia visibile impostando il colore a bianco
                         )
@@ -550,8 +546,6 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
 
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-
-
 
 
                 Box(
@@ -611,11 +605,6 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                     verticalArrangement = Arrangement.Top
                 ) {
 
-
-
-
-
-
                     OutlinedTextField(
                         value = nome,
                         onValueChange = { nome = it },
@@ -633,8 +622,8 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                         label = { Text((stringResource(id = R.string.matricola1)), color = darkTextColor) }
                     )
                     OutlinedTextField(
-                        value = dataDiNascita,
-                        onValueChange = { dataDiNascita = it },
+                        value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dataDiNascita),
+                        onValueChange = {},
                         label = { Text(stringResource(id = R.string.dataDiNascita), color = darkTextColor) }
                     )
                     OutlinedTextField(

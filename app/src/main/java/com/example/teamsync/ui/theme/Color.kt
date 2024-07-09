@@ -15,5 +15,3 @@ val ColorePrioritaAlta = Color(0xFFC1092A)
 val ColorePrioritaMedia = Color(0xFFFFA500)
 val ColorePrioritaBassa = Color(0xFF00C980)
 val ColoreSenzaPriorita = Color(0xFFFFFFFF)
-
-val fb_grey = Color(0xF3F4F8)

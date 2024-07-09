@@ -33,6 +33,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
+import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
 
 @Composable
@@ -41,7 +42,11 @@ fun SezioneProfiloUtente(
     viewModelUtente: ViewModelUtente,
 ){
     val userProfile = viewModelUtente.userProfile
+
     ElevatedCard(
+        onClick = {
+            navController.navigate(Schermate.Profilo.route)
+        },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
@@ -68,7 +73,7 @@ fun SezioneProfiloUtente(
                     fontWeight = FontWeight.Normal,
                 )
                 Text(
-                    text = "Alessandro" + "!",
+                    text = "${userProfile?.nome}!",
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.White,
                     fontWeight = FontWeight.Normal,
@@ -76,34 +81,19 @@ fun SezioneProfiloUtente(
 
             }
 
-                // Usa la funzione per mostrare l'immagine del profilo utente
-                ImmagineProfiloUtente(
-                    imageUrl = userProfile?.immagine,
-                    defaultImage = R.drawable.logo_rotondo,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .size(90.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.White, CircleShape)
-                )
-
-
+            ImmagineProfiloUtente(
+                imageUrl = userProfile?.immagine,
+                defaultImage = R.drawable.logo_rotondo,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(90.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, Color.White, CircleShape)
+            )
 
         }
     }
 }
-
-/*
-@Composable
-fun ImmagineProfiloUtente(imageResource: Int, modifier: Modifier = Modifier) {
-    Image(
-        painter = painterResource(id = imageResource),
-        contentDescription = null,
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-    )
-}
-*/
 
 
 @Composable
@@ -130,7 +120,8 @@ fun ImmagineProfiloUtente(imageUrl: String?, defaultImage: Int, modifier: Modifi
         modifier = modifier
             .size(64.dp)
             .background(Color.White, CircleShape)
-            .padding(7.dp),
+            //.padding(4.dp)
+        ,
         contentScale = ContentScale.Crop
     )
 }

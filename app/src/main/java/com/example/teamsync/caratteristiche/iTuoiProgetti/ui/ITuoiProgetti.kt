@@ -20,47 +20,53 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
+import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import java.text.SimpleDateFormat
@@ -78,34 +84,37 @@ fun ITuoiProgetti(
     var expended by remember {
         mutableStateOf(false)
     }
-    var showDialog by remember {
+    var mostraCreaProgettoDialog by remember {
         mutableStateOf(false)
     }
     val aggiungiProgettoRiuscito = viewModelProgetto.aggiungiProgettoRiuscito.value
     val progetti by viewModelProgetto.progetti
+
+    val utenteCorrenteId by viewModelProgetto.utenteCorrenteId
     val context = LocalContext.current
+    val loading = viewModelProgetto.isLoading.value
 
     LaunchedEffect(Unit) {
         viewModelProgetto.utenteCorrenteId.value?.let {
-            viewModelProgetto.caricaProgettiUtente(it)
+            viewModelProgetto.caricaProgettiUtente(it, false)
         }
         Log.d("View", "utente corrente : ${viewModelProgetto.utenteCorrenteId.value}")
     }
 
     Scaffold(
        topBar = {
-           TopAppBar(
+           CenterAlignedTopAppBar(
                title = {
                    Text(
-                       text = "",
-                       textAlign = TextAlign.Center
+                       text = "Home",
+                       style = MaterialTheme.typography.headlineSmall,
+                       fontWeight = FontWeight.Bold,
+                       textAlign = TextAlign.Center,
+                       color = Color.Black
                    )
                },
 
                actions = {
-                   IconButton(onClick = { /*TODO: implementare una funzione di refresh della pagina utente*/ }) {
-                       Icon(Icons.Default.Refresh, contentDescription = "Ricerca progetto per nome")
-                   }
                    Box{
                        IconButton(onClick = {expended = true }) {
                            Icon(Icons.Default.MoreVert, contentDescription = "Menu")
@@ -116,28 +125,19 @@ fun ITuoiProgetti(
                            modifier = Modifier.background(Grey20)
                        ) {
                            DropdownMenuItem(
-                               text = { Text(text = "Profilo") },
+                               text = { Text(text = "Sincronizza") },
                                onClick = {
                                    expended = false
+                                   utenteCorrenteId?.let {
+                                       viewModelProgetto.caricaProgettiUtente(it, true)
+                                   }
+                               },
+                               leadingIcon = {
+                                   Icon(Icons.Default.Refresh, contentDescription = "icona sincronizzazione")
+                               },
+                               modifier = Modifier.background(Grey20)
+                           )
 
-                                   navController.navigate(Schermate.Profilo.route)
-                               },
-                               leadingIcon = {
-                                   Icon(Icons.Default.Person, contentDescription = "icona profilo utente")
-                               },
-                               modifier = Modifier.background(Grey20)
-                           )
-                           DropdownMenuItem(
-                               text = { Text(text = "Notifiche") },
-                               onClick = {
-                                   expended = false
-                                   navController.navigate(Schermate.Notifiche.route)
-                               },
-                               leadingIcon = {
-                                   Icon(Icons.Default.Notifications, contentDescription = "icona Impostazioni")
-                               },
-                               modifier = Modifier.background(Grey20)
-                           )
                            DropdownMenuItem(
                                text = { Text(text = "Impostazioni") },
                                onClick = {
@@ -169,13 +169,18 @@ fun ITuoiProgetti(
                        }
                    }
 
-               }
+               },
+               colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                   containerColor = Color.Transparent,
+                   titleContentColor = Color.Black,
+                   actionIconContentColor = Color.Black,
+               )
            )
        },
        floatingActionButton = {
            FloatingActionButton(
                onClick = {
-                   showDialog = true
+                   mostraCreaProgettoDialog = true
                },
                containerColor = Red70,
                contentColor = White,
@@ -184,19 +189,38 @@ fun ITuoiProgetti(
            }
        },
        content = {padding ->
+
            Column(
                modifier = Modifier
                    .fillMaxSize()
                    .padding(padding)
-                   .padding(16.dp)
+                   .padding(horizontal = 16.dp)
            ) {
+               Row(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .padding(8.dp),
+                   verticalAlignment = Alignment.Top,
+                   horizontalArrangement = Arrangement.Center
+               ){
+                   if (loading) {
+                       CircularProgressIndicator(
+                           modifier = Modifier
+                               .padding(8.dp)
+                               .align(Alignment.Top),
+                           color = Grey50,
+                           trackColor = Red70,
+                           strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                       )
+                   }
+               }
+
 
                SezioneProfiloUtente(navController, viewModelUtente)
 
-
                Spacer(modifier = Modifier.height(16.dp))
 
-               SezioneITUoiProgetti(navController = navController, progetti = progetti)
+               SezioneITUoiProgetti(navController = navController, progetti = progetti, viewModelProgetto = viewModelProgetto)
 
                Spacer(modifier = Modifier.height(16.dp))
 
@@ -214,12 +238,13 @@ fun ITuoiProgetti(
            }
        }
    )
-    if (showDialog) {
-        AggiungiProgettoDialog(
-            onDismissRequest = { showDialog = false },
+    if (mostraCreaProgettoDialog) {
+        CreaProgettoDialog(
+            onDismissRequest = { mostraCreaProgettoDialog = false },
             viewModelProgetto = viewModelProgetto
         )
     }
+
 
     LaunchedEffect(viewModelProgetto.erroreAggiungiProgetto.value) {
         if(viewModelProgetto.erroreAggiungiProgetto.value != null){
@@ -231,8 +256,11 @@ fun ITuoiProgetti(
     LaunchedEffect(aggiungiProgettoRiuscito) {
         if(aggiungiProgettoRiuscito){
             Toast.makeText(context, "Progetto aggiunto con successo", Toast.LENGTH_LONG).show()
+            utenteCorrenteId?.let {
+                viewModelProgetto.caricaProgettiUtente(it, true)
+            }
             viewModelProgetto.resetAggiugniProgettoRiuscito()
-            showDialog = false
+            mostraCreaProgettoDialog = false
         }
     }
 
@@ -243,9 +271,9 @@ fun ITuoiProgetti(
 
 
 @Composable
-fun AggiungiProgettoDialog(
+fun CreaProgettoDialog(
     onDismissRequest: () -> Unit,
-   viewModelProgetto: ViewModelProgetto
+    viewModelProgetto: ViewModelProgetto,
 ) {
     var nome by remember { mutableStateOf("") }
     var descrizione by remember { mutableStateOf("") }
@@ -253,6 +281,9 @@ fun AggiungiProgettoDialog(
     var priorita by remember { mutableStateOf(Priorità.NESSUNA) }
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+    var mostraAggiungiProgetto by remember {
+        mutableStateOf(false)
+    }
 
     val datePickerDialog = DatePickerDialog(
         context,
@@ -272,7 +303,11 @@ fun AggiungiProgettoDialog(
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text("Aggiungi Progetto") },
+        title = {
+            Text(
+                "Crea un nuovo progetto",
+            )
+                },
         containerColor = White,
         text = {
             Column {
@@ -371,23 +406,51 @@ fun AggiungiProgettoDialog(
                         }
                     }
                 }
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = Red70,
+                    thickness = 2.dp
+                )
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Oppure unisciti a un progetto con ",
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "un codice",
+                        textDecoration = TextDecoration.Underline,
+                        textAlign = TextAlign.Center,
+                        color = Red70,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {mostraAggiungiProgetto = true}
+                            .padding(horizontal = 2.dp),
+                    )
+                }
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    val progetto = Progetto(
+                    viewModelProgetto.creaProgetto(
                         nome = nome,
                         descrizione = descrizione,
                         dataScadenza = dataScadenza,
-                        priorita = priorita,
-                        partecipanti = listOf(viewModelProgetto.utenteCorrenteId.value ?: "")
+                        priorita = priorita
                     )
-                    viewModelProgetto.aggiungiProgetto(progetto)
                 },
                 colors = ButtonDefaults.buttonColors(Red70)
             ) {
-                Text("Aggiungi")
+                Text("Crea")
             }
         },
         dismissButton = {
@@ -401,6 +464,12 @@ fun AggiungiProgettoDialog(
             }
         }
     )
+    if(mostraAggiungiProgetto){
+        AggiungiProgettoDialog(
+            onDismissRequest = { mostraAggiungiProgetto = false },
+            viewModelProgetto = viewModelProgetto ,
+        )
+    }
     LaunchedEffect(viewModelProgetto.erroreAggiungiProgetto.value) {
         if(viewModelProgetto.erroreAggiungiProgetto.value != null){
             Toast.makeText(context, viewModelProgetto.erroreAggiungiProgetto.value, Toast.LENGTH_LONG).show()
@@ -408,6 +477,73 @@ fun AggiungiProgettoDialog(
         }
 
     }
+}
+
+@Composable
+fun AggiungiProgettoDialog(
+    onDismissRequest: () -> Unit,
+    viewModelProgetto: ViewModelProgetto,
+){
+    var codiceProgetto by remember { mutableStateOf("") }
+    val utenteId = viewModelProgetto.utenteCorrenteId.value
+    AlertDialog(
+        title = {
+            Text(
+                text = "Aggiungi un progetto",
+            )
+        },
+        containerColor = White,
+        text = {
+            Column {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    text = "Per unirti a un progetto esistente, inserisci il codice univoco fornito dal creatore del progetto.",
+                    textAlign = TextAlign.Center
+                )
+                OutlinedTextField(
+                    value = codiceProgetto , 
+                    onValueChange = {codiceProgetto = it},
+                    label = {
+                        Text(
+                            "Codice progetto",
+                            color = Color.Black
+                        ) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = Red70,
+                        focusedBorderColor = Red70
+                    ),
+                    maxLines = 1
+                )
+            }
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = { 
+            Button(
+                onClick = {
+                    utenteId?.let {
+                        viewModelProgetto.aggiungiPartecipanteConCodice(it,codiceProgetto)
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(Red70),
+                enabled = codiceProgetto.length >= 8
+            ) {
+                Text(text = "Unisciti")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismissRequest
+            ){
+                Text(
+                    text = "Annulla",
+                    color = Color.Black
+                )
+            }
+        }
+    )
 }
 
 

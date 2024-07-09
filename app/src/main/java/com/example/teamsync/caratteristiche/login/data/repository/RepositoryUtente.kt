@@ -2,6 +2,7 @@ package com.example.teamsync.caratteristiche.login.data.repository
 
 import android.net.Uri
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
+import com.example.teamsync.caratteristiche.login.data.model.SessoUtente
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -11,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import java.util.UUID
 
 
@@ -45,15 +47,15 @@ class RepositoryUtente {
         }
     }
 
-    suspend fun signUp(matricola: String, nome: String, cognome: String, dataNascita: String, email: String, password: String): FirebaseUser?{
+    suspend fun signUp(matricola: String, nome: String, cognome: String, dataNascita: Date, sesso: SessoUtente, email: String, password: String): FirebaseUser?{
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val utente = result.user ?: return null
 
-            val profiloUtente = ProfiloUtente(utente.uid, nome, cognome, matricola, dataNascita, email)
+            val profiloUtente = ProfiloUtente(utente.uid, nome, cognome, matricola, dataNascita, sesso, email)
             firestore.collection("utenti").document(utente.uid).set(profiloUtente).await()
 
-            return utente
+            utente
 
         }catch (e: FirebaseAuthUserCollisionException){
             //l'email è già in uso
@@ -82,13 +84,13 @@ class RepositoryUtente {
     }
 
 
-    suspend fun getUtenteAttuale(): FirebaseUser?{
+    fun getUtenteAttuale(): FirebaseUser?{
         val utenteCorrente = auth.currentUser
         return utenteCorrente
     }
 
 
-    suspend fun sendEmailVerification(){
+    fun sendEmailVerification(){
         auth.useAppLanguage()
         try {
             val utente = getUtenteAttuale()
@@ -103,7 +105,7 @@ class RepositoryUtente {
             return document.toObject(ProfiloUtente::class.java)
     }
 
-    fun get_user_sincrono(userId: String, callback: (ProfiloUtente?) -> Unit) {
+    fun getUserSincrono(userId: String, callback: (ProfiloUtente?) -> Unit) {
          firestore.collection("utenti").document(userId).get()
             .addOnSuccessListener { documentSnapshot ->
                 val profile = documentSnapshot.toObject(ProfiloUtente::class.java)

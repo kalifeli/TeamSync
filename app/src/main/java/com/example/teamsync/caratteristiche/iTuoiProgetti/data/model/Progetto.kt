@@ -14,8 +14,9 @@ data class Progetto(
     val priorita: Priorità = Priorità.NESSUNA, // Priorità del progetto
     val attivita: List<LeMieAttivita> = emptyList(), // Lista di attività associate al progetto
     val partecipanti: List<String> = emptyList(), // lista degli id dei partecipanti
-    val completato: Boolean = false
+    val completato: Boolean = false,
+    val codice: String = ""
 ) {
     // Costruttore vuoto richiesto da Firestore per deserializzare l'oggetto
-    constructor() : this(null, "", "", Date(), Date(), Priorità.NESSUNA, emptyList(), emptyList())
+    //constructor() : this(null, "", "", Date(), Date(), Priorità.NESSUNA, emptyList(), emptyList())
 }

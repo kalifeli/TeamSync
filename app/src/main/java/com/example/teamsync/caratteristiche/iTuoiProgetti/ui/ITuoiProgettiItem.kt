@@ -15,15 +15,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,15 +35,23 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ITuoiProgettiItem(
     progetto: Progetto,
-    navController: NavController
+    navController: NavController,
+    viewModelProgetto: ViewModelProgetto
 ){
+    val dataCorrente = remember { progetto.dataScadenza }
+    val formattatoreData = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    val dataFormattata = formattatoreData.format(dataCorrente)
 
     ElevatedCard(
         onClick = {
@@ -88,7 +97,7 @@ fun ITuoiProgettiItem(
             )
 
             Row(
-                modifier = Modifier.align(Alignment.End), // Aggiunto per allineare a destra
+                modifier = Modifier.align(Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -102,33 +111,34 @@ fun ITuoiProgettiItem(
                     textAlign = TextAlign.End,
                     fontSize = 12.sp
                 )
-
             }
             Row(
-                modifier = Modifier.align(Alignment.End), // Aggiunto per allineare a destra
+                modifier = Modifier.align(Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val progettoScaduto = viewModelProgetto.progettoScaduto(progetto)
+                val iconaCalendario = if(!progettoScaduto) R.drawable.ic_calendario_evento else R.drawable.ic_progettoscaduto
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_calendario_evento),
+                    painter = painterResource(iconaCalendario),
                     contentDescription = "data scadenza",
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
+                    tint = if(viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "23/07/2024",
+                    text = dataFormattata,
                     textAlign = TextAlign.End,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = if(viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
                 )
             }
         }
-        
     }
-
-
 }
 
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewITuoiProgettiItem(){
-    ITuoiProgettiItem( navController = rememberNavController(),progetto = Progetto(nome = "TeamSync"))
+    ITuoiProgettiItem( navController = rememberNavController(),progetto = Progetto(nome = "TeamSync"), viewModelProgetto = ViewModelProgetto())
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun SezioneProgressiProgetti(progress: Float, completedProjects: Int){
@@ -44,7 +45,7 @@ fun SezioneProgressiProgetti(progress: Float, completedProjects: Int){
             Text(
                 text = "Progressi",
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
             Spacer(modifier = Modifier.size(8.dp))
@@ -61,7 +62,7 @@ fun SezioneProgressiProgetti(progress: Float, completedProjects: Int){
                 Text(
                     text = "${(progress * 100).toInt()}%",
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
             }

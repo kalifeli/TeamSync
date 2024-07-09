@@ -19,7 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -54,18 +54,20 @@ import com.example.teamsync.R.drawable.background_black
 import com.example.teamsync.R.drawable.icon
 import com.example.teamsync.R.drawable.logo_white
 import com.example.teamsync.R.drawable.registrazione
+import com.example.teamsync.caratteristiche.login.data.model.SessoUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
+import java.util.Date
 
 @Composable
 fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUtente) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val background: Painter = painterResource(id = registrazione)
-    val background_b: Painter = painterResource(id = background_black)
+    val backgroundB: Painter = painterResource(id = background_black)
 
     var matricola by remember {
         mutableStateOf("")
@@ -86,7 +88,10 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
         mutableStateOf("")
     }
     var dataNascita by remember {
-        mutableStateOf("")
+        mutableStateOf(Date())
+    }
+    var sesso by remember {
+        mutableStateOf(SessoUtente.UOMO)
     }
     var passwordVisibile by remember {
         mutableStateOf(false)
@@ -105,7 +110,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     ) {
        if(isDarkTheme)
            Image(
-               painter = background_b,
+               painter = backgroundB,
                contentDescription = "Background Image",
                modifier = Modifier
                    .fillMaxSize(),
@@ -319,7 +324,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
 
                         visualTransformation = if (confermaPasswordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
 
-                        // visualizza o non visualizzare password
+                        // visualizza o non visualizzare password di conferma
                         trailingIcon = {
                             IconButton(onClick = { confermaPasswordVisibile = !confermaPasswordVisibile }) {
                                 val icona: Painter = if (confermaPasswordVisibile) {
@@ -344,7 +349,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
                         onClick = {
-                            viewModelUtente.signUp(matricola,nome, cognome,email,dataNascita,password,confermaPassword)
+                            viewModelUtente.signUp(matricola,nome, cognome,email,dataNascita,sesso,password,confermaPassword)
                                   },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -397,12 +402,12 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                                 textAlign = TextAlign.Center,
                                 color = if(isDarkTheme) White else Red70
                             )
-                            Divider(
-                                color = if(isDarkTheme) White else Red70,
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .width(50.dp)
-                                    .height(1.dp) // Adjust thickness as needed
+                                    .height(1.dp), // Adjust thickness as needed
+                                color = if(isDarkTheme) White else Red70
                             )
                         }
                     }

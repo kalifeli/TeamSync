@@ -1,10 +1,9 @@
 
 
-package com.example.teamsync.caratteristiche.ProfiloAmici
+package com.example.teamsync.caratteristiche.Profilo
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +23,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -54,7 +52,6 @@ import coil.request.ImageRequest
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
-import com.example.teamsync.navigation.Schermate
 
 
 @Composable
@@ -75,25 +72,10 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Box(
-                modifier = Modifier
-                    .size(35.dp)
-                    .background(
-                        Color.White,
-                        RoundedCornerShape(20.dp)
-                    ) // Imposta il rettangolo di sfondo a nero
-                    .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "close_impostazioni",
-                    tint = Color.DarkGray // Assicurati che l'icona sia visibile impostando il colore a bianco
-                )
-            }
-            // Centra il testo all'interno della Row
             Row(
-                modifier = Modifier.weight(8f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(8f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -103,7 +85,6 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
                     fontWeight = FontWeight.Bold
                 )
             }
-
             // Row vuota per bilanciare il layout
             Row(
                 modifier = Modifier.weight(1f),
@@ -138,7 +119,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController) 
         userProfile?.let {
                     nome = it.nome
                     amici = it.amici
-                }
+        }
 
     Column(
         modifier = Modifier
@@ -277,7 +258,7 @@ fun ListaColleghi(
     var visualizza_amici by remember { mutableStateOf(true) }
 
     userProfile?.let {
-        amici = it.amici ?: emptyList()
+        amici = it.amici
     }
 
     // Utilizzo di LaunchedEffect per gestire il cambio di stato di amici

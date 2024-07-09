@@ -93,19 +93,11 @@ dependencies {
     // Splash API
     implementation(libs.androidx.core.splashscreen)
 
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
-    // Coil for loading images
-
-
-
+    implementation (libs.androidx.material)
+    implementation (libs.ui.tooling)
 
     // Splash API
     implementation(libs.androidx.core.splashscreen)
-
-    //Navigation Compose
-    implementation(libs.androidx.navigation.compose)
 
     // Lottie Animation
     implementation (libs.lottie.compose)

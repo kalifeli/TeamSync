@@ -11,13 +11,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
+import com.example.teamsync.caratteristiche.login.data.model.SessoUtente
 import com.example.teamsync.caratteristiche.login.data.repository.EmailAlreadyInUseException
 import com.example.teamsync.caratteristiche.login.data.repository.ImageUploader
 import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
+import java.util.Date
+
 
 class ViewModelUtente : ViewModel() {
 
@@ -70,10 +72,6 @@ class ViewModelUtente : ViewModel() {
             erroreLogin.value = "Per favore, inserisci la password."
             return
         }
-        if(tentativiLoginFalliti.intValue > 3){
-            erroreLogin.value = "Hai dimenticato la password?"
-            return
-        }
 
         viewModelScope.launch {
             try {
@@ -90,9 +88,14 @@ class ViewModelUtente : ViewModel() {
                 }
             }catch (e: Exception){
                 tentativiLoginFalliti.intValue += 1
-                erroreLogin.value = "Email o password errate. Controlla le tue credenziali e riprova."
+                if(tentativiLoginFalliti.intValue > 3){
+                    erroreLogin.value = "Hai dimenticato la password?"
+                }else {
+                    erroreLogin.value = "Email o password errate. Controlla le tue credenziali e riprova."
+                }
             }
         }
+
     }
     fun aggiorna_foto_profilo(uri: Uri) : Task<Uri>
     {
@@ -104,7 +107,8 @@ class ViewModelUtente : ViewModel() {
         nome: String,
         cognome: String,
         email: String,
-        dataNascita: String, // TODO cambia in Date
+        dataNascita: Date,
+        sesso: SessoUtente,
         password: String,
         confermaPassword: String
     ) {
@@ -116,7 +120,7 @@ class ViewModelUtente : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val utente = repositoryUtente.signUp(matricola, nome, cognome, dataNascita, email, password)
+                val utente = repositoryUtente.signUp(matricola, nome, cognome, dataNascita,sesso, email, password)
                 sendEmailVerification()
                 erroreRegistrazione.value = null
                 registrazioneRiuscita.value = true
@@ -135,7 +139,7 @@ class ViewModelUtente : ViewModel() {
         nome: String,
         cognome: String,
         email: String,
-        dataNascita: String, // TODO cambia in Date
+        dataNascita: Date,
         password: String,
         confermaPassword: String
 
@@ -235,15 +239,11 @@ class ViewModelUtente : ViewModel() {
     }
 
 
-
     fun ottieni_utente(id: String, callback: (ProfiloUtente?) -> Unit) {
-        repositoryUtente.get_user_sincrono(id) { profile ->
+        repositoryUtente.getUserSincrono(id) { profile ->
             callback(profile)
         }
-
     }
-
-
 
 
 

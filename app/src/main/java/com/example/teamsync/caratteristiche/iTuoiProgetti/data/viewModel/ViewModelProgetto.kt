@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.mutableStateOf
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
+import com.example.teamsync.data.models.Priorità
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class ViewModelProgetto : ViewModel() {
     private val repositoryProgetto = RepositoryProgetto()
@@ -19,12 +22,14 @@ class ViewModelProgetto : ViewModel() {
     var progetti = mutableStateOf<List<Progetto>>(emptyList())
         private set
     var utenteCorrenteId = mutableStateOf<String?>(null)
+    var isLoading = mutableStateOf(false)
+        private set
 
     init {
         aggiornaUtenteCorrente()
         Log.d("ViewModelProgetto", "Utente corrente: ${utenteCorrenteId.value}")
         utenteCorrenteId.value?.let {
-            caricaProgettiUtente(it)
+            caricaProgettiUtente(it, false)
         }
 
     }
@@ -32,35 +37,47 @@ class ViewModelProgetto : ViewModel() {
         utenteCorrenteId.value = repositoryProgetto.getUtenteCorrente()?.uid
     }
 
-    fun caricaProgettiUtente(userId: String) {
+    fun caricaProgettiUtente(userId: String, loadingInit: Boolean) {
         viewModelScope.launch {
+            isLoading.value = loadingInit
             try {
+                delay(700)
                 val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
                 progetti.value = progettiUtente
                 Log.d("ViewModelProgetto", "Progetti caricati: ${progettiUtente.size}")
             } catch (e: Exception) {
                 erroreCaricamentoProgetto.value = "Errore nel caricamento dei progetti."
                 Log.e("ViewModelProgetto", "Errore nel caricamento dei progetti", e)
+            }finally {
+                isLoading.value = false
             }
         }
     }
 
-    fun aggiungiProgetto(progetto: Progetto) {
-        if (progetto.nome.isBlank()) {
+    fun creaProgetto(nome:String, descrizione: String, dataScadenza: Date, priorita: Priorità) {
+        if (nome.isBlank()) {
             erroreAggiungiProgetto.value = "Per favore, inserisci il nome del progetto"
             return
         }
-        if (progetto.dataScadenza <= progetto.dataCreazione) {
+        if (dataScadenza <= Date()) {
             erroreAggiungiProgetto.value = "La data di scadenza non può essere precedente alla data di creazione del progetto."
             return
         }
         viewModelScope.launch {
             try {
-                val progettoId = repositoryProgetto.aggiungiProgetto(progetto)
+                val codiceProgetto = repositoryProgetto.generaCodiceProgetto()
+                val progetto = Progetto(
+                    nome = nome,
+                    descrizione = descrizione,
+                    dataScadenza = dataScadenza,
+                    priorita = priorita,
+                    codice = codiceProgetto,
+                    partecipanti = listOf(utenteCorrenteId.value ?: "")
+                )
+                val progettoId = repositoryProgetto.creaProgetto(progetto)
                 Log.d("ViewModelProgetto", "Progetto aggiunto con ID: $progettoId")
-                repositoryProgetto.aggiungiPartecipante(progettoId, utenteCorrenteId.value ?: "")
                 utenteCorrenteId.value?.let {
-                    caricaProgettiUtente(it)
+                    caricaProgettiUtente(it, false)
                 }
                 aggiungiProgettoRiuscito.value = true
                 erroreAggiungiProgetto.value = null
@@ -69,6 +86,45 @@ class ViewModelProgetto : ViewModel() {
                 erroreAggiungiProgetto.value = "Si è verificato un errore durante la creazione del progetto. Riprovare."
                 Log.e("ViewModelProgetto", "Errore durante la creazione del progetto", e)
             }
+        }
+    }
+    fun aggiungiPartecipanteConCodice(userId: String,codice: String){
+        viewModelScope.launch {
+            try {
+                val progettoId = repositoryProgetto.getProgettoIdByCodice(codice)
+                val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
+                if(progettoId != null && !utentePartecipa(progettiUtente,progettoId)) {
+                    repositoryProgetto.aggiungiPartecipante(
+                        progettoId, utenteCorrenteId.value
+                    )
+                    aggiungiProgettoRiuscito.value = true
+                    erroreAggiungiProgetto.value = null
+                }else if (progettoId == null){
+                    aggiungiProgettoRiuscito.value = false
+                    erroreAggiungiProgetto.value = "Il codice inserito non è valido. Riprovare o contattare il creatore del progetto"
+                }else{
+                    aggiungiProgettoRiuscito.value = false
+                    erroreAggiungiProgetto.value = "Fai già parte di questo progetto!"
+                }
+            }catch (e: Exception){
+                aggiungiProgettoRiuscito.value = false
+                erroreAggiungiProgetto.value = "Si è verificato un errore durante l'aggiunta di un progetto"
+            }
+        }
+    }
+
+    fun progettoScaduto(progetto: Progetto): Boolean = progetto.dataScadenza < Date()
+
+    private fun utentePartecipa(progettiUtente: List<Progetto>, aggiungiProgettoId: String?) : Boolean{
+        return try {
+            for(progetto in progettiUtente){
+                if(progetto.id == aggiungiProgettoId){
+                    return true
+                }
+            }
+            false
+        }catch (e: Exception){
+            throw e
         }
     }
 

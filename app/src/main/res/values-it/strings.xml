@@ -12,7 +12,7 @@
     <string name="datiErrati">Per favore verifica i dati inseriti, non sono validi</string>
     <string name="salvaEdit">Salva</string>
     <string name="annullaEdit">Annulla</string>
-    <string name="aggiungiTodo">Aggiungi una nuova ToDo</string>
+    <string name="aggiungiTodo">Aggiungi</string>
     <string name="inserisciTitolo">Inserisci Titolo</string>
     <string name="inserisciDescrizione">Inserisci Descrizione</string>
     <string name="inserisciData">Data Scadenza (dd/MM/yyyy)</string>

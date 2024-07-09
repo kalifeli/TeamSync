@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.data.repository
 
+import android.util.Log
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.data.models.Priorità
 import com.google.firebase.firestore.FirebaseFirestore
@@ -10,6 +11,7 @@ import java.util.Date
 
 class ToDoRepository {
     private val database = FirebaseFirestore.getInstance()
+
 
     suspend fun addTodo(titolo: String,
                         descrizione: String,
@@ -37,7 +39,20 @@ class ToDoRepository {
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
     }
 
-
+    //conteggio per la progress bar
+    suspend fun countCompletedTodo(): Int {
+        val snapshot = database.collection("Todo")
+            .whereEqualTo("completato", true) // Filtra per attività completate
+            .get()
+            .await()
+        return snapshot.size()
+    }
+    suspend fun countAllTodo(): Int {
+        val snapshot = database.collection("Todo")
+            .get()
+            .await()
+        return snapshot.size()
+    }
 
 
     suspend fun getAllTodoCompletate(): List<LeMieAttivita> {
@@ -65,7 +80,8 @@ class ToDoRepository {
         titolo: String,
         descrizione: String,
         dataScad: Date,
-        priorita: Priorità
+        priorita: Priorità,
+        fileUri: String?
     ) {
         try {
             val updatedTodo = LeMieAttivita(
@@ -73,7 +89,8 @@ class ToDoRepository {
                 titolo = titolo,
                 descrizione = descrizione,
                 dataScadenza = dataScad,
-                priorita = priorita
+                priorita = priorita,
+                fileUri = fileUri
             )
             database.collection("Todo").document(id).set(updatedTodo).await()
         } catch (e: Exception) {

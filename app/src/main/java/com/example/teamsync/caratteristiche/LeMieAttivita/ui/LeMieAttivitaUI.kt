@@ -1,6 +1,10 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,11 +41,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.asFlow
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
@@ -70,6 +77,10 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
     var sezione by remember { mutableIntStateOf(1) }
+    val progressione by viewModel.progressione.collectAsState() // Osserva il valore del flusso
+    val todoCompletate by viewModel.taskCompletate.collectAsState()
+    val todoNonCompletate by viewModel.taskNonCompletate.collectAsState()
+
 
     if (addTodoDialog) {
         AddTodoDialog(
@@ -94,13 +105,16 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             todoItem = currentTodoItem.value!!,
             onDismiss = { openDialog.value = false },
             onSave = { updatedItem ->
+                var sezioneTodo = sezione
+                val fileUri = viewModel.uploadResult.value
                 viewModel.updateTodo(
                     id = updatedItem.id ?: "",
                     titolo = updatedItem.titolo,
                     descrizione = updatedItem.descrizione,
                     dataScad = updatedItem.dataScadenza,
+                    fileUri =fileUri,
                     priorita = updatedItem.priorita,
-                    sezione
+                    sezione = sezioneTodo
                 )
                 openDialog.value = false
             }
@@ -161,19 +175,14 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            ElevatedCard(
-                elevation = CardDefaults.cardElevation(
-                defaultElevation = 3.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .align(Alignment.Start)
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 10.dp),
-                colors = CardDefaults.cardColors(Grey35)
-                ) {
 
+
+
+            Row {
+                Card(progressione,todoCompletate,todoNonCompletate)
             }
+
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -381,13 +390,26 @@ fun TodoItem(
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
     onDismiss: () -> Unit,
-    onSave: (LeMieAttivita) -> Unit
+    onSave: (LeMieAttivita) -> Unit,
+    viewModel: LeMieAttivitaViewModel = LeMieAttivitaViewModel()
 ) {
     var titolo by remember { mutableStateOf(todoItem.titolo) }
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
     var dataScadenza by remember { mutableStateOf(SimpleDateFormat("dd/MM/yyyy").format(todoItem.dataScadenza)) }
-    val priorita by remember { mutableStateOf(todoItem.priorita) }
+    var priorita by remember { mutableStateOf(todoItem.priorita) }
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedFileUri = it
+            viewModel.setFileUri(it)  // Imposta il file URI nel ViewModel
+        }
+    }
+
+
+    // Observe the upload result
+    val uploadResult by viewModel.uploadResult.observeAsState()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -395,7 +417,12 @@ fun EditTodoDialog(
         containerColor = Grey35,
         textContentColor = Grey50,
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 TextField(
                     value = titolo,
                     onValueChange = { titolo = it },
@@ -417,36 +444,46 @@ fun EditTodoDialog(
                 TextField(
                     value = dataScadenza,
                     onValueChange = { dataScadenza = it },
-                    label = { Text(stringResource(id = R.string.dataEdit), color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.inserisciData), color = Color.Black) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
                 )
-                // Gestisci la priorità se necessario
-                // puoi usare un RadioButton o un DropdownMenu per gestire la priorità
+                // Aggiungi la selezione della priorità
+                // ...
+
+                // Aggiungi il pulsante per selezionare un file
+                Button(onClick = { launcher.launch("*/*") }) {
+                    Text("Seleziona File")
+                }
+
+                if (selectedFileUri != null) {
+                    Text("File Selezionato: ${selectedFileUri?.lastPathSegment}")
+                }
             }
         },
         confirmButton = {
             Button(
-                colors = ButtonDefaults.buttonColors(Red70),
                 onClick = {
-                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY)
-                    val date = sdf.parse(dataScadenza)
-
-                    if (date != null) {
-                        onSave(
-                            todoItem.copy(
-                                titolo = titolo,
-                                descrizione = descrizione,
-                                dataScadenza = date,
-                                priorita = priorita
-                            )
-                        )
-                    } else {
-                        Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
-                    }
-                }
+                    val updatedTodo = todoItem.copy(
+                        titolo = titolo,
+                        descrizione = descrizione,
+                        dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse(dataScadenza),
+                        priorita = priorita
+                    )
+                    viewModel.uploadFileAndSaveTodo(
+                        id = updatedTodo.id ?: "",
+                        titolo = updatedTodo.titolo,
+                        descrizione = updatedTodo.descrizione,
+                        dataScad = updatedTodo.dataScadenza,
+                        priorita = priorita,
+                        sezione = 1
+                    )  // Esegui l'upload del file e salva il todo
+                    onSave(updatedTodo)
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(Red70)
             ) {
                 Text(stringResource(id = R.string.salvaEdit))
             }
@@ -460,7 +497,15 @@ fun EditTodoDialog(
             }
         }
     )
+
+    LaunchedEffect(uploadResult) {
+        // Gestisci il risultato dell'upload se necessario
+    }
 }
+
+
+
+
 
 @Composable
 fun AddTodoDialog(
@@ -471,11 +516,9 @@ fun AddTodoDialog(
     var descrizione by remember { mutableStateOf("") }
     var dataScadenza by remember { mutableStateOf("") }
     var priorita by remember { mutableStateOf(Priorità.BASSA) }
+    var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
-    // Stato per gestire l'apertura/chiusura del menu a discesa
-    var expanded by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -544,15 +587,13 @@ fun AddTodoDialog(
                                 )
                             }
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
                         modifier = Modifier.width(150.dp)
                     ) {
-                        //per gli enum si usa entries
                         Priorità.entries.forEach { p ->
                             DropdownMenuItem(
                                 text = { Text(p.name, color = p.colore) },
@@ -564,6 +605,15 @@ fun AddTodoDialog(
                             )
                         }
                     }
+                }
+
+                // Aggiungi qui il bottone "Aggiungi File"
+                Button(
+                    onClick = { /* Logica per aggiungere file */ },
+                    colors = ButtonDefaults.buttonColors(Grey50),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Aggiungi File", color = Color.Black)
                 }
             }
         },
@@ -591,7 +641,7 @@ fun AddTodoDialog(
                             onDismiss()
                         }
                     } else {
-                        Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {
@@ -599,13 +649,13 @@ fun AddTodoDialog(
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(Grey70)) {
+            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(Grey70)) {
                 Text(stringResource(id = R.string.annullaEdit))
             }
         }
     )
 }
+
 
 @Composable
 fun CompleteDialog(
@@ -630,7 +680,7 @@ fun CompleteDialog(
                     onClick = {
                         onSave(item)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
+                    colors = ButtonDefaults.buttonColors(containerColor = Red70) // Colore di sfondo del pulsante di conferma
                 ) {
                     Text(text = stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
                 }
@@ -639,12 +689,11 @@ fun CompleteDialog(
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(Grey70)
-                    // Colore di sfondo del pulsante di annullamento
                 ) {
                     Text(
                         text = stringResource(id = R.string.annullaEdit),
                         color = Color.White
-                    ) // Testo nero sul pulsante grigio chiaro
+                    )
                 }
             }
         )
@@ -685,7 +734,87 @@ fun CompleteDialog(
     }
 }
 
+@Composable
+fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Grey35 // Sostituisci Grey35 con il colore appropriato
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // Prima colonna (vuota)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.tipocheride),
+                    contentDescription = "tipo che ride",
+                    modifier = Modifier
+                        .size(200.dp) // Imposta la dimensione desiderata
+                        .offset(x = (-16).dp) // Sposta l'immagine fuori dai bordi della colonna
+                )
+            }
 
+
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Hai Completato $todoCompletate/$todoNonCompletate ToDo",
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        progress = progress,
+                        modifier = Modifier.size(64.dp),
+                        color = Red70,
+                        trackColor = Grey50
+                    )
+                    Text(
+                        text = "${(progress * 100).toInt()}%",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
+
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview

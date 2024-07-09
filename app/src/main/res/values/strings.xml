@@ -11,7 +11,7 @@
     <string name="datiErrati">Please check your input; the entered data is not valid.</string>
     <string name="salvaEdit">Save</string>
     <string name="annullaEdit">Cancel</string>
-    <string name="aggiungiTodo">Add New ToDo</string>
+    <string name="aggiungiTodo">Add</string>
     <string name="inserisciTitolo">Insert Title</string>
     <string name="inserisciDescrizione">Insert Description</string>
     <string name="inserisciData">Expiry Date (dd/MM/yyyy)</string>

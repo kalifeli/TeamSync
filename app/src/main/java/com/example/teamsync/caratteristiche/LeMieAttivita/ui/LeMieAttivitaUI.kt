@@ -182,6 +182,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                 Card(progressione,todoCompletate,todoNonCompletate)
             }
 
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

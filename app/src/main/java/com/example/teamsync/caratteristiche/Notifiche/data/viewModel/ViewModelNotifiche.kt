@@ -28,25 +28,38 @@ class ViewModelNotifiche : ViewModel() {
 
 
     fun fetchNotifiche() {
-        viewModelScope.launch {
-            var userId = viewModelU.userProfile?.id
-            while (userId.isNullOrEmpty()) {
-                isLoading.value = true
-                delay(500) // Attendiamo mezzo secondo tra ogni tentativo
-                userId = viewModelU.userProfile?.id
-            }
+        var tentativi = 0
+        val max_tentativi = 8
 
-            // Se siamo qui, abbiamo trovato un userId valido
+        viewModelScope.launch {
             isLoading.value = true
+
             try {
-                val notifiche = repositoryNotifiche.getNotifiche()
-                println("Notifiche ricevute: $notifiche")
+                // Attendiamo finché non abbiamo un userId valido
+                var userId = viewModelU.userProfile?.id
+                while (userId.isNullOrEmpty()) {
+                    delay(500)
+                    userId = viewModelU.userProfile?.id
+                }
+
+                // Se siamo qui, abbiamo trovato un userId valido
+                var notifiche = repositoryNotifiche.getNotifiche()
+                while (notifiche.isEmpty() && tentativi < max_tentativi) {
+                    delay(400)
+                    notifiche = repositoryNotifiche.getNotifiche()
+                    tentativi++
+                }
+
+                // Filtriamo le notifiche per il destinatario corrente
                 notificheList.value = notifiche.filter {
                     it.destinatario == userId
                 }
+
                 println("Notifiche caricate: ${notificheList.value}")
+
             } catch (e: Exception) {
                 e.printStackTrace()
+                // Gestire l'errore, ad esempio mostrare un messaggio all'utente
             } finally {
                 isLoading.value = false
             }
@@ -57,19 +70,60 @@ class ViewModelNotifiche : ViewModel() {
 
 
 
+
+
     fun cambiaStatoNotifica(notificaId: String) {
+
         viewModelScope.launch {
             try {
+                // Apri la notifica su Firebase
                 repositoryNotifiche.apriNotifica(notificaId)
-                // Aggiorna la lista delle notifiche localmente dopo aver cambiato lo stato
+
+                // Aggiorna la lista locale delle notifiche
                 notificheList.value = notificheList.value.map {
-                    if (it.id == notificaId) it.copy(aperto = true) else it
+                    if (it.id == notificaId) {
+                        val updatedNotifica = it.copy(aperto = true)
+                        updatedNotifica
+                    } else {
+                        it
+                    }
                 }
+
                 println("Stato della notifica cambiato con successo")
             } catch (e: Exception) {
                 println("Errore durante il cambio di stato della notifica: $e")
             }
         }
     }
+
+
+    fun cambiaStato_Accettato_Notifica(notificaId: String) {
+        viewModelScope.launch {
+            try {
+                // Apri la notifica su Firebase (assicurati che questa funzione aggiorni Firebase)
+                repositoryNotifiche.apriNotifica(notificaId)
+
+                // Aggiorna la lista locale delle notifiche
+                notificheList.value = notificheList.value.map {
+                    if (it.id == notificaId) {
+                        val updatedNotifica = it.copy(accettato = "true", aperto = true)
+
+                        // Aggiorna la notifica su Firebase
+                        repositoryNotifiche.updateNotifica(updatedNotifica)
+
+                        updatedNotifica
+                    } else {
+                        it
+                    }
+                }
+
+                println("Stato della notifica cambiato con successo")
+            } catch (e: Exception) {
+                println("Errore durante il cambio di stato della notifica: $e")
+            }
+        }
+    }
+
 }
+
 

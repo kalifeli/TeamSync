@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,13 +44,14 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 
 
 @Composable
-fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostController, id: String, amicizia: String, provenienza: String, notificheRepo : RepositoryNotifiche, ) {
+fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostController, id: String, amicizia: String, provenienza: String, notificheRepo : RepositoryNotifiche, task: String, pro : String, viewModelprogetto: ViewModelProgetto ) {
 
     Log.d("Id quando sono dentro", "Dati: $id")
     viewModel.getUserProfile()
@@ -61,6 +64,9 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
     var email by remember { mutableStateOf("") }
     var avvia_notifica by remember { mutableStateOf(false) }
     var accetta_amicizia by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+
+
 
     LaunchedEffect(id) {
         viewModel.ottieni_utente(id) { profile ->
@@ -71,6 +77,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
             email = profile?.email ?: ""
         }
     }
+
     LaunchedEffect(avvia_notifica) {
         if(avvia_notifica)
         { viewModel.ottieni_utente(id) { profile ->
@@ -81,10 +88,13 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                     userProfile.id,
                     profile?.id ?: "",
                     "Richiesta_Amicizia",
-                    contenuto
+                    contenuto,
+                    ""
+
+
                 )
             }
-            }
+        }
         }
     }
     LaunchedEffect(accetta_amicizia) {
@@ -98,8 +108,10 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                     userProfile.id,
                     profile?.id ?: "",
                     "Accetta_Amicizia",
-                    contenuto
-                )
+                    contenuto,
+                    "",
+
+                    )
             }
         }
         }
@@ -146,7 +158,12 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                 Color.Black,
                                 RoundedCornerShape(20.dp)
                             ) // Imposta il rettangolo di sfondo a nero
-                            .clickable { navController.navigate(Schermate.Profilo.route) },
+                            .clickable {
+                                if (provenienza == "task")
+                                    navController.navigate("task_selezionata/${task}/${pro}}")
+                                else
+                                    navController.navigate(Schermate.Profilo.route)
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -339,7 +356,9 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                 .height(70.dp)
                 .padding(horizontal = 16.dp),
 
-                onClick = {navController.navigate("homescreen/0")},
+                onClick = {
+                    expanded = true // Mostra il menu a discesa
+                },
 
                 shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Blue, // Cambia il colore di sfondo del pulsante
@@ -349,14 +368,52 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                 Text(
                     text = "Aggiungi ad un progetto",
                     fontSize = 16.sp,
+
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 12.dp)
                 )
             }
+            DropdownMenu(
+
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .background(Color.White)
+            ) {
+
+                viewModelprogetto.caricaProgettiUtente(viewModel.userProfile?.id.toString(),true)
+                val progetti = viewModelprogetto.progetti
+                progetti.value.forEach { progetto ->
+                    DropdownMenuItem(
+
+                        text = {  Text(progetto.nome, color = Color.Black)  },
+                        onClick = {
+                            viewModel.ottieni_utente(id) { profile ->
+                                val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome ?: "") + " " + "ti ha invitato in un progetto"
+                                if (userProfile != null) {
+                                    notificheRepo.creaNotifica(
+                                        userProfile.id,
+                                        profile?.id ?: "",
+                                        "Richiesta_Progetto",
+                                        contenuto,
+                                        progetto.id.toString()
+
+
+                                    )
+                                }
+                            }
+                            expanded = false
+
+                        },
+
+                    )
+                    }
+            }
+        }
         }
 
     }
-}
+
 
 
 

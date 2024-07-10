@@ -1,25 +1,28 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.repository.ToDoRepository
+import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.data.models.Priorità
-import kotlinx.coroutines.launch
-import java.util.Date
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.google.firebase.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.storage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 class LeMieAttivitaViewModel() : ViewModel() {
@@ -41,9 +44,14 @@ class LeMieAttivitaViewModel() : ViewModel() {
     private val _uploadResult = MutableLiveData<String?>()
     val uploadResult: LiveData<String?> get() = _uploadResult
 
-    init {
-        getAllTodo()
-    }
+
+    var isLoading = mutableStateOf(true)
+        private set
+    val repositoryNotifiche = RepositoryNotifiche()
+
+    var leMieAttivitaNonCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
+    var leMieAttivitaCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
+
 
     fun setFileUri(uri: Uri?) {
         _fileUri.value = uri
@@ -58,6 +66,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         sezione: Int
     ) {
         viewModelScope.launch {
+            var todo = getTodoById(id)
             val uri = _fileUri.value ?: return@launch
             val storageReference = FirebaseStorage.getInstance().reference.child("files/${UUID.randomUUID()}")
             try {
@@ -67,106 +76,314 @@ class LeMieAttivitaViewModel() : ViewModel() {
                 _uploadResult.value = downloadUrl.toString()
 
                 // Chiama la funzione updateTodo con tutti i parametri richiesti
-                updateTodo(id, titolo, descrizione, dataScad, priorita, downloadUrl.toString(), sezione)
+                if (todo != null) {
+                    updateTodo(id, titolo, descrizione, dataScad, priorita,sezione,todo.progetto,todo.utenti, downloadUrl.toString())
+                }
             } catch (e: Exception) {
                 _uploadResult.value = null  // In caso di errore, imposta l'URL come null
             }
         }
     }
 
-    fun updateTaskNonCompletate() {
-        viewModelScope.launch {
-            val completedTasks = repositoryLeMieAttivita.countAllTodo()
-            _taskNonCompletate.value = completedTasks
-        }
-    }
-
-    fun updateTaskCompletate() {
-        viewModelScope.launch {
-            val completedTasks = repositoryLeMieAttivita.countCompletedTodo()
-            _taskCompletate.value = completedTasks
-        }
-    }
-
-    fun updateProgress() {
-        viewModelScope.launch {
-            val completedTasks = repositoryLeMieAttivita.countCompletedTodo()
-            _progressione.value =
-                if (repositoryLeMieAttivita.countAllTodo() > 0) completedTasks.toFloat() / repositoryLeMieAttivita.countAllTodo() else 0.0f
-        }
-    }
-
-    fun getAllTodo() {
-        viewModelScope.launch {
-            leMieAttivita = repositoryLeMieAttivita.getAllTodo()
-            updateProgress()
-            updateTaskCompletate()
-            updateTaskNonCompletate()
-        }
-    }
-
-    fun getAllTodoCompletate() {
-        viewModelScope.launch {
-            leMieAttivita = repositoryLeMieAttivita.getAllTodoCompletate()
-            updateProgress()
-            updateTaskCompletate()
-            updateTaskNonCompletate()
-        }
-    }
-
-
-    fun addTodo(titolo: String, descrizione: String, dataScad: Date, priorita: Priorità, completato: Boolean) {
-        viewModelScope.launch {
-            repositoryLeMieAttivita.addTodo(titolo, descrizione, dataScad, priorita, completato = false)
-            getAllTodo()
-            updateProgress()
-        }
-    }
-
-    fun deleteTodo(id: String, sezione: Int) {
-        viewModelScope.launch {
-            try {
-                repositoryLeMieAttivita.deleteTodo(id)
-                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
-                updateProgress()
-            } catch (e: Exception) {
-                // Gestisci l'errore se necessario
-            }
-        }
-    }
     fun updateTodo(
         id: String,
         titolo: String,
         descrizione: String,
         dataScad: Date,
         priorita: Priorità,
-        fileUri: String?,
-        sezione: Int
+        sezione: Int,
+        progetto: String,
+        utenti: List<String>,
+        uri: String?
     ) {
         viewModelScope.launch {
             try {
-                repositoryLeMieAttivita.updateTodo(id, titolo, descrizione, dataScad, priorita, fileUri)
-                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
+                repositoryLeMieAttivita.updateTodo(id, titolo, descrizione, dataScad, priorita,progetto,utenti)
+                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
         }
     }
-    fun completeTodo(id: String, completato: Boolean, sezione: Int){
+
+    fun updateTaskNonCompletate(id: String) {
+        viewModelScope.launch {
+            val completedTasks = repositoryLeMieAttivita.countAllTodo(id)
+            _taskNonCompletate.value = completedTasks
+        }
+    }
+
+    fun updateTaskCompletate(id: String) {
+        viewModelScope.launch {
+            val completedTasks = repositoryLeMieAttivita.countCompletedTodo(id)
+            _taskCompletate.value = completedTasks
+
+        }
+    }
+
+    fun updateProgress(id: String) {
+        viewModelScope.launch {
+            val completedTasks = repositoryLeMieAttivita.countCompletedTodo(id)
+            _progressione.value =
+                if (repositoryLeMieAttivita.countAllTodo(id) > 0) completedTasks.toFloat() / repositoryLeMieAttivita.countAllTodo(id) else 0.0f
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+     fun getTodoByProject(progetto: String) {
+        viewModelScope.launch {
+            var allTodo = repositoryLeMieAttivita.getAllTodo()
+
+                while (allTodo.isEmpty()) {
+                    isLoading.value = true
+                    delay(500) // Attendiamo mezzo secondo tra ogni tentativo
+                    allTodo = repositoryLeMieAttivita.getAllTodo()
+                }
+
+
+            leMieAttivita= allTodo.filter { it.progetto == progetto }
+        }
+    }*/
+    /*suspend fun getAllTodo_BY_Project(progetto: String): List<LeMieAttivita> {
+        return suspendCoroutine { continuation ->
+            viewModelScope.launch {
+                var appoggio: List<LeMieAttivita> = emptyList()
+                var tentativi = 0
+                val MAX_TENTATIVI = 15
+
+                while (appoggio.isEmpty() && tentativi <= MAX_TENTATIVI) {
+                    Log.d("Attività all'interno", "P: ${appoggio}")
+                    getTodoCompletateByProject(progetto)
+                    getTodoByProject(progetto)
+                    appoggio = (leMieAttivitaCompletate + leMieAttivitaNonCompletate).filterNotNull()
+                    delay(200)
+                    tentativi++
+                    Log.d("Attività all'interno finale", "zzzz: ${appoggio}")
+                }
+                continuation.resume(appoggio)
+            }
+        }
+
+      }*/
+    suspend fun getAllTodo_BY_Project(progetto: String): List<LeMieAttivita> {
+        return suspendCoroutine { continuation ->
+            viewModelScope.launch {
+                var appoggio: List<LeMieAttivita> = emptyList()
+                var tentativi = 0
+                val MAX_TENTATIVI = 15
+
+                while (appoggio.isEmpty() && tentativi <= MAX_TENTATIVI) {
+                    Log.d("Attività all'interno", "P: ${appoggio}")
+                    getTodoCompletateByProject(progetto)
+                    getTodoByProject(progetto)
+                    appoggio = (leMieAttivitaCompletate + leMieAttivitaNonCompletate).filterNotNull()
+                    delay(200)
+                    tentativi++
+                    Log.d("Attività all'interno finale", "zzzz: ${appoggio}")
+
+                }
+                continuation.resume(appoggio)
+                updateProgress(progetto)
+                updateTaskCompletate(progetto)
+                updateTaskNonCompletate(progetto)
+            }
+        }
+    }
+
+
+
+    /*fun getTodoByProject(progetto: String) {
+        viewModelScope.launch {
+            var allTodo = repositoryLeMieAttivita.getAllTodo()
+            var tentativi = 0
+            val MAX_TENTATIVI = 6
+            while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI) {
+                isLoading.value = true
+                delay(500) // Attendiamo mezzo secondo tra ogni tentativo
+                allTodo = repositoryLeMieAttivita.getAllTodo()
+                tentativi++
+            }
+            isLoading.value = false
+            leMieAttivitaNonCompletate = allTodo.filter { it.progetto == progetto && !it.completato }
+
+
+        }
+    }*/
+    fun getTodoByProject(progetto: String) {
+        viewModelScope.launch {
+            var allTodo = repositoryLeMieAttivita.getAllTodo()
+            var tentativi = 0
+            val MAX_TENTATIVI = 6
+            while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI) {
+                isLoading.value = true
+                delay(500) // Attendiamo mezzo secondo tra ogni tentativo
+                allTodo = repositoryLeMieAttivita.getAllTodo()
+                tentativi++
+            }
+            isLoading.value = false
+            leMieAttivitaNonCompletate = allTodo.filter { it.progetto == progetto && !it.completato }
+            updateProgress(progetto)
+            updateTaskCompletate(progetto)
+            updateTaskNonCompletate(progetto)
+
+        }
+    }
+
+
+/*
+    fun getTodoCompletateByProject(progetto: String) {
+        viewModelScope.launch {
+            var tentativi = 0
+            val MAX_TENTATIVI = 6
+            isLoading.value = true
+            try {
+                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI){
+                    isLoading.value = true
+                    delay(500) // Attendiamo mezzo secondo tra ogni tentativo
+                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                    tentativi++
+                }
+                leMieAttivitaCompletate = allTodo.filter { it.progetto == progetto && it.completato }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }*/
+
+    fun getTodoCompletateByProject(progetto: String) {
+        viewModelScope.launch {
+            var tentativi = 0
+            val MAX_TENTATIVI = 6
+            isLoading.value = true
+            try {
+                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI){
+                    isLoading.value = true
+                    delay(500) // Attendiamo mezzo secondo tra ogni tentativo
+                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                    tentativi++
+
+                }
+                leMieAttivitaCompletate = allTodo.filter { it.progetto == progetto && it.completato }
+                updateProgress(progetto)
+                updateTaskCompletate(progetto)
+                updateTaskNonCompletate(progetto)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+
+
+    fun addTodo(
+        titolo: String,
+        descrizione: String,
+        dataScad: Date,
+        priorita: Priorità,
+        completato: Boolean,
+        proprietario: String,
+        progetto : String
+    ) {
+        viewModelScope.launch {
+            repositoryLeMieAttivita.addTodo(
+                titolo,
+                descrizione,
+                dataScad,
+                priorita,
+                completato = false,
+                proprietario,
+                progetto
+            )
+            getTodoByProject(progetto)
+        }
+    }
+
+    fun deleteTodo(id: String, sezione: Int, progetto: String) {
+        viewModelScope.launch {
+            try {
+                repositoryLeMieAttivita.deleteTodo(id)
+                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+            } catch (e: Exception) {
+                // Gestisci l'errore se necessario
+            }
+        }
+    }
+
+
+    fun completeTodo(id: String, completato: Boolean, sezione: Int, progetto: String) {
         viewModelScope.launch {
             try {
                 repositoryLeMieAttivita.completeTodo(id, completato)
-                if (sezione == 0) getAllTodoCompletate() else getAllTodo()
-                updateProgress()
-            }catch (e: Exception){
+                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+            } catch (e: Exception) {
+                //gestire errore
+            }
+        }
+    }
+
+    fun aggiungi_persona(id_task: String, id_persona: String) {
+        viewModelScope.launch {
+            try {
+                repositoryLeMieAttivita.addUserToTodo(id_task, id_persona)
+
+            } catch (e: Exception) {
                 //gestire errore
             }
         }
     }
 
 
-
+    suspend fun getTodoById(id_task: String): LeMieAttivita? {
+        return try {
+            repositoryLeMieAttivita.getTodoById(id_task)
+        } catch (e: Exception) {
+            null // Gestisci l'errore se necessario
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

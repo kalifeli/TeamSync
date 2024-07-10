@@ -26,8 +26,6 @@ class ViewModelUtente : ViewModel() {
     //istanza della classe repository dell'utente
     private val repositoryUtente = RepositoryUtente()
 
-
-
     var utenteCorrente by mutableStateOf<FirebaseUser?>(null)
         private set
     var loginRiuscito = mutableStateOf(false)

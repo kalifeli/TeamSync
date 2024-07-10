@@ -72,6 +72,36 @@ class RepositoryProgetto {
     fun logout(){
         auth.signOut()
     }
+    suspend fun getPartecipantiDelProgetto(progettoId: String): List<String> {
+        return try {
+
+            val docSnapshot = firestore.collection("progetti").document(progettoId).get().await()
+
+            // Verifica se il documento esiste
+            if (docSnapshot.exists()) {
+                // Ottieni il campo "partecipanti" dal documento
+                val partecipanti = docSnapshot.get("partecipanti") as? List<String>
+                partecipanti ?: emptyList() // Restituisci la lista dei partecipanti, se presente, altrimenti una lista vuota
+            } else {
+                emptyList() // Se il documento non esiste, restituisci una lista vuota
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun getProgettoById(progettoId: String): Progetto? {
+        return try {
+            val documentSnapshot = firestore.collection("progetti").document(progettoId).get().await()
+            if (documentSnapshot.exists()) {
+                documentSnapshot.toObject(Progetto::class.java)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
 
 }
 

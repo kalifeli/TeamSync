@@ -1,11 +1,14 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel
 
+import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.compose.runtime.mutableStateOf
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
+import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.data.models.Priorità
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -24,6 +27,10 @@ class ViewModelProgetto : ViewModel() {
     var utenteCorrenteId = mutableStateOf<String?>(null)
     var isLoading = mutableStateOf(false)
         private set
+    var carica_nome_progetto =  mutableStateOf(true)
+    var cambia_lista_partecipanti =  mutableStateOf(false)
+
+    var repositoryUtente = RepositoryUtente()
 
     init {
         aggiornaUtenteCorrente()
@@ -33,6 +40,35 @@ class ViewModelProgetto : ViewModel() {
         }
 
     }
+
+    suspend fun getnome_progetto(id_prog: String): String {
+        carica_nome_progetto.value = true
+
+        var p: Progetto? = null
+        while (p == null)  {
+
+            p = get_progetto_by_id(id_prog)
+            delay(200) // Attende 0.5 secondi prima di tentare di nuovo
+
+        }
+        carica_nome_progetto.value = false
+        return p.nome
+
+    }
+
+    fun getUtenteById(id: String, callback: (ProfiloUtente?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val profile = repositoryUtente.getUserProfile(id)
+                callback(profile)
+            } catch (e: Exception) {
+                Log.e(TAG, "Errore durante il recupero dell'utente con ID $id", e)
+                callback(null)
+            }
+        }
+    }
+
+
     fun aggiornaUtenteCorrente() {
         utenteCorrenteId.value = repositoryProgetto.getUtenteCorrente()?.uid
     }
@@ -148,6 +184,62 @@ class ViewModelProgetto : ViewModel() {
             Log.e("ViewModelProgetto", "Errore durante il logout", e)
         }
     }
+
+    suspend fun getLista_Partecipanti(id_progetto: String): List<String> {
+        return try {
+            repositoryProgetto.getPartecipantiDelProgetto(id_progetto)
+        } catch (e: Exception) {
+            emptyList<String>()
+        }
+    }
+
+    suspend fun getLista_Partecipanti(id_progetto: String, utenteCorrenteId: String?): List<String> {
+        return try {
+            var partecipanti = repositoryProgetto.getPartecipantiDelProgetto(id_progetto)
+
+            utenteCorrenteId?.let { currentUser ->
+                partecipanti = partecipanti.filter { partecipanteId ->
+                    partecipanteId != currentUser
+                }
+            }
+            partecipanti
+        } catch (e: Exception) {
+            emptyList<String>()
+        }
+    }
+
+    suspend fun get_progetto_by_id(id: String) : Progetto {
+        return try {
+            val progetto = repositoryProgetto.getProgettoById(id)
+            progetto ?: throw Exception("Progetto non trovato")
+        } catch (e: Exception) {
+            throw Exception("Errore durante il recupero del progetto: ${e.message}")
+        }
+    }
+    fun aggiungiPartecipanteAlProgetto(progettoId: String, userId: String) {
+        viewModelScope.launch {
+            try {
+                repositoryProgetto.aggiungiPartecipante(progettoId, userId)
+                cambia_lista_partecipanti.value = true
+                // Aggiornare l'elenco dei partecipanti del progetto dopo l'aggiunta
+                // Puoi chiamare la funzione che ottiene la lista dei partecipanti qui
+                // oppure aggiornare direttamente la lista se già presente nel tuo view model.
+            } catch (e: Exception) {
+                Log.e("ViewModelProgetto", "Errore durante l'aggiunta del partecipante al progetto", e)
+                // Gestire l'errore, ad esempio, mostrando un messaggio all'utente
+            }
+        }
+    }
+
+
+
+
+
+
 }
+
+
+
+
 
 

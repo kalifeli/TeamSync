@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,7 +37,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
-import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import java.text.SimpleDateFormat
@@ -55,7 +55,10 @@ fun ITuoiProgettiItem(
 
     ElevatedCard(
         onClick = {
-            navController.navigate(Schermate.LeMieAttivita.route)
+
+
+                navController.navigate("progetto/${progetto.id}")
+
         },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp

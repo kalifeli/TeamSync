@@ -1,8 +1,7 @@
+package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
 
-package com.example.teamsync.caratteristiche.ProfiloAmici
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -42,25 +41,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
+import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
-import com.example.teamsync.navigation.Schermate
 
 
 @Composable
-fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostController) {
+fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, id_task : String, view_model_prog: ViewModelProgetto, id_prog : String) {
     var searchQuery by remember { mutableStateOf("") }
 
+    var task by remember { mutableStateOf<LeMieAttivita?>(null) }
+
+    LaunchedEffect(id_task) {
+        task = viewModel_att.getTodoById(id_task)
+    }
 
     Column(
         modifier = Modifier
@@ -82,7 +85,7 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
                         Color.White,
                         RoundedCornerShape(20.dp)
                     ) // Imposta il rettangolo di sfondo a nero
-                    .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
+                    .clickable { navController.navigate("progetto/${id_prog}") },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -98,7 +101,7 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text =  "Profilo",
+                    text =  "Aggiungi Persone",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -111,29 +114,27 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
             ) {}
 
         }
-        ProfiloHeader(viewModel, navController)
-        Spacer(modifier = Modifier.height(16.dp))
+        task?.let { ProfiloHeader(viewModel, navController, it) }
+        /*Spacer(modifier = Modifier.height(16.dp))
         RicercaAggiungiColleghi { query ->
             // Esegui l'azione di ricerca qui
             searchQuery = query
 
-        }
+        }*/
         Spacer(modifier = Modifier.height(16.dp))
-        ListaColleghi(viewModel, navController, searchQuery)
-    }
+        ListaColleghi(viewModel, navController, searchQuery, viewModel_att, id_task, view_model_prog,id_prog) }
 }
 
 
 
+
 @Composable
-fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController) {
+fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, task : LeMieAttivita) {
     viewModel.getUserProfile()
     val userProfile = viewModel.userProfile
 
     var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
     var amici by remember { mutableStateOf(userProfile?.amici ?: "") }
-
-
 
     userProfile?.let {
         nome = it.nome
@@ -143,82 +144,89 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController) 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFEF5350), RoundedCornerShape(16.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 16.dp, vertical = 8.dp)  // Aggiunta spaziatura tra le scritte e il rettangolo
+            .background(Color.Blue, RoundedCornerShape(16.dp))  // Cambio colore del rettangolo
     ) {
-
-        if (userProfile?.immagine != null) {
-
-            Image(
-                painter = // Gestisci l'indicatore di caricamento qui
-                rememberAsyncImagePainter(ImageRequest.Builder // Placeholder di caricamento
-                // Effetto crossfade durante il caricamento
-                    (LocalContext.current).data(userProfile.immagine).apply(block = fun ImageRequest.Builder.() {
-                    // Gestisci l'indicatore di caricamento qui
-                    placeholder(R.drawable.white) // Placeholder di caricamento
-                    crossfade(true) // Effetto crossfade durante il caricamento
-                }).build()
-                ),
-
-                contentDescription = "Immagine Profilo",
-                modifier = Modifier
-
-                    .size(64.dp)
-                    .background(Color.White, CircleShape)
-                    .padding(16.dp),
-
-                contentScale = ContentScale.Crop,
-
-
-                )
-
-        }
-
-        else {
-
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = "Icona Applicazione",
-                modifier = Modifier
-                    .size(64.dp)
-                    .background(Color.White, CircleShape)
-                    .padding(16.dp),
-            )
-        }
-        Text(
-            text = nome,
-            fontWeight = FontWeight.Bold,
-            fontSize = 24.sp,
-            color = Color.White,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.08f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            StatBox(number = "13", label = "Task Completate")
-            StatBox(number = "2", label = "Progetti Completati")
+
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {}
+
+            Row(
+                modifier = Modifier.weight(8f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Dettagli Task",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {}
+
         }
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Nome: ${task.titolo}",
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Priorità: ${task.priorita}",
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Data scadenza: ${task.dataScadenza}",
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Descrizione: ${task.descrizione}",
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
+        )
     }
-}
-
-
-
-@Composable
-fun StatBox(number: String, label: String) {
-    Column(
-        modifier = Modifier
-            .background(Color.White, RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        Text(text = number, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        Text(text = label, fontSize = 12.sp)
+        Text(
+            text =  "Lista Partecipanti->",
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
+
+
+
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -262,10 +270,16 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
 fun ListaColleghi(
     viewModel: ViewModelUtente,
     navController: NavHostController,
-    searchQuery: String
+    searchQuery: String,
+    viewModel_att: LeMieAttivitaViewModel,
+    id_task : String,
+    viewModel_Prog : ViewModelProgetto,
+    id_progetto : String
 ) {
+
     val userProfile = viewModel.userProfile
-    var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList()) }
+    var amici by remember { mutableStateOf<List<String>>(emptyList()) }
+    var task by remember { mutableStateOf<LeMieAttivita?>(null) }
 
     val cache = remember { mutableStateMapOf<String, ProfiloUtente?>() } // Utilizzo di mutableStateMapOf per la cache
 
@@ -276,14 +290,23 @@ fun ListaColleghi(
 
     var visualizza_amici by remember { mutableStateOf(true) }
 
-    userProfile?.let {
-        amici = it.amici ?: emptyList()
-    }
 
+
+    LaunchedEffect(Unit) {
+        task = viewModel_att.getTodoById(id_task = id_task)
+        if (userProfile != null) {
+            amici = viewModel_Prog.getLista_Partecipanti(id_progetto,userProfile.id)
+        }
+    }
     // Utilizzo di LaunchedEffect per gestire il cambio di stato di amici
     LaunchedEffect(userProfile) {
-        amici = userProfile?.amici ?: emptyList()
+        amici = viewModel_Prog.getLista_Partecipanti(id_progetto)
+
     }
+
+
+
+
 
     if(visualizza_amici)
     {
@@ -306,13 +329,22 @@ fun ListaColleghi(
 
                 }
 
+                // Verifica se l'amico è già nella lista degli utenti di task
+                var partecipa = task?.utenti?.contains(amico) ?: false
+
+
                 user_amico?.let { collega ->
                     CollegaItem(
                         collega,
                         color = getColore(amici.indexOf(amico) + 1),
                         navController,
                         userProfile,
-                        amico
+                        partecipa,
+                        viewModel_att,
+                        id_task,
+                        id_progetto
+
+
                     )
                 }
 
@@ -367,7 +399,10 @@ fun ListaColleghi(
                         color = getColore(lista_ricerca.indexOf(amico) + 1),
                         navController,
                         userProfile,
-                        amico
+                        true,
+                        viewModel_att,
+                        id_task,
+                        id_progetto
                     )
                 }
 
@@ -386,8 +421,9 @@ fun ListaColleghi(
 
 
 @Composable
-fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, y : String) {
+fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel, id_task : String, id_prog: String) {
 
+    val notificheRepo = RepositoryNotifiche()
 
     LaunchedEffect(utente.id) {
         println("l'utente è cambiato " + utente.id)
@@ -413,7 +449,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 detectTapGestures(
                     onTap = {
 
-                        navController.navigate("utente/${utente.id}/${amicizia}/profilo/0/0")
+                        navController.navigate("utente/${utente.id}/${amicizia}/task/${id_task}/${id_prog}")
 
                     }
                 )
@@ -436,7 +472,9 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
             Text(text = utente.nome + " " + utente.cognome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(text = utente.matricola, fontSize = 14.sp)
         }
-        if (!amicizia) {
+
+        if(!partecipa)
+        {
             Spacer(modifier = Modifier.weight(1f))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(8.dp))
@@ -444,13 +482,35 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                     Icons.Default.Add,
                     contentDescription = "Aggiungi",
                     tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            viewModel_att.aggiungi_persona(id_task, utente.id)
+                            Log.d("IconClick", "Icona cliccata")
+
+                            val contenuto = (user_loggato?.nome  + " " + (user_loggato?.cognome ?: "") + " " + "ti ha assegnato una task" )
+                            notificheRepo.creaNotifica(
+                                utente.id,
+                                utente.id ?: "",
+                                "Assegnazione_Task",
+                                contenuto,
+                                id_prog
+
+                            )
+                            navController.navigate("task_selezionata/${id_task}/${id_prog}")
+
+
+                        }
                 )
             }
         }
 
+
+
     }
+
 }
+
 
 
 

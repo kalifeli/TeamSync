@@ -12,8 +12,12 @@ data class LeMieAttivita(
     val descrizione: String = "",
     val dataScadenza: Date = Date(),  // Data di scadenza
     val priorita: Priorità = Priorità.NESSUNA ,// Priorità dell'attività
-    val completato: Boolean = false
-) {
+    val completato: Boolean = false,
+    val fileUri: String? = null,
+    val progetto: String = "",
+    val utenti: List<String> = emptyList(),
+
+    ) {
     // Costruttore vuoto richiesto da Firestore per deserializzare l'oggetto
     constructor() : this(null, "", "", Date(), Priorità.NESSUNA)
 }

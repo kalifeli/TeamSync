@@ -1,32 +1,65 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,18 +69,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
-import com.example.teamsync.caratteristiche.LeMieAttivita.data.repository.ToDoRepository
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
+import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
+import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Green50
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Grey35
@@ -60,8 +95,13 @@ import java.util.Locale
 
 @ExperimentalMaterial3Api
 @Composable
-fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaViewModel) {
-
+fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaViewModel, viewModelUtente: ViewModelUtente, viewmodelprogetto: ViewModelProgetto,  id_prog: String) {
+    val id_progetto_x = id_prog
+    viewModel.getTodoByProject(id_prog)
+    viewModel.getTodoCompletateByProject(id_prog)
+    viewModelUtente.getUserProfile()
+    var repoNotifiche = RepositoryNotifiche()
+    val utente = viewModelUtente.userProfile
     val coroutineScope = rememberCoroutineScope()
     var addTodoDialog by remember { mutableStateOf(false) }
     val currentTodoItem = remember { mutableStateOf<LeMieAttivita?>(null) }
@@ -70,26 +110,110 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
     var sezione by remember { mutableIntStateOf(1) }
+    val caricanome = remember { mutableStateOf(false) }
+    var carica by remember { mutableStateOf(false) }
+    var isCompletedSection by remember { mutableStateOf(false) }
+    var progetto_nome  = remember { mutableStateOf("") }
+    var isLoadingNonCompletate by remember { mutableStateOf(false) }
+    var isLoadingCompletate by remember { mutableStateOf(true) }
+    var partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
+    val progressione by viewModel.progressione.collectAsState() // Osserva il valore del flusso
+    val todoCompletate by viewModel.taskCompletate.collectAsState()
+    val todoNonCompletate by viewModel.taskNonCompletate.collectAsState()
+
+    LaunchedEffect(Unit) {
+        progetto_nome.value = viewmodelprogetto.getnome_progetto(id_progetto_x)
+        partecipanti.value = viewmodelprogetto.getLista_Partecipanti(id_progetto_x)
+    }
+
+
+
+
+
+
+    LaunchedEffect(viewmodelprogetto.cambia_lista_partecipanti.value) {
+        if(viewmodelprogetto.cambia_lista_partecipanti.value) {
+            viewModel.getAllTodo_BY_Project(id_prog)
+            var progettoId = viewModel.leMieAttivita.firstOrNull()?.progetto
+
+            if (progettoId != null) {
+                partecipanti.value = viewmodelprogetto.getLista_Partecipanti(progettoId)
+
+                // Log della lista dei partecipanti
+                Log.d("PartecipantiLog", "Partecipanti: $partecipanti")
+            } else {
+                Log.d("PartecipantiLog", "Nessuna attività trovata")
+            }
+        }
+    }
+
+    LaunchedEffect(viewmodelprogetto.carica_nome_progetto.value) {
+        if(viewmodelprogetto.carica_nome_progetto.value)
+            caricanome.value = true
+        else
+            caricanome.value = false
+    }
+
+
+
+
+
+
+
+
+
+    LaunchedEffect(isClicked1.value) {
+        if(isClicked1.value)
+        {
+            carica = true
+            isLoadingCompletate = true
+            isLoadingNonCompletate = true
+            viewModel.getTodoCompletateByProject(id_prog)
+            carica = false
+            isLoadingCompletate = false
+        }
+
+    }
+
+    LaunchedEffect(isClicked.value) {
+        if(isClicked.value)
+        {
+            carica = true
+            isLoadingNonCompletate = true
+            isLoadingCompletate = true
+            viewModel.getTodoByProject(id_prog)
+            carica = false
+            isLoadingNonCompletate = false
+        }
+    }
+
 
     if (addTodoDialog) {
         AddTodoDialog(
             onDismiss = { addTodoDialog = false },
             onSave = { newTodo ->
                 coroutineScope.launch {
-                    viewModel.addTodo(
-                        newTodo.titolo,
-                        newTodo.descrizione,
-                        newTodo.dataScadenza,
-                        newTodo.priorita,
-                        newTodo.completato
-                    )
+                    utente?.let {
+                        viewModel.addTodo(
+                            newTodo.titolo,
+                            newTodo.descrizione,
+                            newTodo.dataScadenza,
+                            newTodo.priorita,
+                            newTodo.completato,
+                            it.id,
+                            id_prog
+                        )
+                    }
                     addTodoDialog = false
                 }
             }
         )
     }
 
+
+
     if (openDialog.value && currentTodoItem.value != null) {
+
         EditTodoDialog(
             todoItem = currentTodoItem.value!!,
             onDismiss = { openDialog.value = false },
@@ -100,12 +224,21 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     descrizione = updatedItem.descrizione,
                     dataScad = updatedItem.dataScadenza,
                     priorita = updatedItem.priorita,
-                    sezione
+                    sezione,
+                    id_prog,
+                    updatedItem.utenti,
+                    updatedItem.fileUri
                 )
                 openDialog.value = false
-            }
+            },
+            navController,
+            progettoNome = progetto_nome.value
+
+
         )
     }
+
+
 
     if (dialogComplete && currentTodoItem.value != null) {
         CompleteDialog(
@@ -114,13 +247,29 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             onSave = { completeTodo ->
                 coroutineScope.launch {
                     // Chiama la funzione completa nel viewModel
-                    viewModel.completeTodo(id = completeTodo.id ?: "", completeTodo.completato, sezione)
+
+                    viewModel.completeTodo(id = completeTodo.id ?: "", completeTodo.completato, sezione,id_prog)
+                    for(p in partecipanti.value)
+                    {
+                        if (p != viewModelUtente.userProfile?.id )
+                        {
+                            var contenuto = (viewModelUtente.userProfile?.nome ?: " ") + " " + (viewModelUtente.userProfile?.cognome
+                                ?: " ") + " ha completato una task del progetto: " + progetto_nome.value
+                            repoNotifiche.creaNotifica(viewModelUtente.userProfile?.id ?: " ",p,"Completamento_Task", contenuto, id_prog)
+
+                        }
+
+                    }
                 }
                 dialogComplete = false // Chiudi il dialogo dopo aver salvato
             },
-            item = currentTodoItem.value!! // Passa l'elemento su cui agire
+            item = currentTodoItem.value!!
+            // Passa l'elemento su cui agire
         )
+
     }
+
+
 
     Box(
         modifier = Modifier
@@ -134,13 +283,73 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "To Do List",
-                textAlign = TextAlign.Center,
-                fontSize = 24.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.Monospace
-            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.08f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .size(35.dp)
+                        .background(
+                            Color.Black,
+                            RoundedCornerShape(20.dp)
+                        ) // Imposta il rettangolo di sfondo a nero
+                        .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "close_impostazioni",
+                        tint = Color.White // Assicurati che l'icona sia visibile impostando il colore a bianco
+                    )
+                }
+
+                // Centra il testo all'interno della Row
+                Row(
+                    modifier = Modifier.weight(8f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "To Do List",
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        color = Color.Black,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
+
+                // Row vuota per bilanciare il layout
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {}
+
+            }
+
+            if(caricanome.value)
+            {
+                CircularProgressIndicator(color = Color.Black)
+            }
+            else
+            {
+                Text(
+                    text = progetto_nome.value,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+                    color = Color.Black,
+                    fontFamily = FontFamily.Monospace,
+                    modifier = Modifier.padding(top = 5.dp)
+
+                )
+            }
+
 
             Text(
                 textAlign = TextAlign.Center,
@@ -161,19 +370,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            ElevatedCard(
-                elevation = CardDefaults.cardElevation(
-                defaultElevation = 3.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .align(Alignment.Start)
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 10.dp),
-                colors = CardDefaults.cardColors(Grey35)
-                ) {
+            Card(progressione,todoCompletate,todoNonCompletate)
 
-            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -183,7 +381,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 
                 Button(
                     onClick = {
-                        viewModel.getAllTodoCompletate()
+                        viewModel.getTodoCompletateByProject(id_prog)
+                        isCompletedSection = true
                         isClicked1.value = true
                         isClicked.value = false
                         sezione = 0
@@ -198,7 +397,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                 }
                 Button(
                     onClick = {
-                        viewModel.getAllTodo()
+                        viewModel.getTodoByProject(id_prog)
+                        isCompletedSection = false
                         isClicked.value = true
                         isClicked1.value = false
                         sezione = 1
@@ -213,28 +413,62 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     Text(text = stringResource(id = R.string.bottoneNonCompletate))
                 }
             }
-            //bottone non completate sezione = 1 else 0
+            if(carica) {
+                CircularProgressIndicator(color = Color.Black)
+            }
 
 
-            LazyColumn {
-                items(viewModel.leMieAttivita) { attivita ->
-                    TodoItem(
-                        item = attivita,
-                        onDelete = { id ->
-                            viewModel.deleteTodo(id, sezione)
-                        },
-                        onEdit = { item ->
-                            currentTodoItem.value = item
-                            openDialog.value = true
-                        },
-                        onComplete = { item ->
-                            currentTodoItem.value = item
-                            dialogComplete = true
-                        },
-                        sezione
-                    )
+            if (!isLoadingNonCompletate)
+            {
+                LazyColumn{
+                    items(viewModel.leMieAttivitaNonCompletate) { attivita ->
+                        TodoItem(
+                            item = attivita,
+                            onDelete = { id ->
+                                viewModel.deleteTodo(id, sezione, id_prog)
+                            },
+                            onEdit = { item ->
+                                currentTodoItem.value = item
+                                openDialog.value = true
+                            },
+                            onComplete = { item ->
+                                currentTodoItem.value = item
+                                dialogComplete = true
+                            },
+                            sezione,
+                            viewModelUtente
+                        )
+                    }
                 }
             }
+
+
+
+
+
+            if (!isLoadingCompletate) {
+                LazyColumn {
+                    items(viewModel.leMieAttivitaCompletate) { attivita ->
+                        TodoItem(
+                            item = attivita,
+                            onDelete = { id ->
+                                viewModel.deleteTodo(id, sezione, id_prog)
+                            },
+                            onEdit = { item ->
+                                currentTodoItem.value = item
+                                openDialog.value = true
+                            },
+                            onComplete = { item ->
+                                currentTodoItem.value = item
+                                dialogComplete = true
+                            },
+                            sezione,
+                            viewModelUtente
+                        )
+                    }
+                }
+            }
+
         }
 
 
@@ -263,10 +497,31 @@ fun TodoItem(
     onDelete: (String) -> Unit,
     onEdit: (LeMieAttivita) -> Unit,
     onComplete: (LeMieAttivita) -> Unit,
-    sezione: Int
+    sezione: Int,
+    viewModelUtente: ViewModelUtente
 ) {
 
+
     var dialogDelete by remember { mutableStateOf(false) }
+    var lista_utenti by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(item.utenti){
+        lista_utenti = ""
+        for(u in item.utenti)
+        {
+            viewModelUtente.ottieni_utente(u) { userProfile ->
+
+                if (userProfile != null) {
+
+                    lista_utenti  += "${userProfile.nome} ${userProfile.cognome}\n"
+
+                }
+            }
+
+
+        }
+    }
 
 
     Row(modifier = Modifier
@@ -279,14 +534,18 @@ fun TodoItem(
             modifier = Modifier
                 .align(Alignment.CenterVertically) // Aligns the column center vertically
         ) {
-                if (!item.completato)
+            if (!item.completato)
+            {
+                IconButton(onClick = {
+                    onComplete(item)
+
+                })
                 {
-                    IconButton(onClick = { onComplete(item) }) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Completata",
-                            tint = Green50,
-                            modifier = Modifier.size(15.dp)
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Completata",
+                        tint = Green50,
+                        modifier = Modifier.size(15.dp)
                     )
                 }
             }else {
@@ -305,7 +564,7 @@ fun TodoItem(
                 modifier = Modifier.padding(end = 10.dp),
                 text = item.titolo,
                 textAlign = TextAlign.Center,
-                fontSize = 15.sp
+                fontSize = 16.sp
             )
             Text(
                 modifier = Modifier
@@ -315,12 +574,19 @@ fun TodoItem(
             )
             Text(
                 modifier = Modifier
-                    .padding(end = 10.dp)
-                    .padding(top = 4.dp, bottom = 6.dp),
+                    .padding(end = 10.dp),
                 text = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(item.dataScadenza),
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 textAlign = TextAlign.Center
             )
+            Text(
+                text = lista_utenti,
+                color = Grey70,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .padding(bottom = 3.dp),
+            )
+
 
             Canvas(modifier = Modifier
                 .size(16.dp)) {
@@ -328,7 +594,7 @@ fun TodoItem(
                     color = item.priorita.colore,
                     radius = size.minDimension / 2
                 )
-                
+
             }
         }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -377,17 +643,37 @@ fun TodoItem(
     }
 }
 
+
+
 @Composable
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
     onDismiss: () -> Unit,
-    onSave: (LeMieAttivita) -> Unit
+    onSave: (LeMieAttivita) -> Unit,
+    navController: NavHostController,
+    viewModel: LeMieAttivitaViewModel = LeMieAttivitaViewModel(),
+    viewModelUtente: ViewModelUtente = ViewModelUtente(),
+    repoNotifiche: RepositoryNotifiche = RepositoryNotifiche(),
+    progettoNome: String
 ) {
     var titolo by remember { mutableStateOf(todoItem.titolo) }
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
     var dataScadenza by remember { mutableStateOf(SimpleDateFormat("dd/MM/yyyy").format(todoItem.dataScadenza)) }
     val priorita by remember { mutableStateOf(todoItem.priorita) }
     val context = LocalContext.current
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    val uploadResult by viewModel.uploadResult.observeAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedFileUri = it
+            viewModel.setFileUri(it)  // Imposta il file URI nel ViewModel
+        }
+    }
+
+    LaunchedEffect(uploadResult) {
+
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -423,30 +709,60 @@ fun EditTodoDialog(
                         unfocusedContainerColor = Grey50,
                     ),
                 )
+                // Aggiungi il pulsante per selezionare un file
+                Button(onClick = { launcher.launch("*/*") }) {
+                    Text("Seleziona File")
+                }
+
+                if (selectedFileUri != null) {
+                    Text("File Selezionato: ${selectedFileUri!!.lastPathSegment}")
+                }
+
+
+
                 // Gestisci la priorità se necessario
                 // puoi usare un RadioButton o un DropdownMenu per gestire la priorità
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        navController.navigate("task_selezionata/${todoItem.id.toString()}/${todoItem.progetto.toString()}")
+                    },
+                    colors = ButtonDefaults.buttonColors(Grey70)
+                ) {
+                    Text("Delega Task")
+                }
             }
         },
         confirmButton = {
             Button(
                 colors = ButtonDefaults.buttonColors(Red70),
                 onClick = {
-                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY)
-                    val date = sdf.parse(dataScadenza)
-
-                    if (date != null) {
-                        onSave(
-                            todoItem.copy(
-                                titolo = titolo,
-                                descrizione = descrizione,
-                                dataScadenza = date,
-                                priorita = priorita
-                            )
+                    val updatedTodo = todoItem.copy(
+                        titolo = titolo,
+                        descrizione = descrizione,
+                        dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse(dataScadenza),
+                        priorita = priorita
+                    )
+                    coroutineScope.launch {
+                        viewModel.uploadFileAndSaveTodo(
+                            id = updatedTodo.id ?: "",
+                            titolo = updatedTodo.titolo,
+                            descrizione = updatedTodo.descrizione,
+                            dataScad = updatedTodo.dataScadenza,
+                            priorita = priorita,
+                            sezione = 1
                         )
-                    } else {
-                        Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
+
+                        for (p1 in updatedTodo.utenti) {
+                            if (p1 != viewModelUtente.userProfile?.id) {
+                                val contenuto = "${viewModelUtente.userProfile?.nome ?: " "} ${viewModelUtente.userProfile?.cognome ?: " "} ha modificato la vostra task: ${updatedTodo.titolo} del progetto: $progettoNome"
+                                repoNotifiche.creaNotifica(viewModelUtente.userProfile?.id ?: " ", p1, "Modifica_Task", contenuto, updatedTodo.progetto)
+                            }
+                        }
                     }
-                }
+                    onSave(updatedTodo)
+                    onDismiss()
+                },
             ) {
                 Text(stringResource(id = R.string.salvaEdit))
             }
@@ -460,7 +776,25 @@ fun EditTodoDialog(
             }
         }
     )
+    LaunchedEffect(uploadResult) {
+        // Gestisci il risultato dell'upload se necessario
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @Composable
 fun AddTodoDialog(
@@ -628,7 +962,10 @@ fun CompleteDialog(
             confirmButton = {
                 Button(
                     onClick = {
+
                         onSave(item)
+
+                        onDismiss()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
                 ) {
@@ -669,6 +1006,7 @@ fun CompleteDialog(
                     Text(text =  stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
                 }
             },
+
             dismissButton = {
                 Button(
                     onClick = onDismiss,
@@ -685,11 +1023,83 @@ fun CompleteDialog(
     }
 }
 
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun PreviewLeMieAttivita() {
-    LeMieAttivitaUI(navController = rememberNavController(), viewModel = LeMieAttivitaViewModel())
+fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Grey35 // Sostituisci Grey35 con il colore appropriato
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // Prima colonna (vuota)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.tipocheride),
+                    contentDescription = "tipo che ride",
+                    modifier = Modifier
+                        .size(200.dp) // Imposta la dimensione desiderata
+                        .offset(x = (-16).dp) // Sposta l'immagine fuori dai bordi della colonna
+                )
+            }
+
+
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Hai Completato $todoCompletate/$todoNonCompletate ToDo",
+                    textAlign = TextAlign.Center,
+                    color = Color.Black
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.size(64.dp),
+                        color = Red70,
+                        trackColor = Grey50,
+                    )
+                    Text(
+                        text = "${(progress * 100).toInt()}%",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
+
+            }
+        }
+    }
 }

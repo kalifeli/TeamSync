@@ -34,12 +34,21 @@ class RepositoryNotifiche {
 
     private val firestore: FirebaseFirestore = Firebase.firestore
 
-     fun creaNotifica(mittenteId: String, destinatarioId: String, tipo: String, contenuto: String) {
+
+    fun creaNotifica(mittenteId: String, destinatarioId: String, tipo: String, contenuto: String, progetto: String) {
         try {
             val notificaId = UUID.randomUUID().toString()
             val timestamp = System.currentTimeMillis()
+            var notifica = Notifiche ()
+            if(tipo == "Richiesta_Amicizia" || tipo == "Richiesta_Progetto")
+            {
+                notifica = Notifiche(mittenteId, destinatarioId, tipo, false, contenuto,notificaId,progetto,"false")
+            }
+            else
+            {
+                notifica = Notifiche(mittenteId, destinatarioId, tipo, false, contenuto,notificaId,progetto)
 
-            val notifica = Notifiche(mittenteId, destinatarioId, tipo, false, contenuto,notificaId)
+            }
 
             firestore.collection("Notifiche").document(notificaId)
                 .set(notifica)
@@ -73,6 +82,19 @@ class RepositoryNotifiche {
             throw e
         }
     }
+
+    suspend fun updateNotifica(notifica: Notifiche) {
+        try {
+            val notificaRef = firestore.collection("Notifiche").document(notifica.id)
+            notificaRef.set(notifica).await()
+            println("Notifica aggiornata con successo su Firebase: ${notifica.id}")
+        } catch (e: Exception) {
+            println("Errore durante l'aggiornamento della notifica: $e")
+            throw e
+        }
+    }
+
+
 
 
 }

@@ -16,6 +16,7 @@ import androidx.navigation.navArgument
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.LeMieAttivitaUI
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.Lista_Utenti_assegna_Task
+import com.example.teamsync.caratteristiche.LeMieAttivita.ui.SchermataModificaProgetto
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.ui.NotificationScreen
 import com.example.teamsync.caratteristiche.Profilo.ProfiloUtenteCliccato
@@ -59,6 +60,7 @@ fun NavGraph(){
         composable(route = Schermate.Terms.route) {Termini(navController)}
         composable(route = Schermate.Supporto.route) { Supporto(navController)}
 
+
         composable(route = Schermate.ItuoiProgetti.route){
             Scaffold (
                 bottomBar = {
@@ -94,21 +96,12 @@ fun NavGraph(){
             }
         }
 
-
-
-
-
-
-
-        // Composable per la nuova schermata DettaglioProgetto
         composable(
             route = "dettaglio_progetto/{sezioneFaq}",
             arguments = listOf(navArgument("sezioneFaq") { type = NavType.StringType })
         ) { backStackEntry ->
             // Recupera il parametro projectId dalla rotta
             val projectId = backStackEntry.arguments?.getString("sezioneFaq")
-
-
             Faq(navController = navController, sezioneFaq = projectId ?: "")
         }
 
@@ -176,7 +169,6 @@ fun NavGraph(){
             if (projectId != null) {
                 LeMieAttivitaUI(navController, viewModelLeMieAttivita,viewModelUtente,viewModelProgetto,projectId)
             }
-
         }
 
         composable(
@@ -196,7 +188,17 @@ fun NavGraph(){
                     viewNotifiche = RepositoryNotifiche()
                 )
             }
-
+        }
+        composable(
+            route = "modificaProgetto/{progettoId}" ,
+            arguments = listOf(navArgument("progettoId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val progettoId = backStackEntry.arguments?.getString("progettoId") ?: return@composable
+            SchermataModificaProgetto(
+                viewModelProgetto = viewModelProgetto,
+                navController = navController,
+                progettoId = progettoId,
+            )
         }
 
 

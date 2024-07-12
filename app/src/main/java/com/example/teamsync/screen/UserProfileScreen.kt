@@ -311,7 +311,7 @@ fun UserProfileScreen_white(viewModel: ViewModelUtente, navController: NavHostCo
                     shape = RoundedCornerShape(16.dp),
                 )
                 var expanded by remember { mutableStateOf(false) }
-                Box(){
+                Box{
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,

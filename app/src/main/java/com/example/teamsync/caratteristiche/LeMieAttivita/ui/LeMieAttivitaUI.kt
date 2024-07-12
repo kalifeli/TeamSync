@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,29 +26,38 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -68,12 +76,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
@@ -89,6 +97,7 @@ import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -96,11 +105,10 @@ import java.util.Locale
 @ExperimentalMaterial3Api
 @Composable
 fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaViewModel, viewModelUtente: ViewModelUtente, viewmodelprogetto: ViewModelProgetto,  id_prog: String) {
-    val id_progetto_x = id_prog
     viewModel.getTodoByProject(id_prog)
     viewModel.getTodoCompletateByProject(id_prog)
     viewModelUtente.getUserProfile()
-    var repoNotifiche = RepositoryNotifiche()
+    val repoNotifiche = RepositoryNotifiche()
     val utente = viewModelUtente.userProfile
     val coroutineScope = rememberCoroutineScope()
     var addTodoDialog by remember { mutableStateOf(false) }
@@ -113,23 +121,22 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val caricanome = remember { mutableStateOf(false) }
     var carica by remember { mutableStateOf(false) }
     var isCompletedSection by remember { mutableStateOf(false) }
-    var progetto_nome  = remember { mutableStateOf("") }
+    val progetto_nome  = remember { mutableStateOf("") }
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
     var partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
     val progressione by viewModel.progressione.collectAsState() // Osserva il valore del flusso
     val todoCompletate by viewModel.taskCompletate.collectAsState()
     val todoNonCompletate by viewModel.taskNonCompletate.collectAsState()
+    var expended by remember { mutableStateOf(false) }
+    var mostraDialogAbbandono by remember { mutableStateOf(false) }
+    var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
+    val contesto = LocalContext.current
 
     LaunchedEffect(Unit) {
-        progetto_nome.value = viewmodelprogetto.getnome_progetto(id_progetto_x)
-        partecipanti.value = viewmodelprogetto.getLista_Partecipanti(id_progetto_x)
+        progetto_nome.value = viewmodelprogetto.getnome_progetto(id_prog)
+        partecipanti.value = viewmodelprogetto.getLista_Partecipanti(id_prog)
     }
-
-
-
-
-
 
     LaunchedEffect(viewmodelprogetto.cambia_lista_partecipanti.value) {
         if(viewmodelprogetto.cambia_lista_partecipanti.value) {
@@ -138,7 +145,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 
             if (progettoId != null) {
                 partecipanti.value = viewmodelprogetto.getLista_Partecipanti(progettoId)
-
                 // Log della lista dei partecipanti
                 Log.d("PartecipantiLog", "Partecipanti: $partecipanti")
             } else {
@@ -147,19 +153,13 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         }
     }
 
+    //Questo in teoria non serve. Potresti riprendere la variabile che è presente nel viewModel e osservarla
     LaunchedEffect(viewmodelprogetto.carica_nome_progetto.value) {
         if(viewmodelprogetto.carica_nome_progetto.value)
             caricanome.value = true
         else
             caricanome.value = false
     }
-
-
-
-
-
-
-
 
 
     LaunchedEffect(isClicked1.value) {
@@ -187,7 +187,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         }
     }
 
-
     if (addTodoDialog) {
         AddTodoDialog(
             onDismiss = { addTodoDialog = false },
@@ -209,7 +208,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             }
         )
     }
-
 
 
     if (openDialog.value && currentTodoItem.value != null) {
@@ -238,8 +236,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         )
     }
 
-
-
     if (dialogComplete && currentTodoItem.value != null) {
         CompleteDialog(
             sezione,
@@ -256,239 +252,254 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                             var contenuto = (viewModelUtente.userProfile?.nome ?: " ") + " " + (viewModelUtente.userProfile?.cognome
                                 ?: " ") + " ha completato una task del progetto: " + progetto_nome.value
                             repoNotifiche.creaNotifica(viewModelUtente.userProfile?.id ?: " ",p,"Completamento_Task", contenuto, id_prog)
-
                         }
-
                     }
                 }
-                dialogComplete = false // Chiudi il dialogo dopo aver salvato
+                dialogComplete = false
             },
             item = currentTodoItem.value!!
-            // Passa l'elemento su cui agire
         )
-
     }
 
-
-
-    Box(
-        modifier = Modifier
-            .background(Grey20)
-            .fillMaxSize()
-    ) {
-        Column(
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = progetto_nome.value,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate(Schermate.ItuoiProgetti.route) }) { // non è meglio popBackStack() ???
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "torna indietro", tint = Color.Black)
+                    }
+                },
+                actions = {
+                    Box{
+                        IconButton(onClick = {expended = true}) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "menu a tendina", tint = Color.Black)
+                        }
+                        DropdownMenu(
+                            expanded = expended ,
+                            onDismissRequest = { expended = false },
+                            modifier = Modifier.background(Grey20)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = "Condividi") },
+                                onClick = {
+                                    expended = false
+                                    mostraDialogCodiceProgetto = true
+                                },
+                                leadingIcon = { Icon(Icons.Default.Share, contentDescription = "condividi progetto")},
+                                modifier = Modifier.background(Grey20)
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Info Progetto") },
+                                onClick = {
+                                    expended = false
+                                    navController.navigate("progetto_da_accettare/${id_prog}")
+                                },
+                                leadingIcon = { Icon(Icons.Default.Info, contentDescription = "informazioni progetto")},
+                                modifier = Modifier.background(Grey20)
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Abbandona", color = Red70) },
+                                onClick = {
+                                    expended = false
+                                    mostraDialogAbbandono = true
+                                },
+                                leadingIcon = { Icon(painter = painterResource(id = R.drawable.ic_logout), contentDescription = "informazioni progetto", modifier = Modifier.size(20.dp), tint = Red70)},
+                                modifier = Modifier.background(Grey20)
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black,
+                )
+            )
+        }
+    ){ padding ->
+        Box(
             modifier = Modifier
+                .background(White)
                 .fillMaxSize()
-                .padding(top = 30.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 16.dp)
         ) {
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.08f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .fillMaxSize()
+                    .padding(padding),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                if(caricanome.value)
+                {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        color = Grey50,
+                        trackColor = Red70,
+                        strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                    )
+                }
 
-                Box(
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = stringResource(id = R.string.project_tasks_description),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Grey70,
                     modifier = Modifier
-                        .padding(start = 16.dp)
-                        .size(35.dp)
-                        .background(
-                            Color.Black,
-                            RoundedCornerShape(20.dp)
-                        ) // Imposta il rettangolo di sfondo a nero
-                        .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = Red70,
+                    thickness = 2.dp
+                )
+
+                Card(progressione,todoCompletate,todoNonCompletate)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Start)
+                ) {
+                    Button(
+                        onClick = {
+                            viewModel.getTodoCompletateByProject(id_prog)
+                            isCompletedSection = true
+                            isClicked1.value = true
+                            isClicked.value = false
+                            sezione = 0
+                        },
+                        modifier = Modifier
+                            .padding(start = 16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            if (isClicked1.value) Red70 else Grey35
+                        )
+                    ) {
+                        Text(text = stringResource(id = R.string.bottoneCompletate))
+                    }
+                    Button(
+                        onClick = {
+                            viewModel.getTodoByProject(id_prog)
+                            isCompletedSection = false
+                            isClicked.value = true
+                            isClicked1.value = false
+                            sezione = 1
+                        },
+                        modifier = Modifier
+                            .padding(start = 16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            if (isClicked.value) Red70 else Grey35
+                        ),
+
+                        ) {
+                        Text(text = stringResource(id = R.string.bottoneNonCompletate))
+                    }
+                }
+                if(carica) {
+                    CircularProgressIndicator(color = Color.Black)
+                }
+
+
+                if (!isLoadingNonCompletate)
+                {
+                    LazyColumn{
+                        items(viewModel.leMieAttivitaNonCompletate) { attivita ->
+                            TodoItem(
+                                item = attivita,
+                                onDelete = { id ->
+                                    viewModel.deleteTodo(id, sezione, id_prog)
+                                },
+                                onEdit = { item ->
+                                    currentTodoItem.value = item
+                                    openDialog.value = true
+                                },
+                                onComplete = { item ->
+                                    currentTodoItem.value = item
+                                    dialogComplete = true
+                                },
+                                sezione,
+                                viewModelUtente
+                            )
+                        }
+                    }
+                }
+
+                if (!isLoadingCompletate) {
+                    LazyColumn {
+                        items(viewModel.leMieAttivitaCompletate) { attivita ->
+                            TodoItem(
+                                item = attivita,
+                                onDelete = { id ->
+                                    viewModel.deleteTodo(id, sezione, id_prog)
+                                },
+                                onEdit = { item ->
+                                    currentTodoItem.value = item
+                                    openDialog.value = true
+                                },
+                                onComplete = { item ->
+                                    currentTodoItem.value = item
+                                    dialogComplete = true
+                                },
+                                sezione,
+                                viewModelUtente
+                            )
+                        }
+                    }
+                }
+
+            }
+            if (sezione == 1) {
+                FloatingActionButton(
+                    containerColor = Red70,
+                    shape = FloatingActionButtonDefaults.shape,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp),
+                    onClick = { addTodoDialog = true }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "close_impostazioni",
-                        tint = Color.White // Assicurati che l'icona sia visibile impostando il colore a bianco
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "add Todo",
+                        tint = Color.White
                     )
                 }
-
-                // Centra il testo all'interno della Row
-                Row(
-                    modifier = Modifier.weight(8f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "To Do List",
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
-                        color = Color.Black,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-
-                // Row vuota per bilanciare il layout
-                Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {}
-
-            }
-
-            if(caricanome.value)
-            {
-                CircularProgressIndicator(color = Color.Black)
-            }
-            else
-            {
-                Text(
-                    text = progetto_nome.value,
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    color = Color.Black,
-                    fontFamily = FontFamily.Monospace,
-                    modifier = Modifier.padding(top = 5.dp)
-
-                )
-            }
-
-
-            Text(
-                textAlign = TextAlign.Center,
-                text = stringResource(id = R.string.project_tasks_description),
-                color = Grey70,
-                modifier = Modifier
-                    .padding(top = 10.dp)
-                    .padding(horizontal = 20.dp)
-            )
-
-            Image(
-                painterResource(id = R.drawable.linea),
-                contentDescription = "Linea",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(30.dp),
-                alignment = Alignment.Center
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Card(progressione,todoCompletate,todoNonCompletate)
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Start)
-            ) {
-
-
-                Button(
-                    onClick = {
-                        viewModel.getTodoCompletateByProject(id_prog)
-                        isCompletedSection = true
-                        isClicked1.value = true
-                        isClicked.value = false
-                        sezione = 0
-                    },
-                    modifier = Modifier
-                        .padding(start = 16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        if (isClicked1.value) Red70 else Grey35
-                    )
-                ) {
-                    Text(text = stringResource(id = R.string.bottoneCompletate))
-                }
-                Button(
-                    onClick = {
-                        viewModel.getTodoByProject(id_prog)
-                        isCompletedSection = false
-                        isClicked.value = true
-                        isClicked1.value = false
-                        sezione = 1
-                    },
-                    modifier = Modifier
-                        .padding(start = 16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        if (isClicked.value) Red70 else Grey35
-                    ),
-
-                    ) {
-                    Text(text = stringResource(id = R.string.bottoneNonCompletate))
-                }
-            }
-            if(carica) {
-                CircularProgressIndicator(color = Color.Black)
-            }
-
-
-            if (!isLoadingNonCompletate)
-            {
-                LazyColumn{
-                    items(viewModel.leMieAttivitaNonCompletate) { attivita ->
-                        TodoItem(
-                            item = attivita,
-                            onDelete = { id ->
-                                viewModel.deleteTodo(id, sezione, id_prog)
-                            },
-                            onEdit = { item ->
-                                currentTodoItem.value = item
-                                openDialog.value = true
-                            },
-                            onComplete = { item ->
-                                currentTodoItem.value = item
-                                dialogComplete = true
-                            },
-                            sezione,
-                            viewModelUtente
-                        )
-                    }
-                }
-            }
-
-
-
-
-
-            if (!isLoadingCompletate) {
-                LazyColumn {
-                    items(viewModel.leMieAttivitaCompletate) { attivita ->
-                        TodoItem(
-                            item = attivita,
-                            onDelete = { id ->
-                                viewModel.deleteTodo(id, sezione, id_prog)
-                            },
-                            onEdit = { item ->
-                                currentTodoItem.value = item
-                                openDialog.value = true
-                            },
-                            onComplete = { item ->
-                                currentTodoItem.value = item
-                                dialogComplete = true
-                            },
-                            sezione,
-                            viewModelUtente
-                        )
-                    }
-                }
-            }
-
-        }
-
-
-        if (sezione == 1) {
-            FloatingActionButton(
-                containerColor = Red70,
-                shape = FloatingActionButtonDefaults.shape,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(8.dp),
-                onClick = { addTodoDialog = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "add Todo",
-                    tint = Color.White
-                )
             }
         }
     }
+
+    if(mostraDialogAbbandono){
+        AbbandonaProgettoDialog(
+            onDismissRequest = { mostraDialogAbbandono = false },
+            viewModelProgetto = viewmodelprogetto,
+            navController = navController,
+            progettoId = id_prog
+        )
+    }
+
+    if(mostraDialogCodiceProgetto){
+        CondividiProgettoDialog(
+            onDismissRequest = { mostraDialogCodiceProgetto = false },
+            viewModelProgetto = viewmodelprogetto,
+            contesto = contesto,
+            progettoId = id_prog
+        )
+    }
+
 }
 
 @Composable
@@ -518,8 +529,6 @@ fun TodoItem(
 
                 }
             }
-
-
         }
     }
 
@@ -532,7 +541,7 @@ fun TodoItem(
     ) {
         Column(
             modifier = Modifier
-                .align(Alignment.CenterVertically) // Aligns the column center vertically
+                .align(Alignment.CenterVertically)
         ) {
             if (!item.completato)
             {
@@ -563,7 +572,7 @@ fun TodoItem(
             Text(
                 modifier = Modifier.padding(end = 10.dp),
                 text = item.titolo,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Left,
                 fontSize = 16.sp
             )
             Text(
@@ -718,8 +727,6 @@ fun EditTodoDialog(
                     Text("File Selezionato: ${selectedFileUri!!.lastPathSegment}")
                 }
 
-
-
                 // Gestisci la priorità se necessario
                 // puoi usare un RadioButton o un DropdownMenu per gestire la priorità
                 Spacer(modifier = Modifier.width(8.dp))
@@ -780,21 +787,6 @@ fun EditTodoDialog(
         // Gestisci il risultato dell'upload se necessario
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @Composable
 fun AddTodoDialog(
@@ -1025,25 +1017,25 @@ fun CompleteDialog(
 
 @Composable
 fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
-    ElevatedCard(
+    OutlinedCard(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 16.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Grey20
         ),
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 10.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Grey35 // Sostituisci Grey35 con il colore appropriato
-        )
+            .padding(vertical = 8.dp),
+
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Prima colonna (vuota)
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -1052,10 +1044,10 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.tipocheride),
-                    contentDescription = "tipo che ride",
+                    contentDescription = "studente che ride",
                     modifier = Modifier
-                        .size(200.dp) // Imposta la dimensione desiderata
-                        .offset(x = (-16).dp) // Sposta l'immagine fuori dai bordi della colonna
+                        .size(200.dp) // da modificare!!!
+                        .offset(x = (-16).dp) // da modificare!!!
                 )
             }
 
@@ -1069,8 +1061,9 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Hai Completato $todoCompletate/$todoNonCompletate ToDo",
+                    text = "Hai Completato $todoCompletate/$todoNonCompletate Attività",
                     textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge,
                     color = Color.Black
                 )
             }
@@ -1103,3 +1096,52 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
         }
     }
 }
+
+@Composable
+fun AbbandonaProgettoDialog(
+    onDismissRequest : () -> Unit,
+    viewModelProgetto: ViewModelProgetto,
+    navController: NavController,
+    progettoId: String
+){
+    val userId = viewModelProgetto.utenteCorrenteId.value
+    AlertDialog(
+        text = {
+            Text(
+                text = "Sei sicuro di abbandonare il progetto? Una volta confermato non potrai tornare più indietro!",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                textAlign = TextAlign.Center,
+            )
+        },
+        containerColor = White,
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Button(
+                onClick = {
+                    onDismissRequest()
+                    viewModelProgetto.abbandonaProgetto(userId,progettoId)
+                    navController.navigate(Schermate.ItuoiProgetti.route)
+                          },
+                colors = ButtonDefaults.buttonColors(Red70),
+            ) {
+                Text(
+                    text = "Abbandona"
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismissRequest
+            ){
+                Text(
+                    text = "Annulla",
+                    color = Color.Black
+                )
+            }
+        }
+    )
+
+}
+

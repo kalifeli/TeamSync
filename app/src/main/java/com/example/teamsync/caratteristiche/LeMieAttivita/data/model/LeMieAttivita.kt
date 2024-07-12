@@ -16,10 +16,6 @@ data class LeMieAttivita(
     val fileUri: String? = null,
     val progetto: String = "",
     val utenti: List<String> = emptyList(),
-
-    ) {
-    // Costruttore vuoto richiesto da Firestore per deserializzare l'oggetto
-    constructor() : this(null, "", "", Date(), Priorità.NESSUNA)
-}
+    )
 
 

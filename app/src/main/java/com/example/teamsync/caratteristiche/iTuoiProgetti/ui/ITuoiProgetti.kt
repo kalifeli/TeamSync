@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -321,7 +322,7 @@ fun CreaProgettoDialog(
                     onValueChange = { nome = it },
                     label = {
                         Text(
-                            "Nome",
+                            stringResource(id = R.string.nome),
                             color = Color.Black
                         ) },
                     modifier = Modifier.fillMaxWidth(),
@@ -334,12 +335,14 @@ fun CreaProgettoDialog(
                     value = descrizione,
                     onValueChange = { descrizione = it },
                     label = {
-                        Text("Descrizione",
+                        Text(
+                            stringResource(id = R.string.descrizioneEdit),
                         color = Color.Black) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Red70
-                    )
+                    ),
+                    maxLines = 15
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 

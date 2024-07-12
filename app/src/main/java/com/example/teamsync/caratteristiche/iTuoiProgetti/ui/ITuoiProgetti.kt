@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -50,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -117,7 +121,7 @@ fun ITuoiProgetti(
                actions = {
                    Box{
                        IconButton(onClick = {expended = true }) {
-                           Icon(Icons.Default.MoreVert, contentDescription = "Menu")
+                           Icon(Icons.Default.MoreVert, contentDescription = "Menu a tendina")
                        }
                        DropdownMenu(
                            expanded = expended,
@@ -133,7 +137,7 @@ fun ITuoiProgetti(
                                    }
                                },
                                leadingIcon = {
-                                   Icon(Icons.Default.Refresh, contentDescription = "icona sincronizzazione")
+                                   Icon(Icons.Default.Refresh, contentDescription = "icona sincronizzazione", tint = Color.Black)
                                },
                                modifier = Modifier.background(Grey20)
                            )
@@ -145,7 +149,7 @@ fun ITuoiProgetti(
                                    navController.navigate(Schermate.Impostazioni.route)
                                          },
                                leadingIcon = {
-                                   Icon(Icons.Default.Settings, contentDescription = "icona Impostazioni")
+                                   Icon(Icons.Default.Settings, contentDescription = "icona Impostazioni", tint = Color.Black)
                                },
                                modifier = Modifier.background(Grey20)
                            )
@@ -160,6 +164,7 @@ fun ITuoiProgetti(
                                    Icon(
                                        painter = painterResource(id = R.drawable.ic_logout),
                                        contentDescription = "icona Logout",
+                                       tint = Color.Black,
                                        modifier = Modifier.size(20.dp),
                                    )
                                },
@@ -396,7 +401,22 @@ fun CreaProgettoDialog(
                     ) {
                         Priorità.entries.forEach { p ->
                             DropdownMenuItem(
-                                text = { Text(p.name) },
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(CircleShape)
+                                                .border(0.5.dp, Color.Black, CircleShape)
+                                                .background(p.colore)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(p.name)
+
+                                    }
+                                       },
                                 onClick = {
                                     priorita = p
                                     expanded = false
@@ -432,7 +452,7 @@ fun CreaProgettoDialog(
                         color = Red70,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {mostraAggiungiProgetto = true}
+                            .clickable { mostraAggiungiProgetto = true }
                             .padding(horizontal = 2.dp),
                     )
                 }

@@ -70,7 +70,30 @@ class ViewModelProgetto : ViewModel() {
         contesto.startActivity(condividiIntent)
     }
 
-    suspend fun getnome_progetto(id_prog: String): String {
+    fun aggiornaProgetto(progettoId: String, nome: String, descrizione: String, dataScadenza: Date,priorita: Priorità){
+        viewModelScope.launch {
+            try {
+                val progetto = repositoryProgetto.getProgettoById(progettoId)
+                if(progetto != null){
+                    val progettoAggiornato = progetto.copy(
+                        nome = nome,
+                        descrizione = descrizione,
+                        dataScadenza = dataScadenza,
+                        priorita = priorita
+                    )
+                    repositoryProgetto.aggiornaProgetto(progettoAggiornato)
+                    utenteCorrenteId.value?.let {
+                        caricaProgettiUtente(it,false)
+                    }
+                }
+            }catch (e: Exception){
+                Log.e("ViewModelProgetto", "Errore durante l'aggiornamento del progetto", e)
+
+            }
+        }
+    }
+
+     suspend fun getnome_progetto(id_prog: String): String {
         carica_nome_progetto.value = true
 
         var p: Progetto? = null
@@ -82,7 +105,6 @@ class ViewModelProgetto : ViewModel() {
         }
         carica_nome_progetto.value = false
         return p.nome
-
     }
 
     fun getUtenteById(id: String, callback: (ProfiloUtente?) -> Unit) {
@@ -256,6 +278,7 @@ class ViewModelProgetto : ViewModel() {
         }
     }
 
+
     suspend fun get_progetto_by_id(id: String) : Progetto {
         return try {
             val progetto = repositoryProgetto.getProgettoById(id)
@@ -264,6 +287,7 @@ class ViewModelProgetto : ViewModel() {
             throw Exception("Errore durante il recupero del progetto: ${e.message}")
         }
     }
+
     fun aggiungiPartecipanteAlProgetto(progettoId: String, userId: String) {
         viewModelScope.launch {
             try {

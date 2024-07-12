@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -304,6 +305,15 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                     navController.navigate("progetto_da_accettare/${id_prog}")
                                 },
                                 leadingIcon = { Icon(Icons.Default.Info, contentDescription = "informazioni progetto")},
+                                modifier = Modifier.background(Grey20)
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Modifica Progetto") },
+                                onClick = {
+                                    expended = false
+                                    navController.navigate("modificaProgetto/${id_prog}")
+                                },
+                                leadingIcon = { Icon(Icons.Default.Create, contentDescription = "modifica informazioni progetto")},
                                 modifier = Modifier.background(Grey20)
                             )
                             DropdownMenuItem(

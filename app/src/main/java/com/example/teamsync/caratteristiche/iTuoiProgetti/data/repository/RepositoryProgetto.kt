@@ -207,6 +207,17 @@ class RepositoryProgetto {
         }
     }
 
+    suspend fun aggiornaProgetto(progetto: Progetto){
+        try {
+            progetto.id?.let { id ->
+                firestore.collection("progetti").document(id).set(progetto).await()
+            }
+        }catch (e: Exception){
+            throw Exception("Errore durante l'aggiornamento del progetto: ${e.message}")
+
+        }
+    }
+
 
 }
 

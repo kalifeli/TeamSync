@@ -55,6 +55,7 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Red70
 
 
 @Composable
@@ -81,14 +82,14 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
                     .background(
                         Color.White,
                         RoundedCornerShape(20.dp)
-                    ) // Imposta il rettangolo di sfondo a nero
+                    )
                     .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "close_impostazioni",
-                    tint = Color.DarkGray // Assicurati che l'icona sia visibile impostando il colore a bianco
+                    tint = Color.DarkGray
                 )
             }
             // Centra il testo all'interno della Row
@@ -143,7 +144,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController) 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFEF5350), RoundedCornerShape(16.dp))
+            .background(Red70, RoundedCornerShape(16.dp))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

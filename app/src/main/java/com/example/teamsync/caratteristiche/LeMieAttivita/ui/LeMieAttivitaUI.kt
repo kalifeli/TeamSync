@@ -1,5 +1,7 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
+import android.app.DatePickerDialog
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -25,13 +27,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,9 +49,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -70,7 +72,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -89,8 +90,11 @@ import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
+import com.google.rpc.Help.Link
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @ExperimentalMaterial3Api
@@ -117,9 +121,11 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
     var partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
-    val progressione by viewModel.progressione.collectAsState() // Osserva il valore del flusso
+    val progressione by viewModel.progressione.collectAsState()
     val todoCompletate by viewModel.taskCompletate.collectAsState()
     val todoNonCompletate by viewModel.taskNonCompletate.collectAsState()
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         progetto_nome.value = viewmodelprogetto.getnome_progetto(id_progetto_x)
@@ -153,12 +159,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         else
             caricanome.value = false
     }
-
-
-
-
-
-
 
 
 
@@ -218,6 +218,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             todoItem = currentTodoItem.value!!,
             onDismiss = { openDialog.value = false },
             onSave = { updatedItem ->
+                val fileUri = viewModel.uploadResult.value
+
                 viewModel.updateTodo(
                     id = updatedItem.id ?: "",
                     titolo = updatedItem.titolo,
@@ -227,7 +229,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     sezione,
                     id_prog,
                     updatedItem.utenti,
-                    updatedItem.fileUri
+                    fileUri = fileUri
                 )
                 openDialog.value = false
             },
@@ -269,6 +271,20 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 
     }
 
+    LaunchedEffect(viewModel.erroreAggiungiTask.value) {
+        if(viewModel.erroreAggiungiTask.value != null){
+            Toast.makeText(context, viewModel.erroreAggiungiTask.value, Toast.LENGTH_LONG).show()
+            viewModel.erroreAggiungiTask.value
+        }
+    }
+
+    LaunchedEffect(viewModel.erroreEditTask.value) {
+        if(viewModel.erroreEditTask.value != null){
+            Toast.makeText(context, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
+            viewModel.resetErroreAggiungiTask()
+        }
+
+    }
 
 
     Box(
@@ -435,7 +451,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 currentTodoItem.value = item
                                 dialogComplete = true
                             },
-                            sezione,
                             viewModelUtente
                         )
                     }
@@ -462,7 +477,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 currentTodoItem.value = item
                                 dialogComplete = true
                             },
-                            sezione,
                             viewModelUtente
                         )
                     }
@@ -492,155 +506,163 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 }
 
 @Composable
-fun TodoItem(
-    item: LeMieAttivita,
-    onDelete: (String) -> Unit,
-    onEdit: (LeMieAttivita) -> Unit,
-    onComplete: (LeMieAttivita) -> Unit,
-    sezione: Int,
-    viewModelUtente: ViewModelUtente
-) {
+fun TodoItem
+            (
+                item: LeMieAttivita,
+                onDelete: (String) -> Unit,
+                onEdit: (LeMieAttivita) -> Unit,
+                onComplete: (LeMieAttivita) -> Unit,
+                viewModelUtente: ViewModelUtente
+            )
+    {
+        var dialogDelete by remember { mutableStateOf(false) }
+        var dialogExpanded by remember { mutableStateOf(false) }
+        var lista_utenti by remember { mutableStateOf("") }
 
-
-    var dialogDelete by remember { mutableStateOf(false) }
-    var lista_utenti by remember { mutableStateOf("") }
-
-
-    LaunchedEffect(item.utenti){
-        lista_utenti = ""
-        for(u in item.utenti)
-        {
-            viewModelUtente.ottieni_utente(u) { userProfile ->
-
-                if (userProfile != null) {
-
-                    lista_utenti  += "${userProfile.nome} ${userProfile.cognome}\n"
-
+        LaunchedEffect(item.utenti) {
+            lista_utenti = ""
+            var size = item.utenti.size
+            var contatore = 0
+            for (u in item.utenti) {
+                viewModelUtente.ottieni_utente(u) { userProfile ->
+                    contatore++
+                    if (userProfile != null) {
+                        if (contatore == size){
+                        lista_utenti += "${userProfile.nome} ${userProfile.cognome}"
+                        }else{lista_utenti+= "${userProfile.nome} ${userProfile.cognome}\n"}
+                    }
                 }
             }
-
-
         }
-    }
 
-
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .background(Grey35)
-    ) {
-        Column(
+        Row(
             modifier = Modifier
-                .align(Alignment.CenterVertically) // Aligns the column center vertically
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Grey35)
+                .clickable {
+                    dialogExpanded = true
+                }
         ) {
-            if (!item.completato)
-            {
-                IconButton(onClick = {
-                    onComplete(item)
+            Column(
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+                if (!item.completato) {
+                    IconButton(onClick = {
+                        onComplete(item)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Completata",
+                            tint = Green50,
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                } else {
+                    IconButton(onClick = { onComplete(item) }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Non Completata",
+                            tint = Red70,
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp)
+            ) {
+                Text(
+                    maxLines = 1,
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = item.titolo,
+                    fontSize = 16.sp
+                )
+                Text(
+                    maxLines = 1,
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = item.descrizione,
+                    color = Grey70
+                )
+                Text(
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(item.dataScadenza),
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = lista_utenti,
+                    color = Grey70,
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .padding(bottom = 3.dp),
+                )
+                if (item.fileUri != null) {
+                    Text(text = "File allegato clicca per visualizzare")
+                }
 
-                })
-                {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Completata",
-                        tint = Green50,
-                        modifier = Modifier.size(15.dp)
+                Canvas(
+                    modifier = Modifier.size(16.dp)
+                ) {
+                    drawCircle(
+                        color = item.priorita.colore,
+                        radius = size.minDimension / 2
                     )
                 }
-            }else {
-                IconButton(onClick = { onComplete(item) }) {
-                    Icon(imageVector = Icons.Default.Clear,
-                        contentDescription = "Non Completata",
-                        tint = Red70,
-                        modifier = Modifier.size(15.dp))
+
+
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                IconButton(onClick = { dialogDelete = true }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_delete_24),
+                        contentDescription = "Delete",
+                        tint = Color.Red
+                    )
+                }
+                if (dialogDelete) {
+                    AlertDialog(
+                        onDismissRequest = { dialogDelete = false },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    onDelete(item.id ?: "")
+                                    dialogDelete = false
+                                },
+                                colors = ButtonDefaults.buttonColors(Red70),
+                            ) {
+                                Text(stringResource(id = R.string.conferma))
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = { dialogDelete = false },
+                                colors = ButtonDefaults.buttonColors(Grey50),
+                            ) {
+                                Text(stringResource(id = R.string.annullaEdit))
+                            }
+                        },
+                        title = { Text(stringResource(id = R.string.eliminaTodoTitle)) },
+                        text = { Text(stringResource(id = R.string.eliminaTodoDescrizione)) },
+                        containerColor = Grey35,
+                    )
+                }
+                IconButton(onClick = { onEdit(item) }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_edit_24),
+                        contentDescription = "Edit",
+                        tint = Grey70
+                    )
                 }
             }
         }
-        Column(modifier = Modifier
-            .weight(1f)
-            .padding(vertical = 8.dp)) {
-            Text(
-                modifier = Modifier.padding(end = 10.dp),
-                text = item.titolo,
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp
-            )
-            Text(
-                modifier = Modifier
-                    .padding(end = 10.dp),
-                text = item.descrizione,
-                color = Grey70
-            )
-            Text(
-                modifier = Modifier
-                    .padding(end = 10.dp),
-                text = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(item.dataScadenza),
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = lista_utenti,
-                color = Grey70,
-                modifier = Modifier
-                    .padding(end = 10.dp)
-                    .padding(bottom = 3.dp),
-            )
 
-
-            Canvas(modifier = Modifier
-                .size(16.dp)) {
-                drawCircle(
-                    color = item.priorita.colore,
-                    radius = size.minDimension / 2
-                )
-
-            }
+        if (dialogExpanded) {
+            ExpandedDialog(item = item, onDismiss = { dialogExpanded = false }, viewModelUtente)
         }
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            IconButton(onClick = {dialogDelete = true}
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_delete_24),
-                    contentDescription = "Delete",
-                    tint = Color.Red
-                )
-            }
-            if (dialogDelete){
-                AlertDialog(
-                    onDismissRequest = { dialogDelete = false },
-                    confirmButton = {
-                        Button(onClick = {
-                            onDelete(item.id ?: "")
-                            dialogDelete = false
-                        },
-                            colors = ButtonDefaults.buttonColors(Red70),
-                        ) {
-                            Text(stringResource(id = R.string.conferma))
-                        }
-                    },
-                    dismissButton = {
-                        Button(
-                            onClick = {dialogDelete = false},
-                            colors = ButtonDefaults.buttonColors(Grey50),
-                        ) {
-                            Text(stringResource(id = R.string.annullaEdit))
-                        }
-                    },
-                    title = { Text(stringResource(id = R.string.eliminaTodoTitle)) },
-                    text = { Text(stringResource(id = R.string.eliminaTodoDescrizione)) },
-                    containerColor = Grey35,
-                )
-            }
-            IconButton(onClick = { onEdit(item) }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_edit_24),
-                    contentDescription = "Edit",
-                    tint = Grey70
-                )
-            }
-        }
-    }
 }
 
 
@@ -658,7 +680,7 @@ fun EditTodoDialog(
 ) {
     var titolo by remember { mutableStateOf(todoItem.titolo) }
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
-    var dataScadenza by remember { mutableStateOf(SimpleDateFormat("dd/MM/yyyy").format(todoItem.dataScadenza)) }
+    var dataScadenza by remember { mutableStateOf(Date()) }
     val priorita by remember { mutableStateOf(todoItem.priorita) }
     val context = LocalContext.current
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
@@ -667,9 +689,24 @@ fun EditTodoDialog(
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             selectedFileUri = it
-            viewModel.setFileUri(it)  // Imposta il file URI nel ViewModel
+            viewModel.setFileUri(it)
         }
     }
+
+    val calendar = Calendar.getInstance()
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    var dataScadenzaStr = sdf.format(dataScadenza)
+    val datePickerDialog = DatePickerDialog(
+        context,
+        R.style.CustomDatePickerDialog,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+            dataScadenza = calendar.time
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
 
     LaunchedEffect(uploadResult) {
 
@@ -682,32 +719,49 @@ fun EditTodoDialog(
         textContentColor = Grey50,
         text = {
             Column {
-                TextField(
+                OutlinedTextField(
                     value = titolo,
                     onValueChange = { titolo = it },
+                    shape = RoundedCornerShape(16.dp),
                     label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
                 )
-                TextField(
+                OutlinedTextField(
                     value = descrizione,
                     onValueChange = { descrizione = it },
-                    label = { Text((stringResource(id = R.string.descrizioneEdit)), color = Color.Black) },
-                    colors = TextFieldDefaults.colors(
+                    shape = RoundedCornerShape(16.dp),
+                    label = { Text((stringResource(id = R.string.descrizioneEdit)), color = Color.Black,modifier = Modifier.background(Color.Transparent) ) },
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
                 )
-                TextField(
-                    value = dataScadenza,
-                    onValueChange = { dataScadenza = it },
-                    label = { Text(stringResource(id = R.string.dataEdit), color = Color.Black) },
-                    colors = TextFieldDefaults.colors(
+                OutlinedTextField(
+                    value = dataScadenzaStr,
+                    onValueChange = {dataScadenzaStr = it},
+                    shape = RoundedCornerShape(16.dp),
+                    readOnly = true,
+                    label = { Text(stringResource(id = R.string.inserisciData), color = Color.Black) },
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { datePickerDialog.show() },
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_calendario_evento),
+                                contentDescription = "scegli data di scadenza progetto",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    },
+                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    placeholder = { Text("dd/MM/yyyy") }
                 )
                 // Aggiungi il pulsante per selezionare un file
                 Button(onClick = { launcher.launch("*/*") }) {
@@ -720,8 +774,7 @@ fun EditTodoDialog(
 
 
 
-                // Gestisci la priorità se necessario
-                // puoi usare un RadioButton o un DropdownMenu per gestire la priorità
+
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {
@@ -740,7 +793,7 @@ fun EditTodoDialog(
                     val updatedTodo = todoItem.copy(
                         titolo = titolo,
                         descrizione = descrizione,
-                        dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse(dataScadenza),
+                        dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse(dataScadenzaStr),
                         priorita = priorita
                     )
                     coroutineScope.launch {
@@ -776,24 +829,14 @@ fun EditTodoDialog(
             }
         }
     )
-    LaunchedEffect(uploadResult) {
-        // Gestisci il risultato dell'upload se necessario
+    LaunchedEffect(viewModel.erroreEditTask.value) {
+        if(viewModel.erroreEditTask.value != null){
+            Toast.makeText(context, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
+            viewModel.resetErroreAggiungiTask()
+        }
+
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @Composable
@@ -803,13 +846,27 @@ fun AddTodoDialog(
 ) {
     var titolo by remember { mutableStateOf("") }
     var descrizione by remember { mutableStateOf("") }
-    var dataScadenza by remember { mutableStateOf("") }
+    var dataScadenza by remember { mutableStateOf(Date()) }
     var priorita by remember { mutableStateOf(Priorità.BASSA) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val calendar = Calendar.getInstance()
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val dataScadenzaStr = sdf.format(dataScadenza)
 
-    // Stato per gestire l'apertura/chiusura del menu a discesa
     var expanded by remember { mutableStateOf(false) }
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        R.style.CustomDatePickerDialog,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+            dataScadenza = calendar.time
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -823,48 +880,62 @@ fun AddTodoDialog(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                TextField(
+                OutlinedTextField(
                     value = titolo,
                     onValueChange = { titolo = it },
+                    shape = RoundedCornerShape(16.dp),
                     label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
                     textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
                     placeholder = { Text(stringResource(id = R.string.titoloEdit)) }
                 )
-                TextField(
+                OutlinedTextField(
                     value = descrizione,
                     onValueChange = { descrizione = it },
+                    shape = RoundedCornerShape(16.dp),
                     label = { Text(stringResource(id = R.string.descrizioneEdit), color = Color.Black) },
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
                     textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
                     placeholder = { Text(stringResource(id = R.string.inserisciDescrizione)) }
                 )
-                TextField(
-                    value = dataScadenza,
-                    onValueChange = { dataScadenza = it },
+                OutlinedTextField(
+                    value = dataScadenzaStr,
+                    onValueChange = {},
+                    shape = RoundedCornerShape(16.dp),
+                    readOnly = true,
                     label = { Text(stringResource(id = R.string.inserisciData), color = Color.Black) },
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Grey35,
                         unfocusedContainerColor = Grey50,
                     ),
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { datePickerDialog.show() },
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_calendario_evento),
+                                contentDescription = "scegli data di scadenza progetto",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    },
                     textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     placeholder = { Text("dd/MM/yyyy") }
                 )
 
-                // Componente DropdownMenu per la priorità
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    TextField(
+                    OutlinedTextField(
                         value = priorita.name,
                         onValueChange = {},
+                        shape = RoundedCornerShape(16.dp),
                         label = { Text(stringResource(id = R.string.selPriorita), color = Color.Black) },
-                        colors = TextFieldDefaults.colors(
+                        colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Grey35,
                             unfocusedContainerColor = Grey50,
                         ),
@@ -886,7 +957,6 @@ fun AddTodoDialog(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier.width(150.dp)
                     ) {
-                        //per gli enum si usa entries
                         Priorità.entries.forEach { p ->
                             DropdownMenuItem(
                                 text = { Text(p.name, color = p.colore) },
@@ -907,7 +977,7 @@ fun AddTodoDialog(
                 onClick = {
                     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY)
                     val date = try {
-                        sdf.parse(dataScadenza)
+                        sdf.parse(dataScadenzaStr)
                     } catch (e: Exception) {
                         null
                     }
@@ -939,6 +1009,7 @@ fun AddTodoDialog(
             }
         }
     )
+
 }
 
 @Composable
@@ -976,12 +1047,11 @@ fun CompleteDialog(
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(Grey70)
-                    // Colore di sfondo del pulsante di annullamento
                 ) {
                     Text(
                         text = stringResource(id = R.string.annullaEdit),
                         color = Color.White
-                    ) // Testo nero sul pulsante grigio chiaro
+                    )
                 }
             }
         )
@@ -1001,9 +1071,9 @@ fun CompleteDialog(
                     onClick = {
                         onSave(item)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
-                    Text(text =  stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
+                    Text(text =  stringResource(id = R.string.conferma), color = Color.White)
                 }
             },
 
@@ -1011,16 +1081,177 @@ fun CompleteDialog(
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(Grey70)
-                    // Colore di sfondo del pulsante di annullamento
                 ) {
                     Text(
                         text = stringResource(id = R.string.annullaEdit),
                         color = Color.White
-                    ) // Testo nero sul pulsante grigio chiaro
+                    )
                 }
             }
         )
     }
+}
+
+@Composable
+fun ExpandedDialog(
+    item: LeMieAttivita,
+    onDismiss: () -> Unit,
+    viewModelUtente: ViewModelUtente
+) {
+    var lista_utenti by remember { mutableStateOf("") }
+
+    LaunchedEffect(item.utenti) {
+        lista_utenti = ""
+        var size = item.utenti.size
+        var contatore = 0
+        for (u in item.utenti) {
+            viewModelUtente.ottieni_utente(u) { userProfile ->
+                contatore++
+                if (userProfile != null) {
+                    if (contatore == size){
+                        lista_utenti += "${userProfile.nome} ${userProfile.cognome}"
+                    }else{lista_utenti+= "${userProfile.nome} ${userProfile.cognome}\n"}
+                }
+            }
+        }
+    }
+
+    val context = LocalContext.current
+
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Grey35,
+        title = { Text(text = "Dettagli Attività", color = Color.Black) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Grey35)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Titolo:",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = item.titolo,
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Text(
+                    text = "Descrizione:",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = item.descrizione,
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Text(
+                    text = "Data di Scadenza:",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Text(
+                    text = "Priorità:",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = item.priorita.toString(),
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Text(
+                    text = "Lista Partecipanti:",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+
+                Text(
+                    text = lista_utenti,
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Text(
+                    text = "File Allegato:",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                
+                if (item.fileUri != null) {
+                    Button(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                data = Uri.parse(item.fileUri)
+                            }
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "File Icon",
+                            tint = Color.White,
+                        )
+                        Text(
+                            text = "Clicca qui per visualizzare il file",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }else Text(text = "Nessun File allegato....")
+                
+               
+            }
+        },
+
+        confirmButton = {
+            Box(modifier = Modifier.fillMaxWidth())
+            {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Grey70),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Text(text = "Capito", color = Color.White)
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -1035,7 +1266,7 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
             .padding(horizontal = 8.dp)
             .padding(bottom = 10.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Grey35 // Sostituisci Grey35 con il colore appropriato
+            containerColor = Grey35
         )
     ) {
         Row(
@@ -1043,7 +1274,7 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Prima colonna (vuota)
+
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -1054,8 +1285,8 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
                     painter = painterResource(id = R.drawable.tipocheride),
                     contentDescription = "tipo che ride",
                     modifier = Modifier
-                        .size(200.dp) // Imposta la dimensione desiderata
-                        .offset(x = (-16).dp) // Sposta l'immagine fuori dai bordi della colonna
+                        .size(200.dp)
+                        .offset(x = (-16).dp)
                 )
             }
 

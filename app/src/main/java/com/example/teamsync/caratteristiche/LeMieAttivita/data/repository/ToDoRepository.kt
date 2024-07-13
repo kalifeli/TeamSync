@@ -72,6 +72,8 @@ class ToDoRepository {
         priorita: Priorità,
         progetto: String,
         utenti : List<String>,
+        fileUri: String?
+
     ) {
         try {
             val updatedTodo = LeMieAttivita(
@@ -81,7 +83,8 @@ class ToDoRepository {
                 dataScadenza = dataScad,
                 priorita = priorita,
                 progetto = progetto,
-                utenti = utenti
+                utenti = utenti,
+                fileUri = fileUri
             )
             database.collection("Todo").document(id).set(updatedTodo).await()
         } catch (e: Exception) {

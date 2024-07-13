@@ -52,6 +52,13 @@ class LeMieAttivitaViewModel() : ViewModel() {
     var leMieAttivitaNonCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
     var leMieAttivitaCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
+    var erroreAggiungiTask = mutableStateOf<String?>(null)
+        private set
+
+    var erroreEditTask = mutableStateOf<String?>(null)
+        private set
+
+
 
     fun setFileUri(uri: Uri?) {
         _fileUri.value = uri
@@ -85,6 +92,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
+
     fun updateTodo(
         id: String,
         titolo: String,
@@ -94,16 +102,25 @@ class LeMieAttivitaViewModel() : ViewModel() {
         sezione: Int,
         progetto: String,
         utenti: List<String>,
-        uri: String?
+        fileUri: String?
     ) {
+        if (dataScad < Date()) {
+            erroreEditTask.value = " MODIFICA RIFIUTATA : La data di scadenza non può essere precedente alla data della Task. "
+            return
+        }
         viewModelScope.launch {
             try {
-                repositoryLeMieAttivita.updateTodo(id, titolo, descrizione, dataScad, priorita,progetto,utenti)
+                repositoryLeMieAttivita.updateTodo(id, titolo, descrizione, dataScad, priorita,progetto,utenti,fileUri)
                 if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
         }
+    }
+
+    fun resetErroreAggiungiTask() {
+        erroreEditTask.value = null
     }
 
     fun updateTaskNonCompletate(id: String) {
@@ -130,61 +147,6 @@ class LeMieAttivitaViewModel() : ViewModel() {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-     fun getTodoByProject(progetto: String) {
-        viewModelScope.launch {
-            var allTodo = repositoryLeMieAttivita.getAllTodo()
-
-                while (allTodo.isEmpty()) {
-                    isLoading.value = true
-                    delay(500) // Attendiamo mezzo secondo tra ogni tentativo
-                    allTodo = repositoryLeMieAttivita.getAllTodo()
-                }
-
-
-            leMieAttivita= allTodo.filter { it.progetto == progetto }
-        }
-    }*/
-    /*suspend fun getAllTodo_BY_Project(progetto: String): List<LeMieAttivita> {
-        return suspendCoroutine { continuation ->
-            viewModelScope.launch {
-                var appoggio: List<LeMieAttivita> = emptyList()
-                var tentativi = 0
-                val MAX_TENTATIVI = 15
-
-                while (appoggio.isEmpty() && tentativi <= MAX_TENTATIVI) {
-                    Log.d("Attività all'interno", "P: ${appoggio}")
-                    getTodoCompletateByProject(progetto)
-                    getTodoByProject(progetto)
-                    appoggio = (leMieAttivitaCompletate + leMieAttivitaNonCompletate).filterNotNull()
-                    delay(200)
-                    tentativi++
-                    Log.d("Attività all'interno finale", "zzzz: ${appoggio}")
-                }
-                continuation.resume(appoggio)
-            }
-        }
-
-      }*/
     suspend fun getAllTodo_BY_Project(progetto: String): List<LeMieAttivita> {
         return suspendCoroutine { continuation ->
             viewModelScope.launch {
@@ -212,23 +174,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
 
 
 
-    /*fun getTodoByProject(progetto: String) {
-        viewModelScope.launch {
-            var allTodo = repositoryLeMieAttivita.getAllTodo()
-            var tentativi = 0
-            val MAX_TENTATIVI = 6
-            while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI) {
-                isLoading.value = true
-                delay(500) // Attendiamo mezzo secondo tra ogni tentativo
-                allTodo = repositoryLeMieAttivita.getAllTodo()
-                tentativi++
-            }
-            isLoading.value = false
-            leMieAttivitaNonCompletate = allTodo.filter { it.progetto == progetto && !it.completato }
 
-
-        }
-    }*/
     fun getTodoByProject(progetto: String) {
         viewModelScope.launch {
             var allTodo = repositoryLeMieAttivita.getAllTodo()
@@ -250,28 +196,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
     }
 
 
-/*
-    fun getTodoCompletateByProject(progetto: String) {
-        viewModelScope.launch {
-            var tentativi = 0
-            val MAX_TENTATIVI = 6
-            isLoading.value = true
-            try {
-                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
-                while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI){
-                    isLoading.value = true
-                    delay(500) // Attendiamo mezzo secondo tra ogni tentativo
-                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
-                    tentativi++
-                }
-                leMieAttivitaCompletate = allTodo.filter { it.progetto == progetto && it.completato }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                isLoading.value = false
-            }
-        }
-    }*/
+
 
     fun getTodoCompletateByProject(progetto: String) {
         viewModelScope.launch {
@@ -310,6 +235,10 @@ class LeMieAttivitaViewModel() : ViewModel() {
         proprietario: String,
         progetto : String
     ) {
+        if (dataScad < Date()) {
+            erroreAggiungiTask.value = "AGGIUNGI RIFIUTATO : La data di scadenza non può essere precedente alla data di creazione della Task."
+            return
+        }
         viewModelScope.launch {
             repositoryLeMieAttivita.addTodo(
                 titolo,

@@ -10,15 +10,14 @@ sealed class Schermate(val route: String){
 
     object Registrazione: Schermate("Registrazione")
     object VerificaEmail : Schermate("Verifica_Email")
-    object Inizio: Schermate("Start")
     object ModificaProfilo: Schermate("ModificaProfilo")
     object Impostazioni: Schermate ("Impostazioni")
     object Tema: Schermate("tema")
     object Terms: Schermate("terms")
     object Supporto: Schermate("supporto")
-    object LeMieAttivita: Schermate("LeMieAttivita")
+    object LeMieAttivita: Schermate("LeMieAttivita") // perche non viene mai utilizzata??
     object Profilo: Schermate("Profilo")
     object Notifiche: Schermate("Notifiche")
-    object SchermataPrincipale: Schermate("Schermate principale")
+    object InfoProgetto : Schermate("InformazioniProgetto")
 
 }

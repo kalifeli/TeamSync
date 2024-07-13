@@ -120,7 +120,6 @@ fun ImmagineProfiloUtente(imageUrl: String?, defaultImage: Int, modifier: Modifi
         modifier = modifier
             .size(64.dp)
             .background(Color.White, CircleShape)
-            //.padding(4.dp)
         ,
         contentScale = ContentScale.Crop
     )

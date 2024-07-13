@@ -16,7 +16,4 @@ data class Progetto(
     val partecipanti: List<String> = emptyList(), // lista degli id dei partecipanti
     val completato: Boolean = false,
     val codice: String = ""
-) {
-    // Costruttore vuoto richiesto da Firestore per deserializzare l'oggetto
-    //constructor() : this(null, "", "", Date(), Date(), Priorità.NESSUNA, emptyList(), emptyList())
-}
+)

@@ -1,8 +1,12 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
@@ -22,6 +26,8 @@ class ViewModelProgetto : ViewModel() {
         private set
     var erroreCaricamentoProgetto = mutableStateOf<String?>(null)
         private set
+    var erroreAbbandonaProgetto = mutableStateOf<String?>(null)
+        private set
     var progetti = mutableStateOf<List<Progetto>>(emptyList())
         private set
     var utenteCorrenteId = mutableStateOf<String?>(null)
@@ -29,6 +35,9 @@ class ViewModelProgetto : ViewModel() {
         private set
     var carica_nome_progetto =  mutableStateOf(true)
     var cambia_lista_partecipanti =  mutableStateOf(false)
+
+    private val _codiceProgetto = MutableLiveData<String?>()
+    val codiceProgetto: LiveData<String?> get() = _codiceProgetto
 
     var repositoryUtente = RepositoryUtente()
 
@@ -38,10 +47,53 @@ class ViewModelProgetto : ViewModel() {
         utenteCorrenteId.value?.let {
             caricaProgettiUtente(it, false)
         }
-
     }
 
-    suspend fun getnome_progetto(id_prog: String): String {
+    fun recuperaCodiceProgetto(progettoId: String){
+        viewModelScope.launch {
+            try {
+                val progetto = repositoryProgetto.getProgettoById(progettoId)
+                _codiceProgetto.value = progetto?.codice
+            }catch (e:Exception){
+                _codiceProgetto.value = null
+            }
+        }
+    }
+
+    fun condividiCodiceProgetto(contesto: Context, codiceProgetto: String){
+        val inviaIntent : Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "Ecco il codice per poter aggiungere il progetto: $codiceProgetto")
+            type = "text/plain"
+        }
+        val condividiIntent = Intent.createChooser(inviaIntent, null)
+        contesto.startActivity(condividiIntent)
+    }
+
+    fun aggiornaProgetto(progettoId: String, nome: String, descrizione: String, dataScadenza: Date,priorita: Priorità){
+        viewModelScope.launch {
+            try {
+                val progetto = repositoryProgetto.getProgettoById(progettoId)
+                if(progetto != null){
+                    val progettoAggiornato = progetto.copy(
+                        nome = nome,
+                        descrizione = descrizione,
+                        dataScadenza = dataScadenza,
+                        priorita = priorita
+                    )
+                    repositoryProgetto.aggiornaProgetto(progettoAggiornato)
+                    utenteCorrenteId.value?.let {
+                        caricaProgettiUtente(it,false)
+                    }
+                }
+            }catch (e: Exception){
+                Log.e("ViewModelProgetto", "Errore durante l'aggiornamento del progetto", e)
+
+            }
+        }
+    }
+
+     suspend fun getnome_progetto(id_prog: String): String {
         carica_nome_progetto.value = true
 
         var p: Progetto? = null
@@ -53,7 +105,6 @@ class ViewModelProgetto : ViewModel() {
         }
         carica_nome_progetto.value = false
         return p.nome
-
     }
 
     fun getUtenteById(id: String, callback: (ProfiloUtente?) -> Unit) {
@@ -73,6 +124,7 @@ class ViewModelProgetto : ViewModel() {
         utenteCorrenteId.value = repositoryProgetto.getUtenteCorrente()?.uid
     }
 
+    // Questa funzione permette il caricamento dei progetti di un utente nella schermata Home dell' utente
     fun caricaProgettiUtente(userId: String, loadingInit: Boolean) {
         viewModelScope.launch {
             isLoading.value = loadingInit
@@ -90,6 +142,7 @@ class ViewModelProgetto : ViewModel() {
         }
     }
 
+    // La funzione permette di generare un progetto con le caratteristiche scelte dal creatore
     fun creaProgetto(nome:String, descrizione: String, dataScadenza: Date, priorita: Priorità) {
         if (nome.isBlank()) {
             erroreAggiungiProgetto.value = "Per favore, inserisci il nome del progetto"
@@ -124,6 +177,7 @@ class ViewModelProgetto : ViewModel() {
             }
         }
     }
+    // La funzione permette di aggiungere un utente ad un progetto utilizzando il codice progetto
     fun aggiungiPartecipanteConCodice(userId: String,codice: String){
         viewModelScope.launch {
             try {
@@ -149,9 +203,22 @@ class ViewModelProgetto : ViewModel() {
         }
     }
 
+    // Questa funzione consente ad un utente di abbandonare un progetto
+    fun abbandonaProgetto(userId: String?, progettoId: String){
+        viewModelScope.launch {
+            try {
+                repositoryProgetto.abbandonaProgetto(userId,progettoId)
+                erroreAbbandonaProgetto.value = null
+            }catch (e: Exception){
+                erroreAbbandonaProgetto.value = "Si è verificato un errore. Per favore riprovare"
+            }
+        }
+    }
+
+    // Questa funzione ha il compito di verificare se un progetto è scaduto tornando un valore booleano. True nel caso in cui il progetto è scaduto, altrimenti False.
     fun progettoScaduto(progetto: Progetto): Boolean = progetto.dataScadenza < Date()
 
-    private fun utentePartecipa(progettiUtente: List<Progetto>, aggiungiProgettoId: String?) : Boolean{
+    fun utentePartecipa(progettiUtente: List<Progetto>, aggiungiProgettoId: String?) : Boolean{
         return try {
             for(progetto in progettiUtente){
                 if(progetto.id == aggiungiProgettoId){
@@ -164,6 +231,9 @@ class ViewModelProgetto : ViewModel() {
         }
     }
 
+    /*
+        Questa funzione resetta il messaggio di errore di aggiunta di un progetto
+     */
     fun resetErroreAggiungiProgetto() {
         erroreAggiungiProgetto.value = null
     }
@@ -189,7 +259,7 @@ class ViewModelProgetto : ViewModel() {
         return try {
             repositoryProgetto.getPartecipantiDelProgetto(id_progetto)
         } catch (e: Exception) {
-            emptyList<String>()
+            emptyList()
         }
     }
 
@@ -204,9 +274,10 @@ class ViewModelProgetto : ViewModel() {
             }
             partecipanti
         } catch (e: Exception) {
-            emptyList<String>()
+            emptyList()
         }
     }
+
 
     suspend fun get_progetto_by_id(id: String) : Progetto {
         return try {
@@ -216,26 +287,18 @@ class ViewModelProgetto : ViewModel() {
             throw Exception("Errore durante il recupero del progetto: ${e.message}")
         }
     }
+
     fun aggiungiPartecipanteAlProgetto(progettoId: String, userId: String) {
         viewModelScope.launch {
             try {
                 repositoryProgetto.aggiungiPartecipante(progettoId, userId)
                 cambia_lista_partecipanti.value = true
-                // Aggiornare l'elenco dei partecipanti del progetto dopo l'aggiunta
-                // Puoi chiamare la funzione che ottiene la lista dei partecipanti qui
-                // oppure aggiornare direttamente la lista se già presente nel tuo view model.
             } catch (e: Exception) {
                 Log.e("ViewModelProgetto", "Errore durante l'aggiunta del partecipante al progetto", e)
                 // Gestire l'errore, ad esempio, mostrando un messaggio all'utente
             }
         }
     }
-
-
-
-
-
-
 }
 
 

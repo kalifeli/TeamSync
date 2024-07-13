@@ -16,9 +16,11 @@ import androidx.navigation.navArgument
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.LeMieAttivitaUI
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.Lista_Utenti_assegna_Task
+import com.example.teamsync.caratteristiche.LeMieAttivita.ui.SchermataModificaProgetto
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.ui.NotificationScreen
 import com.example.teamsync.caratteristiche.Profilo.ProfiloUtenteCliccato
+import com.example.teamsync.caratteristiche.ProfiloAmici.ProfiloProgetto
 import com.example.teamsync.caratteristiche.ProfiloAmici.ProfiloSchermata
 import com.example.teamsync.caratteristiche.ProfiloAmici.Progetto
 import com.example.teamsync.caratteristiche.faq.ui.Faq
@@ -41,7 +43,6 @@ import com.example.teamsync.screen.UserProfileScreen
 @Composable
 fun NavGraph(){
     val navController = rememberNavController()
-    val viewmodel = ViewModelUtente()
 
     val viewModelUtente = ViewModelUtente()
     val viewModelProgetto = ViewModelProgetto()
@@ -58,6 +59,7 @@ fun NavGraph(){
         composable(route = Schermate.Tema.route){ Tema(navController)}
         composable(route = Schermate.Terms.route) {Termini(navController)}
         composable(route = Schermate.Supporto.route) { Supporto(navController)}
+
 
         composable(route = Schermate.ItuoiProgetti.route){
             Scaffold (
@@ -77,7 +79,7 @@ fun NavGraph(){
                 }
             ){innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)){
-                    NotificationScreen(viewmodel, navController)
+                    NotificationScreen(viewModelUtente, navController)
                 }
             }
 
@@ -89,25 +91,17 @@ fun NavGraph(){
                 }
             ){innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)){
-                    ProfiloSchermata(viewmodel, navController)
+                    ProfiloSchermata(viewModelUtente, navController)
                 }
             }
         }
 
-
-
-
-
-
-        // Composable per la nuova schermata DettaglioProgetto
         composable(
             route = "dettaglio_progetto/{sezioneFaq}",
             arguments = listOf(navArgument("sezioneFaq") { type = NavType.StringType })
         ) { backStackEntry ->
             // Recupera il parametro projectId dalla rotta
             val projectId = backStackEntry.arguments?.getString("sezioneFaq")
-
-
             Faq(navController = navController, sezioneFaq = projectId ?: "")
         }
 
@@ -132,7 +126,7 @@ fun NavGraph(){
                 if (provenienza != null) {
                     if (task != null) {
                         if (pro != null) {
-                            ProfiloUtenteCliccato(viewModel = viewmodel, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, pro = pro,viewModelProgetto)
+                            ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, pro = pro,viewModelProgetto)
                         }
                     }
                 }
@@ -152,7 +146,7 @@ fun NavGraph(){
             if (task != null) {
                 if (prog != null) {
                     Lista_Utenti_assegna_Task(
-                        viewModel = viewmodel,
+                        viewModel = viewModelUtente,
                         navController = navController,
                         viewModel_att = viewModelLeMieAttivita ,
                         id_task = task,
@@ -175,7 +169,6 @@ fun NavGraph(){
             if (projectId != null) {
                 LeMieAttivitaUI(navController, viewModelLeMieAttivita,viewModelUtente,viewModelProgetto,projectId)
             }
-
         }
 
         composable(
@@ -187,7 +180,7 @@ fun NavGraph(){
 
             if (projectId != null) {
                 Progetto(
-                    viewModel = viewmodel,
+                    viewModel = viewModelUtente,
                     navController = navController,
                     viewModel_att = viewModelLeMieAttivita,
                     view_model_prog = viewModelProgetto,
@@ -195,93 +188,22 @@ fun NavGraph(){
                     viewNotifiche = RepositoryNotifiche()
                 )
             }
-
         }
+        composable(
+            route = "modificaProgetto/{progettoId}" ,
+            arguments = listOf(navArgument("progettoId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val progettoId = backStackEntry.arguments?.getString("progettoId") ?: return@composable
+            SchermataModificaProgetto(
+                viewModelProgetto = viewModelProgetto,
+                navController = navController,
+                progettoId = progettoId,
+            )
+        }
+
 
     }
 }
 
-/*
- NavHost(navController = navController, startDestination = Schermate.Login.route) {
-
-
-
-            composable(route = Schermate.ItuoiProgetti.route){
-                Scaffold (
-                    bottomBar = {
-                        BottomNav(navController = navController)
-                    }
-                ){innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)){
-                        ITuoiProgetti(navController, viewModelProgetto, viewModelUtente)
-                    }
-                }
-            }
-            composable(route = Schermate.Notifiche.route) {
-                Scaffold (
-                    bottomBar = {
-                        BottomNav(navController = navController)
-                    }
-                ){innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)){
-                        NotificationScreen(viewmodel, navController)
-                    }
-                }
-
-            }
-            composable(route = Schermate.Profilo.route) {
-                Scaffold (
-                    bottomBar = {
-                        BottomNav(navController = navController)
-                    }
-                ){innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)){
-                        ProfiloSchermata(viewmodel, navController)
-                    }
-                }
-            }
-
-            composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewModelUtente,navController)}
-            composable(route = Schermate.LeMieAttivita.route) { LeMieAttivitaUI(navController, viewModelLeMieAttivita) }
-            composable(route= Schermate.Impostazioni.route){Impostazioni(navController)}
-            composable(route = Schermate.Tema.route){ Tema(navController)}
-            composable(route = Schermate.Terms.route) {Termini(navController)}
-            composable(route = Schermate.Supporto.route) { Supporto(navController)}
-
-            // Composable per la nuova schermata DettaglioProgetto
-            composable(
-                route = "dettaglio_progetto/{sezioneFaq}",
-                arguments = listOf(navArgument("sezioneFaq") { type = NavType.StringType })
-            ) { backStackEntry ->
-                // Recupera il parametro projectId dalla rotta
-                val projectId = backStackEntry.arguments?.getString("sezioneFaq")
-
-
-                Faq(navController = navController, sezioneFaq = projectId ?: "")
-            }
-
-            composable(
-                route = "utente/{id}/{amicizia}/{provenienza}",
-                arguments = listOf(
-                    navArgument("id") { type = NavType.StringType },
-                    navArgument("amicizia") { type = NavType.StringType },
-                    navArgument("provenienza") { type = NavType.StringType },// Aggiungi qui l'argomento "amicizia"
-                )
-            ) { backStackEntry ->
-                // Recupera i parametri "id" e "amicizia" dalla rotta
-                val id_u = backStackEntry.arguments?.getString("id")
-                val amici = backStackEntry.arguments?.getString("amicizia")
-                val provenienza = backStackEntry.arguments?.getString("provenienza")
-
-
-                if (id_u != null) {
-                    if (provenienza != null) {
-                        ProfiloUtenteCliccato(viewModel = viewmodel, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche())
-                    }
-                }
-            }
-
-        }
- */
 
 

@@ -43,6 +43,7 @@
     <string name="matricola">Matricola : Sxxxxxxx</string>
     <string name="nome">Nome</string>
     <string name="cognome">Cognome</string>
+    <string name="sesso">Sesso</string>
     <string name="confermaPassword">Conferma Password</string>
     <string name="next">Avanti</string>
     <string name="accountgia">Hai gia un account? </string>

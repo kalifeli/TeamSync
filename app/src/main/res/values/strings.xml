@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">TeamSync</string>
 
-    <!--To Do Screen-->
+    <!--Schermata Le Mie Attività-->
     <string name="project_tasks_description">Here you will find the tasks assigned for this project.</string>
     <string name="bottoneNonCompletate">Incomplete</string>
     <string name="bottoneCompletate">Completed</string>
@@ -22,7 +22,7 @@
     <string name="eliminaTodoTitle">Delete ToDo</string>
     <string name="eliminaTodoDescrizione">Are you sure you would like to delete this To Do?</string>
 
-    <!--Impostazioni Screen-->
+    <!--Schermata Impostazioni -->
     <string name="impostazioni">Settings</string>
     <string name="modificaProfilo">Edit Profile</string>
     <string name="Notifiche">Notifications</string>
@@ -37,16 +37,17 @@
 
 
 
-    <!--Registrazione Screen-->
+    <!--Schermata Registrazione-->
     <string name="iscriviti">Sign Up</string>
     <string name="matricola">Student ID : Sxxxxxxx</string>
     <string name="nome">Name</string>
     <string name="cognome">Surname</string>
+    <string name="sesso" >Gender</string>
     <string name="confermaPassword">Confirm Password</string>
     <string name="next">Next</string>
     <string name="accountgia">Do You Already Have an Account? </string>
 
-    <!--Schermata Benvenuto Screen-->
+    <!--Schermata di Benvenuto Nuovo utente -->
     <string name="benvenuto">Welcome to TeamSync </string>
     <string name="benvenutosottotitolo">The Easiest and Fastest Way to Organize Your University Projects </string>
     <string name="benvenutotitolo2">Keep Track of All Your Projects </string>

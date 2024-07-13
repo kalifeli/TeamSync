@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,16 +48,13 @@ fun ITuoiProgettiItem(
     navController: NavController,
     viewModelProgetto: ViewModelProgetto
 ){
-    val dataCorrente = remember { progetto.dataScadenza }
+    val dataScadenza = remember { progetto.dataScadenza }
     val formattatoreData = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    val dataFormattata = formattatoreData.format(dataCorrente)
+    val dataFormattata = formattatoreData.format(dataScadenza)
 
     ElevatedCard(
         onClick = {
-
-
                 navController.navigate("progetto/${progetto.id}")
-
         },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp

@@ -2,6 +2,7 @@ package com.example.teamsync.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +18,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,12 +62,16 @@ import com.example.teamsync.R.drawable.logo_white
 import com.example.teamsync.R.drawable.registrazione
 import com.example.teamsync.caratteristiche.login.data.model.SessoUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
+import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 @Composable
 fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUtente) {
@@ -87,7 +97,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     var confermaPassword by remember {
         mutableStateOf("")
     }
-    var dataNascita by remember {
+    var dataDiNascita by remember {
         mutableStateOf(Date())
     }
     var sesso by remember {
@@ -103,7 +113,20 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     val registrazioneRiuscita = viewModelUtente.registrazioneRiuscita.value
     val context = LocalContext.current
 
-
+    val calendar = Calendar.getInstance()
+    val datePickerDialog = android.app.DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+            dataDiNascita = calendar.time
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val dataNascitaSdf = sdf.format(dataDiNascita)
+    var expanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -130,9 +153,8 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             Row(
                 modifier = Modifier
@@ -147,8 +169,6 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                     contentDescription = "Icona Applicazione",
                     modifier = Modifier
                         .size(70.dp)
-
-
                 )
                 else
                     Image(
@@ -156,265 +176,305 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         contentDescription = "Icona Applicazione",
                         modifier = Modifier
                             .size(70.dp)
-
                     )
-
             }
 
+            Text(text = stringResource(id = R.string.iscriviti), fontSize = 35.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) Color.White else  Color.Black, modifier = Modifier.padding(16.dp))
 
-            Spacer(modifier = Modifier.height(40.dp))
-            Text(text = stringResource(id = R.string.iscriviti), fontSize = 35.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) Color.White else  Color.Black)
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                   .padding(horizontal = 16.dp)
             ) {
-                Column(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Grey20,
+                        focusedContainerColor = White
+                    ),
+                    value = matricola,
+                    onValueChange = {matricola = it},
+                    label = { Text(stringResource(id = R.string.matricola)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_badge),
+                            contentDescription = "icona matricola registrazione",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier .fillMaxWidth(),
+                    minLines = 1,
+                    maxLines = 1
+                )
+                OutlinedTextField(
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Grey20,
+                        focusedContainerColor = White
+                    ),
+                    value = email,
+                    onValueChange = {email = it},
+                    label = { Text("Email") },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icona_mail),
+                            contentDescription = "icona mail",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier .fillMaxWidth(),
+                    minLines = 1,
+                    maxLines = 1
+                )
+                Row(
                     modifier = Modifier
-                        .padding(horizontal = 30.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+
                 ) {
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,
                             focusedContainerColor = White
                         ),
-                        value = matricola,
-                        onValueChange = {matricola = it},
-                        label = { Text(stringResource(id = R.string.matricola)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_badge),
-                                contentDescription = "icona matricola registrazione",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
+                        value = nome,
+                        onValueChange = {nome = it},
+                        label = { Text(stringResource(id = R.string.nome)) },
                         shape = RoundedCornerShape(15.dp),
-                        modifier = Modifier .fillMaxWidth(),
-                        minLines = 1,
-                        maxLines = 1
-                    )
-                    OutlinedTextField(
-                        colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Grey20,
-                            focusedContainerColor = White
-                        ),
-                        value = email,
-                        onValueChange = {email = it},
-                        label = { Text("Email") },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.icona_mail),
-                                contentDescription = "icona mail",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        shape = RoundedCornerShape(15.dp),
-                        modifier = Modifier .fillMaxWidth(),
-                        minLines = 1,
-                        maxLines = 1
-                    )
-
-
-                    Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-
-                    ) {
-                        OutlinedTextField(
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Grey20,
-                                focusedContainerColor = White
-                            ),
-                            value = nome,
-                            onValueChange = {nome = it},
-                            label = { Text(stringResource(id = R.string.nome)) },
-                            shape = RoundedCornerShape(15.dp),
-                            modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .padding(end = 5.dp),
-                            minLines = 1,
-                            maxLines = 1
-                        )
-                        OutlinedTextField(
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Grey20,
-                                focusedContainerColor = White
-                            ),
-                            value = cognome,
-                            onValueChange = {cognome = it},
-                            label = { Text(stringResource(id = R.string.cognome)) },
-                            shape = RoundedCornerShape(15.dp),
-                            modifier = Modifier
-                                .fillMaxWidth(1f)
-                                .padding(start = 5.dp),
-                            minLines = 1,
-                            maxLines = 1
-                        )
-                    }
-
+                            .fillMaxWidth(0.5f)
+                            .padding(end = 5.dp),
+                        minLines = 1,
+                        maxLines = 1
+                    )
                     OutlinedTextField(
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Grey20,
                             focusedContainerColor = White
                         ),
-                        value = password,
-                        onValueChange = {password = it},
-                        label = { Text("Password") },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.icona_password),
-                                contentDescription = "icona password registrazione",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Password
-                        ),
-
-                        visualTransformation = if (passwordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
-
-                        // visualizza o non visualizzare password
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisibile = !passwordVisibile }) {
-                                val icona: Painter = if (passwordVisibile) {
-                                    painterResource(id = R.drawable.icona_password_visibile)
-                                } else {
-                                    painterResource(id = R.drawable.icona_password_nonvisibile)
-                                }
-
-                                Icon(
-                                    painter = icona,
-                                    contentDescription = "icona visualizzazione conferma password",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        },
+                        value = cognome,
+                        onValueChange = {cognome = it},
+                        label = { Text(stringResource(id = R.string.cognome)) },
                         shape = RoundedCornerShape(15.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 1,
-                        maxLines = 1
-                    )
-
-                    OutlinedTextField(
-                        colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Grey20,
-                            focusedContainerColor = White
-                        ),
-                        value = confermaPassword,
-                        onValueChange = {confermaPassword = it},
-                        label = { Text(stringResource(id = R.string.confermaPassword)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.icona_password),
-                                contentDescription = "icona password login",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Password
-                        ),
-
-                        visualTransformation = if (confermaPasswordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
-
-                        // visualizza o non visualizzare password di conferma
-                        trailingIcon = {
-                            IconButton(onClick = { confermaPasswordVisibile = !confermaPasswordVisibile }) {
-                                val icona: Painter = if (confermaPasswordVisibile) {
-                                    painterResource(id = R.drawable.icona_password_visibile)
-                                } else {
-                                    painterResource(id = R.drawable.icona_password_nonvisibile)
-                                }
-
-                                Icon(
-                                    painter = icona,
-                                    contentDescription = "icona visualizzazione conferma password",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        },
-                        shape = RoundedCornerShape(15.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 1,
-                        maxLines = 1
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Button(
-                        onClick = {
-                            viewModelUtente.signUp(matricola,nome, cognome,email,dataNascita,sesso,password,confermaPassword)
-                                  },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.20f),
-                        colors = if(isDarkTheme) ButtonDefaults.buttonColors(
-                            containerColor = Color.White, // Cambia il colore di sfondo del pulsante
-                            contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
-                        ) else ButtonDefaults.buttonColors(Red70)
-                    ) {  Text(text = stringResource(id = R.string.next)) }
-
-
+                            .fillMaxWidth(1f)
+                            .padding(start = 5.dp),
+                        minLines = 1,
+                        maxLines = 1
+                    )
                 }
 
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Grey20,
+                            focusedContainerColor = White
+                        ),
+                        value = dataNascitaSdf,
+                        onValueChange = {},
+                        modifier = Modifier.weight(1f),
+                        readOnly = true,
+                        shape = RoundedCornerShape(15.dp),
+                        label = { Text(stringResource(id = R.string.dataDiNascita)) },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {datePickerDialog.show()},
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_calendario_evento),
+                                    contentDescription = "scegli data di scadenza progetto",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        },
+                    )
+                    Box(modifier = Modifier.weight(1f)){
+                        OutlinedTextField(
+                            colors = TextFieldDefaults.colors(
+                                unfocusedContainerColor = Grey20,
+                                focusedContainerColor = White
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            value = sesso.name,
+                            onValueChange = {},
+                            label = { Text(text = stringResource(id = R.string.sesso)) },
+                            readOnly = true,
+                            shape = RoundedCornerShape(15.dp),
+                            trailingIcon = {
+                                Icon(
+                                    Icons.Default.ArrowDropDown,
+                                    contentDescription = "Dropdown",
+                                    modifier = Modifier.clickable { expanded = true })
+                            },
+                            minLines = 1,
+                            maxLines = 1,
+                        )
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.background(Grey20)
+                        ) {
+                            SessoUtente.entries.forEach { s ->
+                                DropdownMenuItem(
+                                    text = { Text(s.name) },
+                                    onClick = {
+                                        sesso = s
+                                        expanded = false
+                                    },
+                                    modifier = Modifier.background(Grey20)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Grey20,
+                        focusedContainerColor = White
+                    ),
+                    value = password,
+                    onValueChange = {password = it},
+                    label = { Text("Password") },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icona_password),
+                            contentDescription = "icona password registrazione",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+
+                    visualTransformation = if (passwordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
+
+                    // visualizza o non visualizzare password
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisibile = !passwordVisibile }) {
+                            val icona: Painter = if (passwordVisibile) {
+                                painterResource(id = R.drawable.icona_password_visibile)
+                            } else {
+                                painterResource(id = R.drawable.icona_password_nonvisibile)
+                            }
+
+                            Icon(
+                                painter = icona,
+                                contentDescription = "icona visualizzazione conferma password",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 1,
+                    maxLines = 1
+                )
+
+                OutlinedTextField(
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Grey20,
+                        focusedContainerColor = White
+                    ),
+                    value = confermaPassword,
+                    onValueChange = {confermaPassword = it},
+                    label = { Text(stringResource(id = R.string.confermaPassword)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icona_password),
+                            contentDescription = "icona password login",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+
+                    visualTransformation = if (confermaPasswordVisibile) VisualTransformation.None else PasswordVisualTransformation(),
+
+                    // visualizza o non visualizzare password di conferma
+                    trailingIcon = {
+                        IconButton(onClick = { confermaPasswordVisibile = !confermaPasswordVisibile }) {
+                            val icona: Painter = if (confermaPasswordVisibile) {
+                                painterResource(id = R.drawable.icona_password_visibile)
+                            } else {
+                                painterResource(id = R.drawable.icona_password_nonvisibile)
+                            }
+
+                            Icon(
+                                painter = icona,
+                                contentDescription = "icona visualizzazione conferma password",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 1,
+                    maxLines = 1
+                )
+
+                Button(
+                    onClick = {
+                        viewModelUtente.signUp(matricola,nome, cognome,email,dataDiNascita,sesso,password,confermaPassword)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    colors = if(isDarkTheme) ButtonDefaults.buttonColors(
+                        containerColor = Color.White, // Cambia il colore di sfondo del pulsante
+                        contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
+                    ) else ButtonDefaults.buttonColors(Red70)
+                ) {  Text(text = stringResource(id = R.string.next)) }
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
             ) {
-
                 Column(
+                    modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(horizontal = 40.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
+                        Text(
+                            text = stringResource(id = R.string.accountgia),
+                            textAlign = TextAlign.Center,
+                            color = if (isDarkTheme) White else Color.Black
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Box(
-                            modifier = Modifier
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.accountgia),
-                                textAlign = TextAlign.Center,
-                                color = if(isDarkTheme) White else Color.Black
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .clickable { navController.navigate(Schermate.Login.route) }
+                            modifier = Modifier.clickable { navController.navigate(Schermate.Login.route) }
                         ) {
                             Text(
                                 text = "Login",
                                 textAlign = TextAlign.Center,
-                                color = if(isDarkTheme) White else Red70
+                                color = if (isDarkTheme) White else Red70
                             )
-                            HorizontalDivider(
+                            Divider(
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .width(50.dp)
-                                    .height(1.dp), // Adjust thickness as needed
-                                color = if(isDarkTheme) White else Red70
+                                    .height(1.dp),
+                                color = if (isDarkTheme) White else Red70
                             )
                         }
                     }
                 }
             }
         }
-
     }
     LaunchedEffect(erroreRegistrazione) {
         if(erroreRegistrazione != null ){

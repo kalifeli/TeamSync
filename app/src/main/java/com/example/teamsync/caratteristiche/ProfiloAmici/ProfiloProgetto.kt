@@ -298,7 +298,7 @@ fun ListaColleghi(
                     user_amico?.let { collega ->
                         CollegaItem(
                             collega,
-                            color = com.example.teamsync.caratteristiche.LeMieAttivita.ui.getColore(amici.indexOf(amico) + 1),
+                            color = Red70,
                             navController,
                             userProfile,
                             partecipa,
@@ -352,7 +352,7 @@ fun ListaColleghi(
                 user_amico?.let { collega ->
                     CollegaItem(
                         collega,
-                        color = com.example.teamsync.caratteristiche.LeMieAttivita.ui.getColore(lista_ricerca.indexOf(amico) + 1),
+                        color = Red70,
                         navController,
                         userProfile,
                         true,
@@ -365,6 +365,11 @@ fun ListaColleghi(
             }
         }
     }
+
+
+
+
+
 }
 
 

@@ -48,11 +48,10 @@ data class SettingItem(val icon: Int, val label: String, val rotta: Schermate)
 
 val settingsList1 = listOf(
     SettingItem(R.drawable.person_icon, R.string.modificaProfilo.toString(),Schermate.ModificaProfilo ),
-    SettingItem(R.drawable.notifiche, R.string.Notifiche.toString(),Schermate.ItuoiProgetti),
-    SettingItem(R.drawable.lingua, R.string.Lingua.toString(),Schermate.ItuoiProgetti),
+    SettingItem(R.drawable.notifiche, R.string.Notifiche.toString(),Schermate.ImpNotifche),
     SettingItem(R.drawable.tema, R.string.tema.toString(),Schermate.Tema),
-    SettingItem(R.drawable.task, R.string.task.toString(), Schermate.ItuoiProgetti),
-    SettingItem(R.drawable.to_do_list, R.string.todolist.toString(),Schermate.ItuoiProgetti),
+    SettingItem(R.drawable.task, R.string.task.toString(), Schermate.Imptask),
+    SettingItem(R.drawable.to_do_list, R.string.progetti.toString(),Schermate.ImpoProgetti),
 
 )
 
@@ -165,7 +164,6 @@ fun ImpostazioniContent(navController: NavHostController) {
 
                 Row(
                     modifier = Modifier
-                        .clickable { navController.navigate(Schermate.ModificaProfilo.route) }
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
                         .padding(top = 20.dp)
@@ -200,7 +198,6 @@ fun ImpostazioniContent(navController: NavHostController) {
 
                 Row(
                     modifier = Modifier
-                        .clickable { navController.navigate(Schermate.ModificaProfilo.route) }
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
                         .padding(top = 50.dp)
@@ -234,7 +231,6 @@ fun ImpostazioniContent(navController: NavHostController) {
                 }
                 Row(
                     modifier = Modifier
-                        .clickable { navController.navigate(Schermate.ModificaProfilo.route) }
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
                         .padding(top = 50.dp)
@@ -447,7 +443,6 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
 
             Row(
                 modifier = Modifier
-                    .clickable { navController.navigate(Schermate.ModificaProfilo.route) }
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .padding(top = 20.dp)
@@ -482,7 +477,6 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
             // Supporto
             Row(
                 modifier = Modifier
-                    .clickable { navController.navigate(Schermate.ModificaProfilo.route) }
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .padding(top = 50.dp)
@@ -516,7 +510,6 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
 // Azioni
             Row(
                 modifier = Modifier
-                    .clickable { navController.navigate(Schermate.ModificaProfilo.route) }
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .padding(top = 50.dp)

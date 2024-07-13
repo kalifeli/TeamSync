@@ -55,6 +55,7 @@ class RepositoryProgetto {
             throw e
         }
     }
+
     /**
      * Funzione che permette di aggiungere un partecipante a un progetto.
      *
@@ -88,14 +89,14 @@ class RepositoryProgetto {
      *
      * @throws Exception Se si verifica un errore durante l'aggiornamento del documento su Firestore, l'eccezione sarà rilanciata.
      */
-    suspend fun abbandonaProgetto(userId: String?, progettoId: String){
+    suspend fun abbandonaProgetto(userId: String?, progettoId: String) {
         try {
             val progettoRef = firestore.collection("progetti").document(progettoId)
             progettoRef.update("partecipanti", FieldValue.arrayRemove(userId)).await()
-            if(getPartecipantiDelProgetto(progettoId).isEmpty()){
+            if (getPartecipantiDelProgetto(progettoId).isEmpty()) {
                 eliminaProgetto(progettoId)
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             throw e
         }
     }
@@ -113,10 +114,11 @@ class RepositoryProgetto {
     fun getUtenteCorrente(): FirebaseUser? {
         return try {
             auth.currentUser
-        }catch (e: Exception){
-            throw  e
+        } catch (e: Exception) {
+            throw e
         }
     }
+
 
     /**
      * Funzione che genera un codice univoco per un progetto.
@@ -126,9 +128,10 @@ class RepositoryProgetto {
      * La funzione utilizza la classe `UUID` per generare un UUID casuale e restituisce i primi 8 caratteri della rappresentazione in stringa dell'UUID.
      * Questo codice può essere utilizzato per identificare in modo univoco un progetto.
      */
-    fun generaCodiceProgetto(): String{
+    fun generaCodiceProgetto(): String {
         return UUID.randomUUID().toString().substring(0, 8)
     }
+
 
     /**
      * Funzione che recupera l'ID di un progetto in base a un codice specificato.
@@ -140,22 +143,23 @@ class RepositoryProgetto {
      * Se l'operazione ha successo e viene trovato un progetto, l'ID del progetto viene restituito. In caso di eccezione o se non viene trovato alcun progetto, viene restituito `null`.
      * La funzione è una funzione sospesa e deve essere chiamata all'interno di una coroutine o di un'altra funzione sospesa.
      */
-    suspend fun getProgettoIdByCodice(codice: String): String?{
-         return try {
+    suspend fun getProgettoIdByCodice(codice: String): String? {
+        return try {
             val progetto = firestore.collection("progetti")
                 .whereEqualTo("codice", codice)
                 .get()
                 .await()
                 .toObjects(Progetto::class.java)
-             if(progetto.isNotEmpty()) {
-                 progetto[0].id
-             }else{
-                 null
-             }
-        }catch (e: Exception){
+            if (progetto.isNotEmpty()) {
+                progetto[0].id
+            } else {
+                null
+            }
+        } catch (e: Exception) {
             null
         }
     }
+
 
     /**
      * Funzione che esegue il logout dell'utente attualmente autenticato.
@@ -163,7 +167,7 @@ class RepositoryProgetto {
      * La funzione utilizza Firebase Authentication per eseguire il logout dell'utente attualmente autenticato chiamando il metodo `signOut` sull'istanza `auth`.
      * Dopo la chiamata a questa funzione, l'utente non sarà più autenticato nell'app.
      */
-    fun logout(){
+    fun logout() {
         auth.signOut()
     }
 
@@ -176,7 +180,8 @@ class RepositoryProgetto {
             if (docSnapshot.exists()) {
                 // Ottieni il campo "partecipanti" dal documento
                 val partecipanti = docSnapshot.get("partecipanti") as? List<String>
-                partecipanti ?: emptyList() // Restituisci la lista dei partecipanti, se presente, altrimenti una lista vuota
+                partecipanti
+                    ?: emptyList() // Restituisci la lista dei partecipanti, se presente, altrimenti una lista vuota
             } else {
                 emptyList() // Se il documento non esiste, restituisci una lista vuota
             }
@@ -184,19 +189,21 @@ class RepositoryProgetto {
             throw e
         }
     }
-     private fun eliminaProgetto(progettoId: String){
+
+    private fun eliminaProgetto(progettoId: String) {
         try {
             firestore.collection("progetti")
                 .document(progettoId)
                 .delete()
-        }catch (e: Exception){
+        } catch (e: Exception) {
             throw e
         }
     }
 
     suspend fun getProgettoById(progettoId: String): Progetto? {
         return try {
-            val documentSnapshot = firestore.collection("progetti").document(progettoId).get().await()
+            val documentSnapshot =
+                firestore.collection("progetti").document(progettoId).get().await()
             if (documentSnapshot.exists()) {
                 documentSnapshot.toObject(Progetto::class.java)
             } else {
@@ -207,17 +214,47 @@ class RepositoryProgetto {
         }
     }
 
-    suspend fun aggiornaProgetto(progetto: Progetto){
+    suspend fun aggiornaProgetto(progetto: Progetto) {
         try {
             progetto.id?.let { id ->
                 firestore.collection("progetti").document(id).set(progetto).await()
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             throw Exception("Errore durante l'aggiornamento del progetto: ${e.message}")
 
         }
     }
 
 
+    suspend fun getProgettiUtente_callback(userId: String, callback: (List<Progetto>) -> Unit) {
+        try {
+            val querySnapshot = firestore.collection("progetti")
+                .whereArrayContains("partecipanti", userId)
+                .get()
+                .await()
+            if (!querySnapshot.isEmpty) {
+                val progettiUtente = querySnapshot.toObjects(Progetto::class.java)
+                callback(progettiUtente)
+            } else {
+                callback(emptyList()) // Callback con lista vuota se non ci sono progetti
+            }
+        } catch (e: Exception) {
+            callback(emptyList()) // Callback con lista vuota se si verifica un'eccezione
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

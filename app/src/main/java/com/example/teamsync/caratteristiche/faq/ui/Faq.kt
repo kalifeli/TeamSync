@@ -52,6 +52,7 @@ import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.util.ThemePreferences
 
 
+
 @Composable
 fun SingolaFaq(faqItem: Faq) {
     var expanded by remember { mutableStateOf(false) }
@@ -173,6 +174,35 @@ fun SingolaFaq(faqItem: Faq) {
     }
 
     }
+
+
+@Composable
+fun recupera_sezione_faq(sezione: String) : String {
+
+    if (sezione == "Introduction" || sezione == "Introduzione")
+        return "Introduzione"
+
+    if (sezione == "Features" || sezione == "Funzionalità")
+        return "Funzionalità"
+
+    if (sezione == "Sicurity" || sezione == "Sicurezza")
+        return "Sicurezza"
+
+    if (sezione == "Advanced" || sezione == "Avanzate")
+        return "Avanzate"
+
+    if (sezione == "Other" || sezione == "Altro")
+        return "Altro"
+
+    if (sezione == "Privacy")
+    return "Privacy"
+    
+    return "0"
+
+}
+
+
+
 
 
 
@@ -317,7 +347,7 @@ fun Faq(navController: NavHostController, sezioneFaq: String) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     LazyColumn() {
                         items(listaFaq) { term ->
-                            if (term.sezione == sezioneFaq)
+                            if (term.sezione == recupera_sezione_faq(sezione = sezioneFaq))
                                 SingolaFaq(term)
                         }
                     }

@@ -174,6 +174,7 @@ fun TemaContent(navController: NavHostController, ) {
                         ) {}
 
 
+
                         RadioButton(
                             selected = selectedOption == R.string.chiaro,
                             onClick = {
@@ -235,7 +236,7 @@ fun TemaContent_dark(navController: NavHostController) {
     val background: Painter = painterResource(id = R.drawable.bianco)
     val context = LocalContext.current
     var selectedOption by remember {
-        mutableStateOf(if (ThemePreferences.getTheme(context)) "Scuro" else "Chiaro")
+        mutableStateOf(if (ThemePreferences.getTheme(context)) R.string.scuro else R.string.chiaro )
     }
 
     Box(
@@ -337,10 +338,10 @@ fun TemaContent_dark(navController: NavHostController) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {}
                         RadioButton(
-                            selected = selectedOption == R.string.chiaro.toString(),
+                            selected = selectedOption == R.string.chiaro,
                             onClick = {
-                                selectedOption =R.string.chiaro.toString()
-                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro.toString())
+                                selectedOption =R.string.chiaro
+                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro)
                                 navController.navigate(Schermate.Tema.route)
                             },
                             colors = RadioButtonDefaults.colors(
@@ -373,17 +374,20 @@ fun TemaContent_dark(navController: NavHostController) {
                             modifier = Modifier.weight(1f),
                             verticalAlignment = Alignment.CenterVertically
                         ) {}
+
                         RadioButton(
-                            selected = selectedOption == R.string.scuro.toString(),
+                            selected = selectedOption == R.string.scuro,
                             onClick = {
-                                selectedOption = R.string.scuro.toString()
-                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro.toString())
+                                selectedOption = R.string.scuro
+                                ThemePreferences.saveTheme(context, selectedOption == R.string.scuro)
                                 navController.navigate(Schermate.Tema.route)
 
                             },
                             colors = RadioButtonDefaults.colors(
+
                                 selectedColor = Color.White, // Cambia il colore selezionato per il tema scuro
-                                unselectedColor = Color.White, // Cambia il colore non selezionato per il tema scuro
+                                unselectedColor = Color.White,
+
                             )
                         )
                         Row(

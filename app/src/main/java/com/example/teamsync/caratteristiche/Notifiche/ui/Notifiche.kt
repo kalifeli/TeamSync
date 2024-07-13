@@ -1,5 +1,7 @@
 package com.example.teamsync.caratteristiche.Notifiche.ui
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +64,8 @@ import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.ui.theme.WhiteFacebook
+import com.example.teamsync.util.ThemePreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +78,17 @@ fun NotificationScreen(
     val tabs = listOf("Non lette", "Tutte")
     val userProfile = viewModel.userProfile
     val notificheList by remember { notificheModel.notificheList }
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+    val context = LocalContext.current
+    val preferences = context.getSharedPreferences("preferenze_notifiche", Context.MODE_PRIVATE)
+    var isEntraProgettoSelected by remember { mutableStateOf(preferences.getBoolean("utente_entra_progetto", true)) }
+    var isCompletaTaskSelected by remember { mutableStateOf(preferences.getBoolean("utente_completa_task", true)) }
+    var isModificaTaskSelected by remember { mutableStateOf(preferences.getBoolean("utente_modifica_mia_task", true)) }
+
+    Log.d("SharedPreferences", "5: $isEntraProgettoSelected")
+    Log.d("SharedPreferences", "6: $isCompletaTaskSelected")
+    Log.d("SharedPreferences", "7: $isModificaTaskSelected")
+
 
     LaunchedEffect(Unit) {
         notificheModel.fetchNotifiche()
@@ -85,7 +102,7 @@ fun NotificationScreen(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color.Black
+                        color = if(isDarkTheme) Color.White else Color.Black
                     )
                 },
                 actions = {
@@ -101,9 +118,9 @@ fun NotificationScreen(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = Color.Black,
-                    actionIconContentColor = Color.Black,
+                    containerColor = if(isDarkTheme) Color.DarkGray else Color.Transparent,
+                    titleContentColor = if(isDarkTheme) Color.White else Color.Black,
+                    actionIconContentColor = if(isDarkTheme) Color.White else Color.Black,
                 )
             )
         },
@@ -113,6 +130,7 @@ fun NotificationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .background(color = if (isDarkTheme) Color.DarkGray else Color.Transparent)
         ) {
 
             // Tabs
@@ -130,13 +148,14 @@ fun NotificationScreen(
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
+
                         selected = selectedTab == index,
                         onClick = {
                             selectedTab = index
                         },
                         text = { Text(text = title) },
                         selectedContentColor = Red70,
-                        unselectedContentColor = Color.Black
+                        unselectedContentColor = if(isDarkTheme) Color.White else Color.Black
                     )
                 }
             }
@@ -167,13 +186,52 @@ fun NotificationScreen(
                     }
                 }) { notifica ->
                     if (userProfile != null) {
-                        NotificationItem(
-                            iconColor = if (notifica.aperto) Color.Gray else if (notifica.Tipo == "Urgente") Color.Red else Color.Blue,
-                            notifica = notifica,
-                            navController = navController,
-                            vmNotifiche = notificheModel
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        when(notifica.Tipo){
+                            "Completamento_Task" -> {
+
+                                if(isCompletaTaskSelected)
+                                {
+                                    NotificationItem(
+                                        iconColor = if (notifica.aperto) WhiteFacebook else  Red70,
+                                        notifica = notifica,
+                                        navController = navController,
+                                        vmNotifiche = notificheModel
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                            "Modifica_Task" -> {
+
+                                if(isModificaTaskSelected)
+                                {
+                                    NotificationItem(
+                                        iconColor = if (notifica.aperto) WhiteFacebook else  Red70,
+                                        notifica = notifica,
+                                        navController = navController,
+                                        vmNotifiche = notificheModel
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                            "Entra_Progetto" -> {
+
+                                if(isEntraProgettoSelected)
+                                {
+                                    NotificationItem(
+                                        iconColor = if (notifica.aperto) WhiteFacebook else  Red70,
+                                        notifica = notifica,
+                                        navController = navController,
+                                        vmNotifiche = notificheModel
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                        }
+
+
+
                     }
                 }
             }
@@ -191,7 +249,19 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
     val repoNotifiche = RepositoryNotifiche()
     var listap by remember { mutableStateOf<List<String>?>(emptyList()) }
     var nomeProgetto by remember { mutableStateOf("") }
+    val isLoading by viewmodelProgetto.carica_nome.collectAsState()
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
+    LaunchedEffect(Unit) {
+        viewmodelUtente.getUserProfile()
+        listap = viewmodelProgetto.getLista_Partecipanti(notifica.progetto_id)
+        if (notifica.progetto_id.isNotEmpty()) {
+            nomeProgetto = viewmodelProgetto.getnome_progetto(notifica.progetto_id)
+        } else {
+            nomeProgetto = "Nome progetto non disponibile"
+        }
+    }
+/*
     LaunchedEffect(Unit) {
         viewmodelUtente.getUserProfile()
         listap =  viewmodelProgetto.getLista_Partecipanti(notifica.progetto_id)
@@ -199,31 +269,37 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
         {
             nomeProgetto = viewmodelProgetto.getnome_progetto(notifica.progetto_id)
         }
-    }
+
+    }*/
     // Esegui l'azione di apertura notifica quando apertura cambia a true
     LaunchedEffect(apertura.value) {
         if (apertura.value) {
             vmNotifiche.cambiaStatoNotifica(notifica.id)
         }
     }
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         ),
         onClick = {
-            apertura.value = true
-            when (notifica.Tipo) {
-                "Richiesta_Amicizia" -> navController.navigate("utente/${notifica.mittente}/false/notifica/2/0")
-                "Accetta_Amicizia" -> navController.navigate(Schermate.Profilo.route)
-                "Richiesta_Progetto" -> navController.navigate("progetto_da_accettare/${notifica.progetto_id}")
-                "Assegnazione_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
-                "Entra_Progetto" -> navController.navigate("progetto/${notifica.progetto_id}")
-                "Completamento_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
-                "Modifica_Task" ->navController.navigate("progetto/${notifica.progetto_id}")
+            if(!isLoading)
+            {
+                apertura.value = true
+                when (notifica.Tipo) {
+                    "Richiesta_Amicizia" -> navController.navigate("utente/${notifica.mittente}/false/notifica/2/0")
+                    "Accetta_Amicizia" -> navController.navigate(Schermate.Profilo.route)
+                    "Richiesta_Progetto" -> navController.navigate("progetto_da_accettare/${notifica.progetto_id}")
+                    "Assegnazione_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
+                    "Entra_Progetto" -> navController.navigate("progetto/${notifica.progetto_id}")
+                    "Completamento_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
+                    "Modifica_Task" ->navController.navigate("progetto/${notifica.progetto_id}")
+                }
             }
+
         },
         colors = CardDefaults.outlinedCardColors(
-            containerColor = White
+            containerColor = if (isDarkTheme) Color.Black else White
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -241,20 +317,30 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
                     .background(iconColor, CircleShape)
                     .padding(8.dp)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon), // Sostituisci con l'icona della notifica
-                    contentDescription = "Notification Icon",
-                    tint = Color.White,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                }
+                else
+                {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon), // Sostituisci con l'icona della notifica
+                        contentDescription = "Notification Icon",
+                        tint = if(notifica.aperto) Color.Black  else Color.White,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
             }
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = notifica.Contenuto,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = if(isDarkTheme)  Color.White else Color.Black
             )
         }
+
+
         if (notifica.Tipo == "Richiesta_Amicizia" || notifica.Tipo == "Richiesta_Progetto")
             if(notifica.accettato == "false" && notifica.aperto == false)
             {

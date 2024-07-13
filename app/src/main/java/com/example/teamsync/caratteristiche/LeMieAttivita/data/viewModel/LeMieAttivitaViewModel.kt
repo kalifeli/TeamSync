@@ -224,6 +224,36 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
+    fun getTodoCompletateByProject2(progetto: String, callback: (List<LeMieAttivita>) -> Unit) {
+        viewModelScope.launch {
+            var tentativi = 0
+            val MAX_TENTATIVI = 6
+            isLoading.value = true
+            var completateAttivita: List<LeMieAttivita> = emptyList()
+            try {
+                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI) {
+                    isLoading.value = true
+                    delay(500) // Attendiamo mezzo secondo tra ogni tentativo
+                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                    tentativi++
+                }
+                completateAttivita = allTodo.filter { it.progetto == progetto && it.completato }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                isLoading.value = false
+                callback(completateAttivita)
+                updateProgress(progetto)
+                updateTaskCompletate(progetto)
+                updateTaskNonCompletate(progetto)
+            }
+        }
+    }
+
+
+
+
 
 
     fun addTodo(

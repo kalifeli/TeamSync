@@ -31,12 +31,33 @@
     <string name="Tema">Tema</string>
     <string name="azioni">Azioni</string>
     <string name="task">Task</string>
-    <string name="todolist">To Do List</string>
+    <string name="progetti">Progetti</string>
     <string name="help">Help &amp; Support</string>
     <string name="terms">Terms and Policies</string>
     <string name="logout">Logout</string>
 
+    <!-- Schermata Impostazioni Notifiche -->
+    <string name="avvisamiquando">Avvisami quando</string>
+    <string name="unutenteentranelprogetto">Un utente entra in un progetto</string>
+    <string name="Unutentecompletaunatask">Un utente completa una task</string>
+    <string name="UnUtenteModificaUnaTask">Un utente modifica una mia task</string>
 
+
+    <!-- Schermata Impostazioni progetti -->
+
+    <string name="ordinevisualizzazioneprogetti">Ordine di visualizzazione Progetti</string>
+    <string name="priorità">Priorità</string>
+    <string name="datadiscadenza">Data di Scadenza</string>
+    <string name="datadicreazione">Data di Creazione</string>
+
+    <!-- Schermata Impostazioni Task -->
+    <string name="VisualizzazioneTask">Visualizzazione Task</string>
+    <string name="Mostrainfo">Mostra tutte le informazioni</string>
+    <string name="MostraSoloAlcune">Mostra solo alcune</string>
+    <string name="cliccaPerVederleTutte">(clicca per vederle tutte)</string>
+    <string name="ordineTask">Ordine Task</string>
+    <string name="inbaseallapriorità">In base alla priorità</string>
+    <string name="ordinedicreazione">Ordine di creazione</string>
 
     <!--Registrazione Screen-->
     <string name="iscriviti">Iscriviti</string>
@@ -86,13 +107,13 @@
     <string name="hoCapito">Ho Capito </string>
 
     <!--Help&Support Screen-->
-    <string name="supporto">Supporto </string>
-    <string name="introduzione">Introduzione </string>
-    <string name="funzionalità">Funzionalità </string>
-    <string name="sicurezza">Sicurezza </string>
-    <string name="avanzate">Avanzate </string>
-    <string name="altro">Altro </string>
-    <string name="privacy">Privacy </string>
+    <string name="supporto">Supporto</string>
+    <string name="introduzione">Introduzione</string>
+    <string name="funzionalità">Funzionalità</string>
+    <string name="sicurezza">Sicurezza</string>
+    <string name="avanzate">Avanzate</string>
+    <string name="altro">Altro</string>
+    <string name="privacy">Privacy</string>
 
     <!--Tema Screen-->
     <string name="tema">Tema </string>

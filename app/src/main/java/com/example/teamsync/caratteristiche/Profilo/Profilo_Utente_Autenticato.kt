@@ -4,14 +4,12 @@ package com.example.teamsync.caratteristiche.ProfiloAmici
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,13 +22,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,90 +51,157 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostController) {
+fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostController, viewModelProgetto: ViewModelProgetto, viewmodelTodo : LeMieAttivitaViewModel) {
     var searchQuery by remember { mutableStateOf("") }
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.08f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .size(35.dp)
-                    .background(
-                        Color.White,
-                        RoundedCornerShape(20.dp)
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+    Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "Profilo",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            color = if(isDarkTheme) Color.White else Color.Black
+                        )
+                    },
+                    actions = {
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = if(isDarkTheme) Color.DarkGray else Color.Transparent,
+                        titleContentColor =  if(isDarkTheme) Color.White else  Color.Black,
+                        actionIconContentColor =  if(isDarkTheme) Color.White else Color.Black,
                     )
-                    .clickable { navController.navigate(Schermate.ItuoiProgetti.route) },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "close_impostazioni",
-                    tint = Color.DarkGray
                 )
             }
-            // Centra il testo all'interno della Row
-            Row(
-                modifier = Modifier.weight(8f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+        ) { padding ->
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = if (isDarkTheme) Color.DarkGray else Color.Transparent)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp)
+
+
             ) {
-                Text(
-                    text =  "Profilo",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
+
+                ProfiloHeader(viewModel, navController, viewModelProgetto, viewmodelTodo)
+                Spacer(modifier = Modifier.height(16.dp))
+                RicercaAggiungiColleghi { query ->
+                    searchQuery = query
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                ListaColleghi(viewModel, navController, searchQuery)
             }
-
-            // Row vuota per bilanciare il layout
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically
-            ) {}
-
         }
-        ProfiloHeader(viewModel, navController)
-        Spacer(modifier = Modifier.height(16.dp))
-        RicercaAggiungiColleghi { query ->
-            // Esegui l'azione di ricerca qui
-            searchQuery = query
-
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        ListaColleghi(viewModel, navController, searchQuery)
     }
+
+
+
 }
 
 
 
 @Composable
-fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController) {
-    viewModel.getUserProfile()
-    val userProfile = viewModel.userProfile
+fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, viewModelProgetto: ViewModelProgetto, viewModelTodo: LeMieAttivitaViewModel) {
+
+    var userProfile by remember { mutableStateOf<ProfiloUtente?>(null) }
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+    var numeroTaskCompletati by remember { mutableStateOf("") }
+    var numeroProgettiCompletati by remember { mutableStateOf("") }
+    var load = remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserProfile()
+    }
+
+
+    LaunchedEffect(viewModel.userProfile) {
+        userProfile = viewModel.userProfile
+    }
+
+    LaunchedEffect(userProfile?.id) {
+        userProfile?.id?.let { userId ->
+            viewModelProgetto.caricaProgettiUtente(userId, true)
+        }
+    }
+
+
+
+
+    LaunchedEffect(viewModelProgetto.isLoading.value) {
+        load.value = true
+        if (!viewModelProgetto.isLoading.value) {
+            userProfile?.id?.let { userId ->
+                val progettiCompletati = viewModelProgetto.progetti.value.count { it.completato }
+                numeroProgettiCompletati = progettiCompletati.toString()
+
+
+                var taskCompletati = 0
+                var completatiCounter = 0 // Contatore per le callback completate
+                val totaleProgetti = viewModelProgetto.progetti.value.size
+
+                viewModelProgetto.progetti.value.forEach { progetto ->
+                    viewModelTodo.getTodoCompletateByProject2(progetto.id.toString()) { attivitàCompletate ->
+                        if (attivitàCompletate.isNotEmpty()) {
+
+                            for (att in attivitàCompletate) {
+                                if (att.utenti.contains(userId)) {
+
+                                    taskCompletati += 1
+
+                                }
+
+                            }
+                        }
+
+                        completatiCounter++
+                        if (completatiCounter == totaleProgetti) {
+                            numeroTaskCompletati = taskCompletati.toString()
+                            load.value = false
+                        }
+                    }
+
+                }
+
+
+            }
+
+        }
+    }
+
+
+
+
+
+
+    userProfile = viewModel.userProfile
 
     var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
     var amici by remember { mutableStateOf(userProfile?.amici ?: "") }
@@ -141,67 +213,97 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController) 
         amici = it.amici
     }
 
-    Column(
+
+
+    ElevatedCard(
+        onClick = {
+            navController.navigate(Schermate.Profilo.route)
+        },
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
         modifier = Modifier
             .fillMaxWidth()
-            .background(Red70, RoundedCornerShape(16.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .height(250.dp),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor =  if(isDarkTheme) Color.Black else Red70
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
 
-        if (userProfile?.immagine != null) {
-
-            Image(
-                painter = // Gestisci l'indicatore di caricamento qui
-                rememberAsyncImagePainter(ImageRequest.Builder // Placeholder di caricamento
-                // Effetto crossfade durante il caricamento
-                    (LocalContext.current).data(userProfile.immagine).apply(block = fun ImageRequest.Builder.() {
-                    // Gestisci l'indicatore di caricamento qui
-                    placeholder(R.drawable.white) // Placeholder di caricamento
-                    crossfade(true) // Effetto crossfade durante il caricamento
-                }).build()
-                ),
-
-                contentDescription = "Immagine Profilo",
-                modifier = Modifier
-
-                    .size(64.dp)
-                    .background(Color.White, CircleShape)
-                    .padding(16.dp),
-
-                contentScale = ContentScale.Crop,
-
-
-                )
-
-        }
-
-        else {
-
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = "Icona Applicazione",
-                modifier = Modifier
-                    .size(64.dp)
-                    .background(Color.White, CircleShape)
-                    .padding(16.dp),
-            )
-        }
-        Text(
-            text = nome,
-            fontWeight = FontWeight.Bold,
-            fontSize = 24.sp,
-            color = Color.White,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            StatBox(number = "13", label = "Task Completate")
-            StatBox(number = "2", label = "Progetti Completati")
+
+            if (userProfile?.immagine != null) {
+
+                Image(
+                    painter = // Gestisci l'indicatore di caricamento qui
+                    rememberAsyncImagePainter(
+                        ImageRequest.Builder // Placeholder di caricamento
+                        // Effetto crossfade durante il caricamento
+                            (LocalContext.current).data(userProfile!!.immagine)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                // Gestisci l'indicatore di caricamento qui
+                                placeholder(R.drawable.white) // Placeholder di caricamento
+                                crossfade(true) // Effetto crossfade durante il caricamento
+                            }).build()
+                    ),
+
+                    contentDescription = "Immagine Profilo",
+                    modifier = Modifier
+
+                        .size(64.dp)
+                        .background(Color.White, CircleShape)
+                        .padding(10.dp),
+
+                    contentScale = ContentScale.Crop,
+
+
+                    )
+
+            } else {
+
+                Image(
+                    painter = painterResource(id = R.drawable.user_icon),
+                    contentDescription = "Icona Applicazione",
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(Color.White, CircleShape)
+                        .padding(10.dp),
+                )
+            }
+            Text(
+                text = nome,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = Color.White,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                if (load.value) {
+                    Column(
+                        modifier = Modifier
+                            .background(if(isDarkTheme) Color.DarkGray else Color.White, RoundedCornerShape(8.dp))
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        CircularProgressIndicator(color = if(isDarkTheme) Color.White else Color.Black)
+                    }
+                } else {
+                    StatBox(number = numeroTaskCompletati, label = "Task Completate")
+                    StatBox(number = numeroProgettiCompletati, label = "Progetti Completati")
+
+                }
+
+            }
         }
     }
 }
@@ -210,14 +312,17 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController) 
 
 @Composable
 fun StatBox(number: String, label: String) {
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     Column(
         modifier = Modifier
-            .background(Color.White, RoundedCornerShape(8.dp))
+            .background( if(isDarkTheme) Color.DarkGray else Color.White,
+                RoundedCornerShape(8.dp))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = number, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        Text(text = label, fontSize = 12.sp)
+
+        Text(text = number, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = if(isDarkTheme) Color.White else Color.Black)
+        Text(text = label, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = if(isDarkTheme) Color.White else Color.Black)
     }
 }
 
@@ -226,21 +331,24 @@ fun StatBox(number: String, label: String) {
 @Composable
 
 fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var searchQuery by remember { mutableStateOf("") }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
             .padding(horizontal = 16.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(50.dp)),
+            .background(
+                color =  if(isDarkTheme) Color.Black else  Color.White,
+                shape = RoundedCornerShape(50.dp)),
         contentAlignment = Alignment.CenterStart
     ) {
-        TextField(
+        OutlinedTextField(
             value = searchQuery,
             onValueChange = { newValue ->
                 searchQuery = newValue
             },
-            placeholder = { Text("Ricerca Colleghi/Aggiungi Colleghi") },
+            placeholder = { Text("Ricerca Colleghi/Aggiungi Colleghi", color = if(isDarkTheme) Color.White else Color.Black ) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             maxLines = 1,
@@ -253,7 +361,11 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
                 }
 
             },
-            shape = RoundedCornerShape(50.dp)
+            shape = RoundedCornerShape(50.dp),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = if(isDarkTheme) Color.Black else  Color.White,
+                focusedContainerColor = White
+            )
         )
     }
 }
@@ -388,7 +500,7 @@ fun ListaColleghi(
 
 @Composable
 fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, y : String) {
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     LaunchedEffect(utente.id) {
         println("l'utente è cambiato " + utente.id)
@@ -408,7 +520,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(8.dp))
+            .background(if(isDarkTheme) Color.Black else Color.White, RoundedCornerShape(8.dp))
             .padding(16.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -424,18 +536,19 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
         Icon(
             painter = painterResource(id = R.drawable.logo_teamsync),
             contentDescription = null,
-
             modifier = Modifier
                 .size(32.dp)
-                .background(color.copy(alpha = 0.2f), CircleShape)
+                .background(
+                    if(isDarkTheme) Color.White else color.copy(alpha = 0.2f),
+                    CircleShape)
                 .padding(8.dp)
         )
 
 
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = utente.nome + " " + utente.cognome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(text = utente.matricola, fontSize = 14.sp)
+            Text(text = utente.nome + " " + utente.cognome, fontWeight = FontWeight.Bold, fontSize = 16.sp,  color = if(isDarkTheme) Color.White else Color.Black)
+            Text(text = utente.matricola, fontSize = 14.sp, color = if(isDarkTheme) Color.White else Color.Black)
         }
         if (!amicizia) {
             Spacer(modifier = Modifier.weight(1f))
@@ -444,7 +557,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "Aggiungi",
-                    tint = Color.Gray,
+                    tint =  if(isDarkTheme) Color.White else Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )
             }

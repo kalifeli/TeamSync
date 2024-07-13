@@ -19,5 +19,7 @@ sealed class Schermate(val route: String){
     object Profilo: Schermate("Profilo")
     object Notifiche: Schermate("Notifiche")
     object InfoProgetto : Schermate("InformazioniProgetto")
-
+    object ImpNotifche: Schermate("Impostazioni_Notifiche")
+    object Imptask: Schermate("Impostazioni_Task")
+    object ImpoProgetti: Schermate("Impostazioni_Progetti")
 }

@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
@@ -53,15 +54,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -102,13 +101,13 @@ import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
-import com.google.rpc.Help.Link
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @ExperimentalMaterial3Api
 @Composable
 fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaViewModel, viewModelUtente: ViewModelUtente, viewmodelprogetto: ViewModelProgetto,  id_prog: String) {
@@ -162,13 +161,15 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         }
     }
 
-    //Questo in teoria non serve. Potresti riprendere la variabile che è presente nel viewModel e osservarla
-    LaunchedEffect(viewmodelprogetto.carica_nome_progetto.value) {
-        if(viewmodelprogetto.carica_nome_progetto.value)
-            caricanome.value = true
-        else
-            caricanome.value = false
+    val caricaNomeState by viewmodelprogetto.carica_nome.collectAsState()
+
+    LaunchedEffect(caricaNomeState) {
+        caricanome.value = caricaNomeState
     }
+
+
+
+
 
 
 
@@ -286,7 +287,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             }
 
         }
-        
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -571,7 +572,7 @@ fun TodoItem
         .padding(8.dp)
         .clip(RoundedCornerShape(8.dp))
         .background(Grey35)
-        .clickable{
+        .clickable {
             dialogExpanded = true
         }
     ) {
@@ -1079,6 +1080,7 @@ fun CompleteDialog(
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(Grey70)
+                    // Colore di sfondo del pulsante di annullamento
                 ) {
                     Text(
                         text = stringResource(id = R.string.annullaEdit),
@@ -1150,7 +1152,7 @@ fun ExpandedDialog(
 
     val context = LocalContext.current
 
-    
+
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Grey35,
@@ -1240,7 +1242,7 @@ fun ExpandedDialog(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
-                
+
                 if (item.fileUri != null) {
                     Button(
                         onClick = {
@@ -1265,8 +1267,8 @@ fun ExpandedDialog(
                         )
                     }
                 }else Text(text = "Nessun File allegato....")
-                
-               
+
+
             }
         },
 
@@ -1299,7 +1301,7 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
             .fillMaxWidth()
             .height(120.dp)
             .padding(vertical = 8.dp),
-        
+
 
         shape = RoundedCornerShape(16.dp)
     ) {

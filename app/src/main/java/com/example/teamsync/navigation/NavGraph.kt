@@ -20,7 +20,6 @@ import com.example.teamsync.caratteristiche.LeMieAttivita.ui.SchermataModificaPr
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.ui.NotificationScreen
 import com.example.teamsync.caratteristiche.Profilo.ProfiloUtenteCliccato
-import com.example.teamsync.caratteristiche.ProfiloAmici.ProfiloProgetto
 import com.example.teamsync.caratteristiche.ProfiloAmici.ProfiloSchermata
 import com.example.teamsync.caratteristiche.ProfiloAmici.Progetto
 import com.example.teamsync.caratteristiche.faq.ui.Faq
@@ -32,7 +31,10 @@ import com.example.teamsync.caratteristiche.login.ui.LoginScreen
 import com.example.teamsync.caratteristiche.login.ui.PasswordDimenticata
 import com.example.teamsync.caratteristiche.login.ui.VerificaEmail
 import com.example.teamsync.screen.BottomNav
+import com.example.teamsync.screen.ImpoProgetti
+import com.example.teamsync.screen.ImpoTask
 import com.example.teamsync.screen.Impostazioni
+import com.example.teamsync.screen.NotificheImp
 import com.example.teamsync.screen.Registrazione
 import com.example.teamsync.screen.SchermataDiBenvenuto
 import com.example.teamsync.screen.Tema
@@ -43,6 +45,7 @@ import com.example.teamsync.screen.UserProfileScreen
 @Composable
 fun NavGraph(){
     val navController = rememberNavController()
+
 
     val viewModelUtente = ViewModelUtente()
     val viewModelProgetto = ViewModelProgetto()
@@ -56,10 +59,12 @@ fun NavGraph(){
         composable(route = Schermate.RecuperoPassword.route) { PasswordDimenticata(navController, viewModelUtente)}
         composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewModelUtente,navController)}
         composable(route= Schermate.Impostazioni.route){Impostazioni(navController)}
-        composable(route = Schermate.Tema.route){ Tema(navController)}
+        composable(route = Schermate.Tema.route){ Tema(navController) }
         composable(route = Schermate.Terms.route) {Termini(navController)}
         composable(route = Schermate.Supporto.route) { Supporto(navController)}
-
+        composable(route = Schermate.ImpNotifche.route) { NotificheImp(navController = navController)}
+        composable(route = Schermate.Imptask.route) { ImpoTask(navController = navController)}
+        composable(route = Schermate.ImpoProgetti.route) { ImpoProgetti(navController = navController)}
 
         composable(route = Schermate.ItuoiProgetti.route){
             Scaffold (
@@ -91,7 +96,7 @@ fun NavGraph(){
                 }
             ){innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)){
-                    ProfiloSchermata(viewModelUtente, navController)
+                    ProfiloSchermata(viewModelUtente, navController, viewModelProgetto,viewModelLeMieAttivita)
                 }
             }
         }
@@ -126,7 +131,7 @@ fun NavGraph(){
                 if (provenienza != null) {
                     if (task != null) {
                         if (pro != null) {
-                            ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, pro = pro,viewModelProgetto)
+                            ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, progetto = pro,viewModelProgetto)
                         }
                     }
                 }

@@ -30,12 +30,31 @@
     <string name="Tema">Theme</string>
     <string name="azioni">Actions</string>
     <string name="task">Task</string>
-    <string name="todolist">To Do List</string>
+    <string name="progetti">Projects</string>
     <string name="help">Help &amp; Support</string>
     <string name="terms">Terms and Policies</string>
     <string name="logout">Logout</string>
 
+    <!-- Schermata Impostazioni Notifiche -->
+    <string name="avvisamiquando">Notify me when</string>
+    <string name="unutenteentranelprogetto">A user joins a project</string>
+    <string name="Unutentecompletaunatask">a user completes a task</string>
+    <string name="UnUtenteModificaUnaTask">A user edits one of my tasks</string>
 
+
+    <string name="ordinevisualizzazioneprogetti">Projects display order</string>
+    <string name="priorità">Priority</string>
+    <string name="datadiscadenza">Expiration date</string>
+    <string name="datadicreazione">Creation date</string>
+
+    <!-- Schermata Impostazioni Task -->
+    <string name="VisualizzazioneTask">Task View</string>
+    <string name="Mostrainfo">Show all information</string>
+    <string name="MostraSoloAlcune">Shows only some info</string>
+    <string name="cliccaPerVederleTutte">(click to see them all)</string>
+    <string name="ordineTask">Task display order</string>
+    <string name="inbaseallapriorità">Based on priority</string>
+    <string name="ordinedicreazione">Creation date</string>
 
     <!--Schermata Registrazione-->
     <string name="iscriviti">Sign Up</string>
@@ -85,13 +104,13 @@
     <string name="hoCapito">I Understood</string>
 
     <!--Help&Support Screen-->
-    <string name="supporto">Support </string>
-    <string name="introduzione">Introduction </string>
-    <string name="funzionalità">Features </string>
-    <string name="sicurezza">Sicurity </string>
+    <string name="supporto">Support</string>
+    <string name="introduzione">Introduction</string>
+    <string name="funzionalità">Features</string>
+    <string name="sicurezza">Sicurity</string>
     <string name="avanzate">Advanced</string>
-    <string name="altro">Other </string>
-    <string name="privacy">Privacy </string>
+    <string name="altro">Other</string>
+    <string name="privacy">Privacy</string>
 
 
     <!--Tema Screen-->

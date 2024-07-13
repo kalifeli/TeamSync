@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,12 +17,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,25 +42,32 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.ProfiloAmici.StatBox
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.util.ThemePreferences
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostController, id: String, amicizia: String, provenienza: String, notificheRepo : RepositoryNotifiche, task: String, pro : String, viewModelprogetto: ViewModelProgetto ) {
+fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostController, id: String, amicizia: String, provenienza: String, notificheRepo : RepositoryNotifiche, task: String, progetto : String, viewModelprogetto: ViewModelProgetto ) {
 
-    Log.d("Id quando sono dentro", "Dati: $id")
-    viewModel.getUserProfile()
-    val userProfile = viewModel.userProfile
+
+    var viewModelTodo = LeMieAttivitaViewModel()
+    var userProfile by remember { mutableStateOf<ProfiloUtente?>(null) }
 
     var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
     var nome by remember { mutableStateOf("") }
@@ -64,9 +76,72 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
     var email by remember { mutableStateOf("") }
     var avvia_notifica by remember { mutableStateOf(false) }
     var accetta_amicizia by remember { mutableStateOf(false) }
-    var expanded by remember { mutableStateOf(false) }
+    var load = remember { mutableStateOf(true) }
+    var numeroTaskCompletati by remember { mutableStateOf("") }
+    var numeroProgettiCompletati by remember { mutableStateOf("") }
+    var showMenu by remember { mutableStateOf(false) }
+    var abilitaBottone by remember { mutableStateOf(false) }
+    var disabilitaclick by remember { mutableStateOf(true) }
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserProfile()
+    }
+    LaunchedEffect(viewModel.userProfile) {
+        userProfile = viewModel.userProfile
+    }
+    LaunchedEffect(userProfile?.id) {
+        disabilitaclick = false
+        userProfile?.id?.let { userId ->
+            viewModelprogetto.caricaProgettiUtente(id, true)
+        }
+        Log.d("Progetti", "${viewModelprogetto.progetti}")
+    }
+    LaunchedEffect(viewModelprogetto.isLoading.value) {
+        load.value = true
+        if (!viewModelprogetto.isLoading.value) {
+            abilitaBottone = true
+            val progettiCompletati = viewModelprogetto.progetti.value.count { it.completato }
+            numeroProgettiCompletati = progettiCompletati.toString()
 
 
+            var taskCompletati = 0
+            var completatiCounter = 0 // Contatore per le callback completate
+            val totaleProgetti = viewModelprogetto.progetti.value.size
+
+            if (totaleProgetti == 0) {
+                numeroTaskCompletati = "0"
+                load.value = false
+            } else {
+                viewModelprogetto.progetti.value.forEach { progetto ->
+                    viewModelTodo.getTodoCompletateByProject2(progetto.id.toString()) { attivitàCompletate ->
+                        if (attivitàCompletate.isNotEmpty()) {
+
+                            for (att in attivitàCompletate) {
+                                if (att.utenti.contains(id)) {
+
+                                    taskCompletati += 1
+
+                                }
+
+                            }
+                        }
+
+                        completatiCounter++
+                        if (completatiCounter == totaleProgetti) {
+                            numeroTaskCompletati = taskCompletati.toString()
+                            load.value = false
+                        }
+                    }
+
+
+                }
+            }
+
+
+        }
+
+    }
 
     LaunchedEffect(id) {
         viewModel.ottieni_utente(id) { profile ->
@@ -79,340 +154,478 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
     }
 
     LaunchedEffect(avvia_notifica) {
-        if(avvia_notifica)
-        { viewModel.ottieni_utente(id) { profile ->
-            val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome ?: "") + " " + "ti ha inviato una richiesta di amicizia"
+        if (avvia_notifica) {
+            viewModel.ottieni_utente(id) { profile ->
+                val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome
+                    ?: "") + " " + "ti ha inviato una richiesta di amicizia"
 
-            if (userProfile != null) {
-                notificheRepo.creaNotifica(
-                    userProfile.id,
-                    profile?.id ?: "",
-                    "Richiesta_Amicizia",
-                    contenuto,
-                    ""
+                if (userProfile != null) {
+                    notificheRepo.creaNotifica(
+                        userProfile!!.id,
+                        profile?.id ?: "",
+                        "Richiesta_Amicizia",
+                        contenuto,
+                        ""
 
 
-                )
+                    )
+                }
             }
-        }
         }
     }
     LaunchedEffect(accetta_amicizia) {
 
-        if(accetta_amicizia)
-        { viewModel.ottieni_utente(id) { profile ->
-            val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome ?: "") + " " + "ha accettato la tua richiesta di amicizia"
+        if (accetta_amicizia) {
+            viewModel.ottieni_utente(id) { profile ->
+                val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome
+                    ?: "") + " " + "ha accettato la tua richiesta di amicizia"
 
-            if (userProfile != null) {
-                notificheRepo.creaNotifica(
-                    userProfile.id,
-                    profile?.id ?: "",
-                    "Accetta_Amicizia",
-                    contenuto,
-                    "",
+                if (userProfile != null) {
+                    notificheRepo.creaNotifica(
+                        userProfile!!.id,
+                        profile?.id ?: "",
+                        "Accetta_Amicizia",
+                        contenuto,
+                        "",
 
-                    )
+                        )
+                }
             }
-        }
         }
     }
 
-    Spacer(modifier = Modifier.height(8.dp))
+    if (showMenu) {
+        userProfile?.let {
+            AddTodoDialog(
+                onDismiss = { showMenu = false },
+                id = id,
+                id_persona_autenticata = it.id
+            )
+        }
+    }
 
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Profilo Utenti",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = if (isDarkTheme) Color.White else Color.Black
+                    )
+                },
+                navigationIcon = {
+                    if (!disabilitaclick) {
+                        Box(
+                            modifier = Modifier
+                                .size(35.dp)
+                                .background(
+                                    Color.Black,
+                                    RoundedCornerShape(20.dp)
+                                )
+                                .clickable {
+                                    if (provenienza == "task") {
+                                        navController.navigate("task_selezionata/${task}/${progetto}")
+                                    } else {
+                                        navController.navigate(Schermate.Profilo.route)
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
 
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "close_impostazioni",
+                                tint = Color.White
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(35.dp)
+                                .background(
+                                    Color.Black,
+                                    RoundedCornerShape(20.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color.Black)
+                        }
 
+                    }
+                },
+                actions = {
+                },
 
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black,
+                )
+            )
+        }
+    ) { padding ->
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFEF5350), RoundedCornerShape(16.dp))
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+                .fillMaxSize()
+                .background(color = if (isDarkTheme) Color.DarkGray else Color.Transparent)
+
+        )
+        {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-
+                    .padding(padding)
+                    .padding(start = 16.dp, end = 16.dp)
             ) {
-                Row(
+
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.08f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .background(if(isDarkTheme)  Color.Black else (Red70), RoundedCornerShape(16.dp))
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Box(
-                        modifier = Modifier
-                            .size(35.dp)
-                            .background(
-                                Color.Black,
-                                RoundedCornerShape(20.dp)
-                            ) // Imposta il rettangolo di sfondo a nero
-                            .clickable {
-                                if (provenienza == "task")
-                                    navController.navigate("task_selezionata/${task}/${pro}}")
-                                else
-                                    navController.navigate(Schermate.Profilo.route)
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "close_impostazioni",
-                            tint = Color.White // Assicurati che l'icona sia visibile impostando il colore a bianco
+
+                    if (user_amico?.immagine != null) {
+
+                        Image(
+                            painter = // Gestisci l'indicatore di caricamento qui
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder // Placeholder di caricamento
+                                // Effetto crossfade durante il caricamento
+                                    (LocalContext.current).data(user_amico!!.immagine)
+                                    .apply(block = fun ImageRequest.Builder.() {
+                                        // Gestisci l'indicatore di caricamento qui
+                                        placeholder(R.drawable.user_icon) // Placeholder di caricamento
+                                        crossfade(true) // Effetto crossfade durante il caricamento
+                                    }).build()
+                            ),
+
+                            contentDescription = "Immagine Profilo",
+                            modifier = Modifier
+
+                                .size(64.dp)
+                                .background(Color.White, CircleShape)
+                                .padding(16.dp),
+
+                            contentScale = ContentScale.Crop,
+
+
+                            )
+
+                    } else {
+
+                        Image(
+                            painter = painterResource(id = R.drawable.user_icon),
+                            contentDescription = "Icona Applicazione",
+                            modifier = Modifier
+                                .size(64.dp)
+                                .background(Color.White, CircleShape)
+                                .padding(16.dp),
                         )
                     }
 
-                    // Centra il testo all'interno della Row
+                    Text(
+                        text = nome + " " + cognome,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                    Text(
+                        text = email,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                    Text(
+                        text = matricola,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
                     Row(
-                        modifier = Modifier.weight(9f),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
                     ) {
+                        if (load.value) {
+                            Column(
+                                modifier = Modifier
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
 
-                    }
-
-
-
-                }
-            }
-
-            if (user_amico?.immagine != null) {
-
-                Image(
-                    painter = // Gestisci l'indicatore di caricamento qui
-                    rememberAsyncImagePainter(ImageRequest.Builder // Placeholder di caricamento
-                    // Effetto crossfade durante il caricamento
-                        (LocalContext.current).data(user_amico!!.immagine).apply(block = fun ImageRequest.Builder.() {
-                        // Gestisci l'indicatore di caricamento qui
-                        placeholder(R.drawable.user_icon) // Placeholder di caricamento
-                        crossfade(true) // Effetto crossfade durante il caricamento
-                    }).build()
-                    ),
-
-                    contentDescription = "Immagine Profilo",
-                    modifier = Modifier
-
-                        .size(64.dp)
-                        .background(Color.White, CircleShape)
-                        .padding(16.dp),
-
-                    contentScale = ContentScale.Crop,
-
-
-                    )
-
-            }
-
-            else {
-
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "Icona Applicazione",
-                    modifier = Modifier
-                        .size(64.dp)
-                        .background(Color.White, CircleShape)
-                        .padding(16.dp),
-                )
-            }
-
-            Text(
-                text = nome + " " +  cognome,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = Color.White,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            Text(
-                text = email,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color.White,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            Text(
-                text = matricola,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color.White,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                StatBoxUtente(number = "13", label = "Task Completate")
-                StatBoxUtente(number = "2", label = "Progetti Completati")
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-
-
-
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-        if(amicizia == "false" )
-        {
-            if(provenienza == "profilo")
-            {
-                Button(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .padding(horizontal = 16.dp),
-                    onClick =
-                    {
-                        avvia_notifica = true
-
-                        navController.navigate(Schermate.Profilo.route)
-                    },
-                    shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Blue, // Cambia il colore di sfondo del pulsante
-                        contentColor = Color.White
-                    ))
-                {
-                    Text(
-                        text = "Richiedi Amicizia",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    )
-                }
-            }
-            if(provenienza == "notifica")
-            {
-                Button(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .padding(horizontal = 16.dp),
-                    onClick =
-                    {
-                        userProfile?.let { profile ->
-                            viewModel.fai_amicizia(profile.id, id) {
-                                viewModel.getUserProfile()
-                                accetta_amicizia = true
-                                navController.navigate(Schermate.Profilo.route)
+                                CircularProgressIndicator(color = Color.Black)
                             }
+                        } else {
+                            StatBox(number = numeroTaskCompletati, label = "Task Completate")
+                            StatBox(
+                                number = numeroProgettiCompletati,
+                                label = "Progetti Completati"
+                            )
+
                         }
-                    },
-                    shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Blue, // Cambia il colore di sfondo del pulsante
-                        contentColor = Color.White
-                    ))
-                {
-                    Text(
-                        text = "Accetta amicizia",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    )
+
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+
+
                 }
-            }
 
-        }
-        if(amicizia == "true")
-        {
-            Button(modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .padding(horizontal = 16.dp),
+                Spacer(modifier = Modifier.height(40.dp))
 
-                onClick = {
-                    userProfile?.let { profile ->
-                        viewModel.finisci_amicizia(profile.id, id) {
-                            viewModel.getUserProfile()
-                            navController.navigate(Schermate.Profilo.route)
+                if (amicizia == "false") {
+                    when (provenienza) {
+                        "profilo" -> {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .padding(horizontal = 16.dp),
+                                onClick =
+                                {
+                                    avvia_notifica = true
+                                    navController.navigate(Schermate.Profilo.route)
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if(isDarkTheme) Color.Black else Red70, // Cambia il colore di sfondo del pulsante
+                                    contentColor = Color.White
+                                )
+                            )
+                            {
+                                Text(
+                                    text = "Richiedi Amicizia",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 12.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+
+                        "task" -> {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .padding(horizontal = 16.dp),
+                                onClick =
+                                {
+                                    avvia_notifica = true
+                                    navController.navigate("task_selezionata/${task}/${progetto}")
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if(isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
+                                    contentColor = Color.White
+                                )
+                            )
+                            {
+                                Text(
+                                    text = "Richiedi Amicizia",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 12.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+
+
+                        "notifica" -> {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .padding(horizontal = 16.dp),
+                                onClick =
+                                {
+                                    userProfile?.let { profile ->
+                                        viewModel.fai_amicizia(profile.id, id) {
+                                            viewModel.getUserProfile()
+                                            accetta_amicizia = true
+                                            navController.navigate(Schermate.Profilo.route)
+                                        }
+                                    }
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if(isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
+                                    contentColor = Color.White
+                                )
+                            )
+                            {
+                                Text(
+                                    text = "Accetta amicizia",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 12.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
+
                         }
                     }
-                },
+                }
 
-                shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red, // Cambia il colore di sfondo del pulsante
-                    contentColor = Color.White
-                ))
-            {
-                Text(
-                    text = "Rimuovi Amicizia",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
-            }
-            Button(modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .padding(horizontal = 16.dp),
+                if (amicizia == "true") {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(70.dp)
+                            .padding(horizontal = 16.dp),
 
-                onClick = {
-                    expanded = true // Mostra il menu a discesa
-                },
-
-                shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Blue, // Cambia il colore di sfondo del pulsante
-                    contentColor = Color.White
-                ))
-            {
-                Text(
-                    text = "Aggiungi ad un progetto",
-                    fontSize = 16.sp,
-
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
-            }
-            DropdownMenu(
-
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .background(Color.White)
-            ) {
-
-                viewModelprogetto.caricaProgettiUtente(viewModel.userProfile?.id.toString(),true)
-                val progetti = viewModelprogetto.progetti
-                progetti.value.forEach { progetto ->
-                    DropdownMenuItem(
-
-                        text = {  Text(progetto.nome, color = Color.Black)  },
                         onClick = {
-                            viewModel.ottieni_utente(id) { profile ->
-                                val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome ?: "") + " " + "ti ha invitato in un progetto"
-                                if (userProfile != null) {
-                                    notificheRepo.creaNotifica(
-                                        userProfile.id,
-                                        profile?.id ?: "",
-                                        "Richiesta_Progetto",
-                                        contenuto,
-                                        progetto.id.toString()
 
-
-                                    )
+                            userProfile?.let { profile ->
+                                viewModel.finisci_amicizia(profile.id, id)
+                                {
+                                    viewModel.getUserProfile()
+                                    if (provenienza == "profilo")
+                                        navController.navigate(Schermate.Profilo.route)
+                                    if (provenienza == "task")
+                                        navController.navigate("task_selezionata/${task}/${progetto}")
                                 }
                             }
-                            expanded = false
-
                         },
 
+                        shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = if(isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
+                            contentColor = Color.White
+                        )
                     )
+                    {
+                        Text(
+                            text = "Rimuovi Amicizia",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
                     }
+                    Spacer(modifier = Modifier.height(5.dp))
+                    when (provenienza) {
+                        "profilo" -> {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .padding(horizontal = 16.dp),
+
+                                onClick = {
+                                    showMenu = true // Mostra l'alert dialog
+                                },
+
+
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (abilitaBottone)  Red70 else Color.Gray, // Cambia il colore di sfondo del pulsante
+                                    contentColor = Color.White
+                                ),
+                                enabled = abilitaBottone
+                            )
+                            {
+                                Text(
+                                    text = "Aggiungi ad un progetto",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 12.dp)
+                                )
+                            }
+                        }
+
+                    }
+                }
             }
         }
-        }
-
     }
+}
+
+
+@Composable
+fun AddTodoDialog(
+    onDismiss: () -> Unit,
+    id: String,
+    id_persona_autenticata: String
+) {
+    val viewModelProgetto = remember { ViewModelProgetto() }
+    val viewModel = remember { ViewModelUtente() }
+    val notificheRepo = remember { RepositoryNotifiche() }
+
+    var isLoading by remember { mutableStateOf(true) }
+    var progetti by remember { mutableStateOf<List<Progetto>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        viewModelProgetto.caricaProgettiUtente_callback(id_persona_autenticata, true) { progettiCaricati ->
+            progetti = progettiCaricati
+            isLoading = false
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text(text = "Seleziona un progetto") },
+        text = {
+            Column {
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    progetti.forEach { progetto ->
+                        Text(
+                            text = progetto.nome,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.ottieni_utente(id) { profile ->
+                                        val contenuto = (viewModel.userProfile?.nome
+                                            ?: "") + " " + (viewModel.userProfile?.cognome
+                                            ?: "") + " ti ha invitato in un progetto"
+                                        if (viewModel.userProfile != null) {
+                                            notificheRepo.creaNotifica(
+                                                viewModel.userProfile!!.id,
+                                                profile?.id ?: "",
+                                                "Richiesta_Progetto",
+                                                contenuto,
+                                                progetto.id.toString()
+                                            )
+                                        }
+                                    }
+                                    onDismiss()
+                                }
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Chiudi")
+            }
+        }
+    )
+}
+
+
+
+
+
 
 
 

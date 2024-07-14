@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -62,7 +61,6 @@ import com.example.teamsync.R.drawable.logo_white
 import com.example.teamsync.R.drawable.registrazione
 import com.example.teamsync.caratteristiche.login.data.model.SessoUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
-import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
@@ -116,6 +114,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     val calendar = Calendar.getInstance()
     val datePickerDialog = android.app.DatePickerDialog(
         context,
+        R.style.CustomDatePickerDialog,
         { _, year, month, dayOfMonth ->
             calendar.set(year, month, dayOfMonth)
             dataDiNascita = calendar.time
@@ -463,7 +462,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                                 textAlign = TextAlign.Center,
                                 color = if (isDarkTheme) White else Red70
                             )
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .width(50.dp)

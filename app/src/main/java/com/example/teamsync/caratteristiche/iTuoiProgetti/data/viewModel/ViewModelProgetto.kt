@@ -74,7 +74,15 @@ class ViewModelProgetto : ViewModel() {
         contesto.startActivity(condividiIntent)
     }
 
-    fun aggiornaProgetto(progettoId: String, nome: String, descrizione: String, dataScadenza: Date,priorita: Priorità){
+    fun aggiornaProgetto(
+        progettoId: String,
+        nome: String,
+        descrizione: String,
+        dataScadenza: Date,
+        priorita: Priorità,
+        voto: String,
+        dataConsegna: Date
+    ){
         viewModelScope.launch {
             try {
                 val progetto = repositoryProgetto.getProgettoById(progettoId)
@@ -83,7 +91,9 @@ class ViewModelProgetto : ViewModel() {
                         nome = nome,
                         descrizione = descrizione,
                         dataScadenza = dataScadenza,
-                        priorita = priorita
+                        priorita = priorita,
+                        voto = voto,
+                        dataConsegna = dataConsegna
                     )
                     repositoryProgetto.aggiornaProgetto(progettoAggiornato)
                     utenteCorrenteId.value?.let {
@@ -92,12 +102,27 @@ class ViewModelProgetto : ViewModel() {
                 }
             }catch (e: Exception){
                 Log.e("ViewModelProgetto", "Errore durante l'aggiornamento del progetto", e)
-
             }
         }
     }
 
+    fun aggiornaStatoProgetto(progettoId: String, completato: Boolean){
+        viewModelScope.launch {
+            try{
+                val progetto = repositoryProgetto.getProgettoById(progettoId)
+                if(progetto != null){
+                    val progettoAggiornato = progetto.copy(completato = completato)
+                    repositoryProgetto.aggiornaProgetto(progettoAggiornato)
+                }
+                utenteCorrenteId.value?.let {
+                    caricaProgettiUtente(it,true)
+                }
 
+            }catch (e:Exception){
+                Log.e("ViewModelProgetto", "Errore durante l'aggiornamento dello stato del progetto", e)
+            }
+        }
+    }
 
     suspend fun getnome_progetto(id_prog: String): String {
         _carica_nome.value = true

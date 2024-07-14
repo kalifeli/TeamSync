@@ -293,6 +293,7 @@ fun CreaProgettoDialog(
 
     val datePickerDialog = DatePickerDialog(
         context,
+        R.style.CustomDatePickerDialog,
         { _, year, month, dayOfMonth ->
             calendar.set(year, month, dayOfMonth)
             dataScadenza = calendar.time

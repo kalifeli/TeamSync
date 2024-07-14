@@ -140,7 +140,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
-    var ordine by remember { mutableStateOf(preferences.getString("ordine_task", "cronologico" )) }
+    var ordine by remember { mutableStateOf(preferences.getString("ordine_task", "creazione" )) }
 
 
     LaunchedEffect(Unit) {

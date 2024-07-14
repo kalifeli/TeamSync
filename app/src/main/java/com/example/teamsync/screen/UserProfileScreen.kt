@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -103,6 +104,7 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
     val context = LocalContext.current
     val datePickerDialog = android.app.DatePickerDialog(
         context,
+        R.style.CustomDatePickerDialog,
         { _, year, month, dayOfMonth ->
             calendar.set(year, month, dayOfMonth)
             dataDiNascita = calendar.time
@@ -191,6 +193,11 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                         )
                     }
                 },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black,
+                )
 
             )
         },

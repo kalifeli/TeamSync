@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -54,7 +56,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -131,7 +132,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val progetto_nome  = remember { mutableStateOf("") }
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
-    var partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
+    val partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
     val progressione by viewModel.progressione.collectAsState()
     val todoCompletate by viewModel.taskCompletate.collectAsState()
     val todoNonCompletate by viewModel.taskNonCompletate.collectAsState()
@@ -140,7 +141,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
-    var ordine by remember { mutableStateOf(preferences.getString("ordine_task", "cronologico" )) }
+    val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "cronologico" )) }
 
 
     LaunchedEffect(Unit) {
@@ -151,7 +152,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     LaunchedEffect(viewmodelprogetto.cambia_lista_partecipanti.value) {
         if(viewmodelprogetto.cambia_lista_partecipanti.value) {
             viewModel.getAllTodo_BY_Project(id_prog)
-            var progettoId = viewModel.leMieAttivita.firstOrNull()?.progetto
+            val progettoId = viewModel.leMieAttivita.firstOrNull()?.progetto
 
             if (progettoId != null) {
                 partecipanti.value = viewmodelprogetto.getLista_Partecipanti(progettoId)
@@ -183,12 +184,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             else -> 0 // Rimane invariato
         }
     }
-
-
-
-
-
-
 
     LaunchedEffect(isClicked1.value) {
         if(isClicked1.value)
@@ -279,7 +274,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     {
                         if (p != viewModelUtente.userProfile?.id )
                         {
-                            var contenuto = (viewModelUtente.userProfile?.nome ?: " ") + " " + (viewModelUtente.userProfile?.cognome
+                            val contenuto = (viewModelUtente.userProfile?.nome ?: " ") + " " + (viewModelUtente.userProfile?.cognome
                                 ?: " ") + " ha completato una task del progetto: " + progetto_nome.value
                             repoNotifiche.creaNotifica(viewModelUtente.userProfile?.id ?: " ",p,"Completamento_Task", contenuto, id_prog)
                         }
@@ -319,7 +314,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Schermate.ItuoiProgetti.route) }) { // non è meglio popBackStack() ???
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "torna indietro", tint = Color.Black)
                     }
                 },
@@ -668,11 +663,11 @@ fun TodoItem
         var dialogDelete by remember { mutableStateOf(false) }
         var dialogExpanded by remember { mutableStateOf(false) }
         var lista_utenti by remember { mutableStateOf("") }
-        var modifica = remember {mutableStateOf(false) }
+        val modifica = remember {mutableStateOf(false) }
 
         LaunchedEffect(item.utenti) {
             lista_utenti = ""
-            var size = item.utenti.size
+            val size = item.utenti.size
             var contatore = 0
             for (u in item.utenti) {
                 viewModelUtente.ottieni_utente(u) { userProfile ->
@@ -748,7 +743,7 @@ fun TodoItem
             Text(
                 modifier = Modifier
                     .padding(end = 10.dp),
-                text = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(item.dataScadenza),
+                text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center
             )
@@ -940,7 +935,7 @@ fun EditTodoDialog(
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {
-                        navController.navigate("task_selezionata/${todoItem.id.toString()}/${todoItem.progetto.toString()}")
+                        navController.navigate("task_selezionata/${todoItem.id.toString()}/${todoItem.progetto}")
                     },
                     colors = ButtonDefaults.buttonColors(Grey70)
                 ) {
@@ -1095,38 +1090,54 @@ fun AddTodoDialog(
                     OutlinedTextField(
                         value = priorita.name,
                         onValueChange = {},
+                        readOnly = true,
+                        label = {
+                            Text(
+                                "Priorità",
+                                color = Color.Black
+                            )
+                        },
                         shape = RoundedCornerShape(16.dp),
-                        label = { Text(stringResource(id = R.string.selPriorita), color = Color.Black) },
+                        trailingIcon = {
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown",
+                                modifier = Modifier.clickable { expanded = true })
+                        },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Grey35,
                             unfocusedContainerColor = Grey50,
                         ),
-                        textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
-                        readOnly = true,
-                        trailingIcon = {
-                            IconButton(onClick = { expanded = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = null
-                                )
-                            }
-                        },
                         modifier = Modifier
                             .fillMaxWidth()
                     )
+
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
-                        modifier = Modifier.width(150.dp)
+                        modifier = Modifier.background(Grey35)
                     ) {
                         Priorità.entries.forEach { p ->
                             DropdownMenuItem(
-                                text = { Text(p.name, color = p.colore) },
-                                colors = MenuDefaults.itemColors(Grey50),
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(CircleShape)
+                                                .border(0.5.dp, Color.Black, CircleShape)
+                                                .background(p.colore)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(p.name)
+
+                                    }
+                                },
                                 onClick = {
                                     priorita = p
                                     expanded = false
-                                }
+                                },
+                                modifier = Modifier.background(Grey35)
                             )
                         }
                     }

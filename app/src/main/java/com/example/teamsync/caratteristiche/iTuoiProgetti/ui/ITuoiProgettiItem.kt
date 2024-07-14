@@ -139,6 +139,7 @@ fun ITuoiProgettiItem(
                     )
                 }
             }
+
             if(progetto.completato){
                 Row(
                     modifier = Modifier.align(Alignment.End),

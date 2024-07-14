@@ -228,7 +228,11 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                 .clickable {
                                     if (provenienza == "task") {
                                         navController.navigate("task_selezionata/${task}/${progetto}")
-                                    } else {
+                                    }
+                                    if(provenienza == "progetto"){
+                                        navController.navigate("progetto_da_accettare/${progetto}")
+                                    }
+                                    else {
                                         navController.navigate(Schermate.Profilo.route)
                                     }
                                 },
@@ -477,6 +481,38 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                             Spacer(modifier = Modifier.height(5.dp))
 
                         }
+
+                        "progetto" -> {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .padding(horizontal = 16.dp),
+                                onClick =
+                                { avvia_notifica = true
+                                    navController.navigate("progetto_da_accettare/${progetto}")
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if(isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
+                                    contentColor = Color.White
+                                )
+                            )
+                            {
+                                Text(
+                                    text = "Richiedi Amicizia",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 12.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
+
+
+
+                        }
+
+
                     }
                 }
 
@@ -486,7 +522,6 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                             .fillMaxWidth()
                             .height(70.dp)
                             .padding(horizontal = 16.dp),
-
                         onClick = {
 
                             userProfile?.let { profile ->
@@ -495,6 +530,8 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                     viewModel.getUserProfile()
                                     if (provenienza == "profilo")
                                         navController.navigate(Schermate.Profilo.route)
+                                    if( provenienza == "profilo")
+                                        navController.navigate("progetto_da_accettare/${progetto}")
                                     if (provenienza == "task")
                                         navController.navigate("task_selezionata/${task}/${progetto}")
                                 }
@@ -517,6 +554,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                     Spacer(modifier = Modifier.height(5.dp))
                     when (provenienza) {
                         "profilo" -> {
+
                             Button(
                                 modifier = Modifier
                                     .fillMaxWidth()

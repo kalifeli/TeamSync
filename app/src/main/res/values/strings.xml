@@ -41,11 +41,13 @@
     <string name="Unutentecompletaunatask">a user completes a task</string>
     <string name="UnUtenteModificaUnaTask">A user edits one of my tasks</string>
 
-
+    <!-- Schermata impostazioni progetti -->
     <string name="ordinevisualizzazioneprogetti">Projects display order</string>
     <string name="priorità">Priority</string>
     <string name="datadiscadenza">Expiration date</string>
     <string name="datadicreazione">Creation date</string>
+    <string name="visualizzaprogetticompletati">View completed projects</string>
+    <string name="mostralidalladashboard">Show them in the dashboard</string>
 
     <!-- Schermata Impostazioni Task -->
     <string name="VisualizzazioneTask">Task View</string>
@@ -54,7 +56,7 @@
     <string name="cliccaPerVederleTutte">(click to see them all)</string>
     <string name="ordineTask">Task display order</string>
     <string name="inbaseallapriorità">Based on priority</string>
-    <string name="ordinedicreazione">Creation date</string>
+    <string name="ordinedicreazione">Most Recent</string>
 
     <!--Schermata Registrazione-->
     <string name="iscriviti">Sign Up</string>

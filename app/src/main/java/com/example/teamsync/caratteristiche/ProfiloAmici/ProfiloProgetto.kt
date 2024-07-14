@@ -387,8 +387,9 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
         amicizia = true
 
     }
+
     ElevatedCard(
-        onClick = {navController.navigate("utente/${utente.id}/${amicizia}/task/1")},
+        onClick = {navController.navigate("utente/${utente.id}/${amicizia}/progetto/1/${id_prog}")},
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 8.dp
         ),

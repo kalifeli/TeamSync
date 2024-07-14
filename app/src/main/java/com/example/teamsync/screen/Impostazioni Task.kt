@@ -37,10 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.teamsync.R.string.MostraSoloAlcune
-import com.example.teamsync.R.string.Mostrainfo
-import com.example.teamsync.R.string.VisualizzazioneTask
-import com.example.teamsync.R.string.cliccaPerVederleTutte
+import com.example.teamsync.R.string.datadiscadenza
 import com.example.teamsync.R.string.inbaseallapriorità
 import com.example.teamsync.R.string.ordineTask
 import com.example.teamsync.R.string.ordinedicreazione
@@ -52,8 +49,7 @@ fun ImpoTask(navController: NavHostController ) {
     val context = LocalContext.current
     val preferences = context.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
     val editor = preferences.edit()
-    var task_completa by remember { mutableStateOf(preferences.getBoolean("preferenze_dati_task", true)) }
-    var ordine_task by remember { mutableStateOf(preferences.getString("ordine_task", "cronologico")) }
+    var ordine_task by remember { mutableStateOf(preferences.getString("ordine_task", "creazione")) }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     Box(
@@ -119,165 +115,7 @@ fun ImpoTask(navController: NavHostController ) {
                     ) {}
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.08f)
-                        .padding(start = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                            text = stringResource(id = VisualizzazioneTask),
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                        color = if(isDarkTheme) Color.White else Color.Black
-                        )
 
-
-                }
-
-                Spacer(modifier = Modifier.height(7.dp))
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(
-                            RoundedCornerShape(
-                                topStart = 20.dp,
-                                topEnd = 20.dp,
-                                bottomEnd = 20.dp,
-                                bottomStart = 20.dp
-                            )
-                        )
-                        .background(if (isDarkTheme) Color.Black else Color(0xFFE5E5E5))
-
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(1f)  // 70% of the available width
-                            .padding(5.dp)
-                            .background(if (isDarkTheme) Color.Black else Color.Transparent),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-
-                    ) {
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(0.8f)  // 70% of the available width
-                                .padding(5.dp)
-                                .background(if (isDarkTheme) Color.Black else Color.Transparent),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start
-                        )
-                        {
-                            Text(
-                                text = stringResource(id = Mostrainfo),
-                                fontSize = 19.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(start = 10.dp),
-                                color = if(isDarkTheme) Color.White else Color.Black
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.weight(1f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {}
-
-
-
-                        RadioButton(
-                            selected = task_completa,
-                            onClick = {
-                                task_completa = true
-                                editor.putBoolean("preferenze_dati_task", task_completa).apply()
-
-                            },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = if(isDarkTheme) Color.White else Color.Black,
-                                unselectedColor =  if(isDarkTheme) Color.White else Color.Black,
-                            )
-                        )
-                        Row(
-                            modifier = Modifier.weight(0.1f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {}
-                    }
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(
-                            RoundedCornerShape(
-                                topStart = 20.dp,
-                                topEnd = 20.dp,
-                                bottomEnd = 12.dp,
-                                bottomStart = 20.dp
-                            )
-                        )
-                        .background(if (isDarkTheme) Color.Black else Color(0xFFE5E5E5))
-                ) {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                            .background(if (isDarkTheme) Color.Black else Color.Transparent),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Column (
-                           modifier = Modifier
-                               .padding(5.dp)
-                               .background(if (isDarkTheme) Color.Black else Color.Transparent),
-                        ){
-
-                                Text(
-                                    text = stringResource(id = MostraSoloAlcune),
-                                    fontSize = 19.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    color = if (isDarkTheme) Color.White else Color.Black
-                                )
-
-
-                                Text(
-                                text = stringResource(id = cliccaPerVederleTutte),
-                                fontSize = 19.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(start = 10.dp),
-                                    color = if (isDarkTheme) Color.White else Color.Black
-                            )
-                                }
-                        Row(
-                            modifier = Modifier.weight(3f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {}
-
-
-                        RadioButton(
-
-                            selected = !task_completa,
-                            onClick = {
-                                task_completa = false
-                                editor.putBoolean("preferenze_dati_task", task_completa).apply()
-
-                            },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = if(isDarkTheme) Color.White else Color.Black,
-                                unselectedColor =  if(isDarkTheme) Color.White else Color.Black,
-                            )
-                        )
-                        Row(
-                            modifier = Modifier.weight(0.1f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {}
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(15.dp))
 
                 Row(
                     modifier = Modifier
@@ -408,9 +246,9 @@ fun ImpoTask(navController: NavHostController ) {
 
                             RadioButton(
 
-                                selected = ordine_task == "cronologico",
+                                selected = ordine_task == "creazione",
                                 onClick = {
-                                    ordine_task = "cronologico"
+                                    ordine_task = "creazione"
                                     editor.putString("ordine_task", ordine_task).apply()
                                 },
                                 colors = RadioButtonDefaults.colors(
@@ -424,6 +262,67 @@ fun ImpoTask(navController: NavHostController ) {
                             ) {}
                         }
                     }
+                Spacer(modifier = Modifier.height(10.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = 20.dp,
+                                topEnd = 20.dp,
+                                bottomEnd = 12.dp,
+                                bottomStart = 20.dp
+                            )
+                        )
+                        .background(if (isDarkTheme) Color.Black else Color(0xFFE5E5E5))
+                ) {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                            .background(if (isDarkTheme) Color.Black else Color.Transparent),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Column (
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .background(if (isDarkTheme) Color.Black else Color.Transparent),
+                        ){
+
+                            Text(
+                                text = stringResource(id = datadiscadenza),
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 10.dp),
+                                color = if (isDarkTheme) Color.White else Color.Black
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.weight(3f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {}
+
+
+                        RadioButton(
+
+                            selected = ordine_task == "data_di_scadenza",
+                            onClick = {
+                                ordine_task = "data_di_scadenza"
+                                editor.putString("ordine_task", ordine_task).apply()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = if(isDarkTheme) Color.White else Color.Black,
+                                unselectedColor =  if(isDarkTheme) Color.White else Color.Black,
+                            )
+                        )
+                        Row(
+                            modifier = Modifier.weight(0.1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {}
+                    }
+                }
 
 
 

@@ -1,6 +1,7 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,9 +20,14 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.ui.theme.White
 
 @Composable
@@ -39,6 +46,42 @@ fun SezioneITUoiProgetti(
     navController: NavController,
     viewModelProgetto: ViewModelProgetto
 ){
+    val contesto = LocalContext.current
+    val preferences = contesto.getSharedPreferences("preferenze_progetti", Context.MODE_PRIVATE)
+
+    val comparatore = Comparator<Progetto> { Progetto1, Progetto2 ->
+        val priorita1 = Progetto1.priorita
+        val priorita2 = Progetto2.priorita
+
+        // Confronto basato sull'ordine dell'enumerazione Priorità
+        when {
+            priorita1 == Priorità.ALTA && priorita2 != Priorità.ALTA -> -1 // ALTA prima di qualsiasi altra
+            priorita1 != Priorità.ALTA && priorita2 == Priorità.ALTA -> 1  // ALTA prima di qualsiasi altra
+
+
+            priorita1 == Priorità.MEDIA && priorita2 == Priorità.BASSA -> -1 // MEDIA prima di BASSA
+            priorita1 == Priorità.BASSA && priorita2 == Priorità.MEDIA -> 1  // MEDIA prima di BASSA
+
+            priorita1 == Priorità.MEDIA && priorita2 == Priorità.NESSUNA -> -1 // MEDIA prima di NESSUNA
+            priorita1 == Priorità.NESSUNA && priorita2 == Priorità.MEDIA -> 1  // MEDIA prima di NESSUNA
+
+            priorita1 == Priorità.BASSA && priorita2 == Priorità.NESSUNA -> -1 // BASSA prima di NESSUNA
+            priorita1 == Priorità.NESSUNA && priorita2 == Priorità.BASSA -> 1  // BASSA prima di NESSUNA
+
+            else -> 0 // Rimane invariato
+        }
+    }
+
+    var visualizza_completati by remember { mutableStateOf(preferences.getBoolean("preferenza_progetti_completati", false)) }
+    var ordine_progetti by remember {
+        mutableStateOf(
+            preferences.getString(
+                "ordine_progetti",
+                "cronologico"
+            )
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start,
@@ -89,9 +132,54 @@ fun SezioneITUoiProgetti(
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(progetti) { progetto ->
-                ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+            when(ordine_progetti){
+                "cronologico" ->
+                {
+                    items(progetti.sortedByDescending { it.dataCreazione }) { progetto ->
+                        if(visualizza_completati)
+                        {
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+
+                        }
+                        else if (!(progetto.completato))
+                        {
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                        }
+
+
+
+                    }
+                }
+                "scadenza" ->
+                {
+                    items(progetti.sortedBy { it.dataScadenza }) { progetto ->
+                        if(visualizza_completati)
+                        {
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+
+                        }
+                        else if (!(progetto.completato))
+                        {
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                        }
+                    }
+                }
+                "priorità" ->
+                {
+                    items(progetti.sortedWith(comparatore)) { progetto ->
+                        if(visualizza_completati)
+                        {
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+
+                        }
+                        else if (!(progetto.completato))
+                        {
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                        }
+                    }
+                }
             }
+
         }
     }
 }

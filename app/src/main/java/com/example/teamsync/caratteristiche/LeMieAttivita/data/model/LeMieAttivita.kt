@@ -15,6 +15,7 @@ data class LeMieAttivita(
     val completato: Boolean = false,
     val fileUri: String? = null,
     val progetto: String = "",
+    val dataCreazione: Date = Date(),
     val utenti: List<String> = emptyList(),
     )
 

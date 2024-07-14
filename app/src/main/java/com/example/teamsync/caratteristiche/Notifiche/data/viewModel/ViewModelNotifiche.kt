@@ -124,6 +124,34 @@ class ViewModelNotifiche : ViewModel() {
         }
     }
 
+    fun eliminaNotifica(notificaId: String) {
+        viewModelScope.launch {
+            try {
+                repositoryNotifiche.deleteNotifica(notificaId)
+
+                // Rimuovi la notifica dalla lista locale
+                notificheList.value = notificheList.value.filter { it.id != notificaId }
+
+
+                println("Notifica eliminata con successo")
+            } catch (e: Exception) {
+                println("Errore durante l'eliminazione della notifica: $e")
+            }
+        }
+    }
+
+    fun getNotificaIdByContent(contenuto: String, onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val notificaId = repositoryNotifiche.getNotificaIdByContent(contenuto)
+                onResult(notificaId)
+            } catch (e: Exception) {
+                println("Errore durante il recupero della notifica: $e")
+                onResult(null)
+            }
+        }
+    }
 }
+
 
 

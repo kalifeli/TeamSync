@@ -49,6 +49,9 @@
     <string name="priorità">Priorità</string>
     <string name="datadiscadenza">Data di Scadenza</string>
     <string name="datadicreazione">Data di Creazione</string>
+    <string name="visualizzaprogetticompletati">Visualizza progetti completati</string>
+    <string name="mostralidalladashboard">Mostrali nella dashboard</string>
+
 
     <!-- Schermata Impostazioni Task -->
     <string name="VisualizzazioneTask">Visualizzazione Task</string>
@@ -57,7 +60,7 @@
     <string name="cliccaPerVederleTutte">(clicca per vederle tutte)</string>
     <string name="ordineTask">Ordine Task</string>
     <string name="inbaseallapriorità">In base alla priorità</string>
-    <string name="ordinedicreazione">Ordine di creazione</string>
+    <string name="ordinedicreazione">Data di creazione</string>
 
     <!--Registrazione Screen-->
     <string name="iscriviti">Iscriviti</string>

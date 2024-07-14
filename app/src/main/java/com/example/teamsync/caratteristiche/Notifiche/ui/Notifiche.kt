@@ -228,7 +228,20 @@ fun NotificationScreen(
                                     Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
+                            else -> {
+                                NotificationItem(
+                                    iconColor = if (notifica.aperto) WhiteFacebook else  Red70,
+                                    notifica = notifica,
+                                    navController = navController,
+                                    vmNotifiche = notificheModel
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+
+
                         }
+
 
 
 

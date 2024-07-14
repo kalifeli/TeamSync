@@ -18,6 +18,7 @@ import com.example.teamsync.caratteristiche.LeMieAttivita.ui.LeMieAttivitaUI
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.Lista_Utenti_assegna_Task
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.SchermataModificaProgetto
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.ui.NotificationScreen
 import com.example.teamsync.caratteristiche.Profilo.ProfiloUtenteCliccato
 import com.example.teamsync.caratteristiche.ProfiloAmici.ProfiloSchermata
@@ -50,6 +51,7 @@ fun NavGraph(){
     val viewModelUtente = ViewModelUtente()
     val viewModelProgetto = ViewModelProgetto()
     val viewModelLeMieAttivita = LeMieAttivitaViewModel()
+    val viewModelNotifiche = ViewModelNotifiche()
     NavHost(navController = navController, startDestination = Schermate.Login.route) {
 
         composable(route = Schermate.Registrazione.route){ Registrazione(navController,viewModelUtente)}
@@ -156,7 +158,8 @@ fun NavGraph(){
                         viewModel_att = viewModelLeMieAttivita ,
                         id_task = task,
                         view_model_prog =viewModelProgetto ,
-                        id_prog = prog
+                        id_prog = prog,
+                        view_model_notifiche = viewModelNotifiche
                     )
                 }
             }
@@ -194,6 +197,7 @@ fun NavGraph(){
                 )
             }
         }
+
         composable(
             route = "modificaProgetto/{progettoId}" ,
             arguments = listOf(navArgument("progettoId") { type = NavType.StringType })

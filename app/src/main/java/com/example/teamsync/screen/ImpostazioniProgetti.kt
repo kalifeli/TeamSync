@@ -35,11 +35,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.teamsync.R.string.datadicreazione
 import com.example.teamsync.R.string.datadiscadenza
+import com.example.teamsync.R.string.mostralidalladashboard
+import com.example.teamsync.R.string.ordinedicreazione
 import com.example.teamsync.R.string.ordinevisualizzazioneprogetti
 import com.example.teamsync.R.string.priorità
 import com.example.teamsync.R.string.progetti
+import com.example.teamsync.R.string.visualizzaprogetticompletati
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.util.ThemePreferences
 
@@ -47,6 +49,14 @@ import com.example.teamsync.util.ThemePreferences
 fun ImpoProgetti(navController: NavHostController ) {
     val context = LocalContext.current
     val preferences = context.getSharedPreferences("preferenze_progetti", Context.MODE_PRIVATE)
+    var visualizza_completati by remember {
+        mutableStateOf(
+            preferences.getBoolean(
+                "preferenza_progetti_completati",
+                false
+            )
+        )
+    }
     val editor = preferences.edit()
     var ordine_progetti by remember {
         mutableStateOf(
@@ -106,7 +116,7 @@ fun ImpoProgetti(navController: NavHostController ) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = stringResource(id = progetti  ),
+                            text = stringResource(id = progetti),
                             fontSize = 25.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isDarkTheme) Color.White else Color.DarkGray
@@ -192,7 +202,7 @@ fun ImpoProgetti(navController: NavHostController ) {
                             selected = ordine_progetti == "priorità",
                             onClick = {
                                 ordine_progetti = "priorità"
-                                editor.putString("ordine_task", "priorità").apply()
+                                editor.putString("ordine_progetti", "priorità").apply()
 
                             },
                             colors = RadioButtonDefaults.colors(
@@ -254,7 +264,7 @@ fun ImpoProgetti(navController: NavHostController ) {
                             selected = ordine_progetti == "scadenza",
                             onClick = {
                                 ordine_progetti = "scadenza"
-                                editor.putString("ordine_task", "scadenza").apply()
+                                editor.putString("ordine_progetti", "scadenza").apply()
 
                             },
                             colors = RadioButtonDefaults.colors(
@@ -269,68 +279,159 @@ fun ImpoProgetti(navController: NavHostController ) {
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
+
                 Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = 20.dp,
+                                topEnd = 20.dp,
+                                bottomEnd = 12.dp,
+                                bottomStart = 20.dp
+                            )
+                        )
+                        .background(if (isDarkTheme) Color.Black else Color(0xFFE5E5E5))
+                ) {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(
-                                RoundedCornerShape(
-                                    topStart = 20.dp,
-                                    topEnd = 20.dp,
-                                    bottomEnd = 12.dp,
-                                    bottomStart = 20.dp
-                                )
-                            )
-                            .background(if (isDarkTheme) Color.Black else Color(0xFFE5E5E5))
+                            .padding(5.dp)
+                            .background(if (isDarkTheme) Color.Black else Color.Transparent),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
                     ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .background(if (isDarkTheme) Color.Black else Color.Transparent),
+                        ) {
+
+                            Text(
+                                text = stringResource(id = ordinedicreazione),
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 10.dp),
+                                color = if (isDarkTheme) Color.White else Color.Black
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.weight(3f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {}
+
+
+                        RadioButton(
+
+                            selected = ordine_progetti == "cronologico",
+                            onClick = {
+                                ordine_progetti = "cronologico"
+                                editor.putString("ordine_progetti", "cronologico").apply()
+
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = if (isDarkTheme) Color.White else Color.Black,
+                                unselectedColor = if (isDarkTheme) Color.White else Color.Black,
+                            )
+                        )
+                        Row(
+                            modifier = Modifier.weight(0.1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {}
+                    }
+                }
+                Spacer(modifier = Modifier.height(25.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.08f)
+                        .padding(start = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = stringResource(id = visualizzaprogetticompletati),
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isDarkTheme) Color.White else Color.Black
+                    )
+
+
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = 20.dp,
+                                topEnd = 20.dp,
+                                bottomEnd = 20.dp,
+                                bottomStart = 20.dp
+                            )
+                        )
+                        .background(if (isDarkTheme) Color.Black else Color(0xFFE5E5E5))
+
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(1f)  // 70% of the available width
+                            .padding(5.dp)
+                            .background(if (isDarkTheme) Color.Black else Color.Transparent),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+
+                    ) {
+
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxWidth(0.8f)  // 70% of the available width
                                 .padding(5.dp)
                                 .background(if (isDarkTheme) Color.Black else Color.Transparent),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .padding(5.dp)
-                                    .background(if (isDarkTheme) Color.Black else Color.Transparent),
-                            ) {
-
-                                Text(
-                                    text = stringResource(id = datadicreazione),
-                                    fontSize = 19.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    color = if (isDarkTheme) Color.White else Color.Black
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.weight(3f),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {}
-
-
-                            RadioButton(
-
-                                selected = ordine_progetti == "cronologico",
-                                onClick = {
-                                    ordine_progetti = "cronologico"
-                                    editor.putString("ordine_task", "cronologico").apply()
-
-                                },
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = if (isDarkTheme) Color.White else Color.Black,
-                                    unselectedColor = if (isDarkTheme) Color.White else Color.Black,
-                                )
+                        )
+                        {
+                            Text(
+                                text = stringResource(id = mostralidalladashboard),
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 10.dp),
+                                color = if (isDarkTheme) Color.White else Color.Black
                             )
-                            Row(
-                                modifier = Modifier.weight(0.1f),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {}
                         }
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {}
+
+
+
+                        RadioButton(
+                            selected = visualizza_completati,
+                            onClick = {
+                                visualizza_completati = !visualizza_completati
+                                editor.putBoolean("preferenza_progetti_completati", visualizza_completati)
+                                    .apply()
+
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = if (isDarkTheme) Color.White else Color.Black,
+                                unselectedColor = if (isDarkTheme) Color.White else Color.Black,
+                            )
+                        )
+                        Row(
+                            modifier = Modifier.weight(0.1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {}
                     }
                 }
+
+
             }
         }
     }
+}
 

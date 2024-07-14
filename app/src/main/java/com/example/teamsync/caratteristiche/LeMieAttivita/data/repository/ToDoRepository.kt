@@ -27,7 +27,7 @@ class ToDoRepository {
             priorita = priorita,
             completato = false,
             progetto = progetto,
-            utenti = listOf(utenti)
+            utenti = listOf(utenti),
         )
         database.collection("Todo").add(leMieAttivita).await()
     }
@@ -46,7 +46,7 @@ class ToDoRepository {
     suspend fun getAllTodoCompletate(): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", true)
-            .orderBy("dataScadenza") // Ordina per data di scadenza
+            .orderBy("dataScadenza")
             .get()
             .await()
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
@@ -120,6 +120,32 @@ class ToDoRepository {
             throw Exception("Errore durante l'aggiornamento degli utenti del Todo: ${e.message}")
         }
     }
+
+
+    suspend fun removeUserFromTodo(id: String, userToRemove: String) {
+        try {
+            val document = database.collection("Todo").document(id).get().await()
+            val leMieAttivita = document.toObject(LeMieAttivita::class.java)
+            if (leMieAttivita != null) {
+                val updatedUsers = leMieAttivita.utenti.toMutableList()
+                if (updatedUsers.remove(userToRemove)) {
+                    database.collection("Todo")
+                        .document(id)
+                        .update("utenti", updatedUsers)
+                        .await()
+                } else {
+                    throw Exception("Utente non trovato nella lista")
+                }
+            } else {
+                throw Exception("Todo non trovato")
+            }
+        } catch (e: Exception) {
+            // Gestisci l'errore se necessario
+            throw Exception("Errore durante la rimozione dell'utente dal Todo: ${e.message}")
+        }
+    }
+
+
     suspend fun getTodoById(id: String): LeMieAttivita? {
         return try {
             val document = database.collection("Todo").document(id).get().await()

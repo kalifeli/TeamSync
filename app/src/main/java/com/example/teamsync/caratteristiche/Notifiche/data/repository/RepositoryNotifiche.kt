@@ -66,6 +66,17 @@ class RepositoryNotifiche {
         }
     }
 
+    suspend fun deleteNotifica(notificaId: String) {
+        try {
+            val docRef = firestore.collection("Notifiche").document(notificaId)
+            docRef.delete().await()
+            println("Notifica con ID $notificaId eliminata con successo")
+        } catch (e: Exception) {
+            println("Errore durante l'eliminazione della notifica: $e")
+            throw e
+        }
+    }
+
     suspend fun apriNotifica(notificaId: String) {
         try {
             val docRef = firestore.collection("Notifiche").document(notificaId)
@@ -83,6 +94,24 @@ class RepositoryNotifiche {
         }
     }
 
+    suspend fun getNotificaIdByContent(contenuto: String): String? {
+        val db = FirebaseFirestore.getInstance()
+        try {
+            val querySnapshot = db.collection("Notifiche")
+                .whereEqualTo("contenuto", contenuto)
+                .limit(1)
+                .get()
+                .await()
+
+            if (querySnapshot.documents.isNotEmpty()) {
+                return querySnapshot.documents[0].id
+            }
+        } catch (e: Exception) {
+            println("Errore durante il recupero della notifica: $e")
+            throw e
+        }
+        return null
+    }
     suspend fun updateNotifica(notifica: Notifiche) {
         try {
             val notificaRef = firestore.collection("Notifiche").document(notifica.id)

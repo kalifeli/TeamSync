@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -47,6 +48,7 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
@@ -55,8 +57,9 @@ import com.example.teamsync.ui.theme.WhiteFacebook
 
 
 @Composable
-fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, id_task : String, view_model_prog: ViewModelProgetto, id_prog : String) {
+fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, id_task : String, view_model_prog: ViewModelProgetto, id_prog : String, view_model_notifiche : ViewModelNotifiche) {
     var task by remember { mutableStateOf<LeMieAttivita?>(null) }
+
 
     LaunchedEffect(id_task) {
         task = viewModel_att.getTodoById(id_task)
@@ -114,7 +117,7 @@ fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHost
 
         task?.let { ProfiloHeader(viewModel, navController, it) }
         Spacer(modifier = Modifier.height(16.dp))
-        task?.let {ListaColleghi(viewModel, navController, viewModel_att, id_task, view_model_prog,id_prog) }}
+        task?.let {ListaColleghi(viewModel, navController, viewModel_att, id_task, view_model_prog,id_prog, view_model_notifiche) }}
 }
 
 
@@ -234,7 +237,8 @@ fun ListaColleghi(
     viewModel_att: LeMieAttivitaViewModel,
     id_task : String,
     viewModel_Prog : ViewModelProgetto,
-    id_progetto : String
+    id_progetto : String,
+    view_model_notifiche: ViewModelNotifiche
 ) {
 
     val userProfile = viewModel.userProfile
@@ -328,7 +332,8 @@ fun ListaColleghi(
                                 partecipa,
                                 viewModel_att,
                                 id_task,
-                                id_progetto
+                                id_progetto,
+                                view_model_notifiche
 
 
                             )
@@ -352,9 +357,10 @@ fun ListaColleghi(
 
 
 @Composable
-fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel, id_task : String, id_prog: String) {
+fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel, id_task : String, id_prog: String, view_model_notifiche: ViewModelNotifiche) {
 
     val notificheRepo = RepositoryNotifiche()
+
 
     var amicizia = false
     if (utente.amici.contains(user_loggato?.id)) {
@@ -440,6 +446,35 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                             }
                     )
                 }
+            }
+            else
+            {
+                Spacer(modifier = Modifier.weight(1f))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "rimuovi delega",
+                        tint = Color.Gray,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable {
+                                viewModel_att.rimuovi_persona(id_task, utente.id)
+                                Log.d("IconClick", "Icona cliccata")
+
+                                val contenuto = (user_loggato?.nome + " " + (user_loggato?.cognome
+                                    ?: "") + " " + "ti ha assegnato una task")
+
+                                view_model_notifiche.getNotificaIdByContent(contenuto) { id ->
+                                    id?.let { view_model_notifiche.eliminaNotifica(it) }
+                                }
+                                navController.navigate("task_selezionata/${id_task}/${id_prog}")
+
+
+                            }
+                    )
+                }
+
             }
 
 

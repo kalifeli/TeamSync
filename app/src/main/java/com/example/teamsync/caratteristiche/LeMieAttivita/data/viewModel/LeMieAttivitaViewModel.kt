@@ -317,6 +317,19 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
+    fun rimuovi_persona(id_task: String, id_persona: String) {
+        viewModelScope.launch {
+            try {
+                repositoryLeMieAttivita.removeUserFromTodo(id_task, id_persona)
+
+
+
+            } catch (e: Exception) {
+                //gestire errore
+            }
+        }
+    }
+
 
     suspend fun getTodoById(id_task: String): LeMieAttivita? {
         return try {

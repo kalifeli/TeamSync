@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.data.models.Priorità
@@ -44,7 +45,8 @@ import com.example.teamsync.ui.theme.White
 fun SezioneITUoiProgetti(
     progetti: List<Progetto>,
     navController: NavController,
-    viewModelProgetto: ViewModelProgetto
+    viewModelProgetto: ViewModelProgetto,
+    viewModelLeMieAttivita: LeMieAttivitaViewModel
 ){
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_progetti", Context.MODE_PRIVATE)
@@ -138,12 +140,12 @@ fun SezioneITUoiProgetti(
                     items(progetti.sortedByDescending { it.dataCreazione }) { progetto ->
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
                         }
 
 
@@ -155,12 +157,12 @@ fun SezioneITUoiProgetti(
                     items(progetti.sortedBy { it.dataScadenza }) { progetto ->
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
                         }
                     }
                 }
@@ -169,12 +171,12 @@ fun SezioneITUoiProgetti(
                     items(progetti.sortedWith(comparatore)) { progetto ->
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
                         }
                     }
                 }
@@ -187,5 +189,5 @@ fun SezioneITUoiProgetti(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewSezioneITuoiProgetti(){
-    SezioneITUoiProgetti(navController = rememberNavController(), progetti = emptyList(), viewModelProgetto = ViewModelProgetto())
+    SezioneITUoiProgetti(navController = rememberNavController(), progetti = emptyList(), viewModelProgetto = ViewModelProgetto(), viewModelLeMieAttivita = LeMieAttivitaViewModel())
 }

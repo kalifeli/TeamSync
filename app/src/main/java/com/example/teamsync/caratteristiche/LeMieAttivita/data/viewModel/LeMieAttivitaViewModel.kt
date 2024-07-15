@@ -182,13 +182,13 @@ class LeMieAttivitaViewModel() : ViewModel() {
 
     fun getTodoByProject(progetto: String) {
         viewModelScope.launch {
-            var allTodo = repositoryLeMieAttivita.getAllTodo()
+            var allTodo = repositoryLeMieAttivita.getAllTodo(progetto)
             var tentativi = 0
             val MAX_TENTATIVI = 6
             while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI) {
                 isLoading.value = true
                 delay(500) // Attendiamo mezzo secondo tra ogni tentativo
-                allTodo = repositoryLeMieAttivita.getAllTodo()
+                allTodo = repositoryLeMieAttivita.getAllTodo(progetto)
                 tentativi++
             }
             isLoading.value = false
@@ -209,11 +209,11 @@ class LeMieAttivitaViewModel() : ViewModel() {
             val MAX_TENTATIVI = 6
             isLoading.value = true
             try {
-                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate(progetto)
                 while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI){
                     isLoading.value = true
                     delay(500) // Attendiamo mezzo secondo tra ogni tentativo
-                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate(progetto)
                     tentativi++
 
                 }
@@ -236,11 +236,11 @@ class LeMieAttivitaViewModel() : ViewModel() {
             isLoading.value = true
             var completateAttivita: List<LeMieAttivita> = emptyList()
             try {
-                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate(progetto)
                 while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI) {
                     isLoading.value = true
                     delay(500) // Attendiamo mezzo secondo tra ogni tentativo
-                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate(progetto)
                     tentativi++
                 }
                 completateAttivita = allTodo.filter { it.progetto == progetto && it.completato }

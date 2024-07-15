@@ -8,9 +8,8 @@ import java.util.Date
 
 
 class ToDoRepository {
+
     private val database = FirebaseFirestore.getInstance()
-
-
 
     suspend fun addTodo(titolo: String,
                         descrizione: String,
@@ -33,7 +32,7 @@ class ToDoRepository {
     }
 
 
-    suspend fun getAllTodo(): List<LeMieAttivita> {
+    suspend fun getAllTodo(progetto: String): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", false)
             .orderBy("dataScadenza") // Ordina per data di scadenza
@@ -43,9 +42,10 @@ class ToDoRepository {
     }
 
 
-    suspend fun getAllTodoCompletate(): List<LeMieAttivita> {
+    suspend fun getAllTodoCompletate(progetto: String): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", true)
+            .whereEqualTo("progetto", progetto)
             .orderBy("dataScadenza")
             .get()
             .await()

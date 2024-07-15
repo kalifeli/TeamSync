@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +29,7 @@ import com.example.teamsync.R
 import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.White
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -35,10 +38,26 @@ fun SezioneCalendario(){
     val currentDate = remember { Date() }
     val dateFormatter = remember { SimpleDateFormat("d MMMM", Locale.getDefault()) }
     val formattedDate = dateFormatter.format(currentDate)
+    val contesto = LocalContext.current
+    val calendario = Calendar.getInstance()
+    val visualizzaCalendario = DatePickerDialog(
+        contesto,
+        R.style.CustomDatePickerDialog,
+        { _, year, month, dayOfMonth ->
+            calendario.set(year, month, dayOfMonth)
+        },
+        calendario.get(Calendar.YEAR),
+        calendario.get(Calendar.MONTH),
+        calendario.get(Calendar.DAY_OF_MONTH)
+    )
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp
         ),
+        onClick = {
+            visualizzaCalendario.show()
+        },
         modifier = Modifier
             .size(width = 160.dp, height = 100.dp),
         colors = CardDefaults.outlinedCardColors(

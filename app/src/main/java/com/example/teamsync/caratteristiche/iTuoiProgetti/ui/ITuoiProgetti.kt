@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
@@ -84,7 +85,8 @@ import java.util.Locale
 fun ITuoiProgetti(
     navController: NavController,
     viewModelProgetto: ViewModelProgetto,
-    viewModelUtente: ViewModelUtente
+    viewModelUtente: ViewModelUtente,
+    viewModelLeMieAttivita: LeMieAttivitaViewModel
 ){
     var expended by remember {
         mutableStateOf(false)
@@ -94,6 +96,7 @@ fun ITuoiProgetti(
     }
     val aggiungiProgettoRiuscito = viewModelProgetto.aggiungiProgettoRiuscito.value
     val progetti by viewModelProgetto.progetti
+    val progettiCompletati by viewModelProgetto.progettiCompletati
 
     val utenteCorrenteId by viewModelProgetto.utenteCorrenteId
     val context = LocalContext.current
@@ -102,6 +105,7 @@ fun ITuoiProgetti(
     LaunchedEffect(Unit) {
         viewModelProgetto.utenteCorrenteId.value?.let {
             viewModelProgetto.caricaProgettiUtente(it, false)
+            viewModelProgetto.caricaProgettiCompletatiUtente(it)
         }
         Log.d("View", "utente corrente : ${viewModelProgetto.utenteCorrenteId.value}")
     }
@@ -135,6 +139,7 @@ fun ITuoiProgetti(
                                    expended = false
                                    utenteCorrenteId?.let {
                                        viewModelProgetto.caricaProgettiUtente(it, true)
+                                       viewModelProgetto.caricaProgettiCompletatiUtente(it)
                                    }
                                },
                                leadingIcon = {
@@ -226,7 +231,7 @@ fun ITuoiProgetti(
 
                Spacer(modifier = Modifier.height(16.dp))
 
-               SezioneITUoiProgetti(navController = navController, progetti = progetti, viewModelProgetto = viewModelProgetto)
+               SezioneITUoiProgetti(navController = navController, progetti = progetti, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
 
                Spacer(modifier = Modifier.height(16.dp))
 
@@ -236,11 +241,10 @@ fun ITuoiProgetti(
                        .fillMaxSize(),
                    horizontalArrangement = Arrangement.spacedBy(32.dp)
                ) {
-                   SezioneProgressiProgetti(progress = 0.55f, completedProjects = 3)
+                   SezioneProgressiProgetti(progettiCompletati = progettiCompletati.size, progettiUtente = progetti.size)
 
                    SezioneCalendario()
                }
-
            }
        }
    )
@@ -264,6 +268,7 @@ fun ITuoiProgetti(
             Toast.makeText(context, "Progetto aggiunto con successo", Toast.LENGTH_LONG).show()
             utenteCorrenteId?.let {
                 viewModelProgetto.caricaProgettiUtente(it, true)
+                viewModelProgetto.caricaProgettiCompletatiUtente(it)
             }
             viewModelProgetto.resetAggiugniProgettoRiuscito()
             mostraCreaProgettoDialog = false
@@ -578,7 +583,7 @@ fun AggiungiProgettoDialog(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewITuoiProgetti(){
-    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(), ViewModelUtente())
+    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(), ViewModelUtente(), viewModelLeMieAttivita = LeMieAttivitaViewModel())
 }
 @Preview(showSystemUi = true)
 @Composable

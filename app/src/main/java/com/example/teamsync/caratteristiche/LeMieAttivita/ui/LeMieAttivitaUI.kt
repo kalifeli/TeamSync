@@ -132,9 +132,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
     val partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
-    val progressione by viewModel.progressione.collectAsState()
-    val todoCompletate by viewModel.taskCompletate.collectAsState()
-    val todoNonCompletate by viewModel.taskNonCompletate.collectAsState()
+
     var expended by remember { mutableStateOf(false) }
     var mostraDialogAbbandono by remember { mutableStateOf(false) }
     var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
@@ -142,6 +140,10 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
     val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "cronologico" )) }
 
+    //Variabili per la progressBar
+    val progressione by viewModel.progressione.collectAsState()
+    val todoCompletate by viewModel.taskCompletate.collectAsState()
+    val todoTotali by viewModel.taskTotali.collectAsState()
 
     LaunchedEffect(Unit) {
         progetto_nome.value = viewmodelprogetto.getnome_progetto(id_prog)
@@ -418,7 +420,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     thickness = 2.dp
                 )
 
-                Card(progressione,todoCompletate,todoNonCompletate)
+                Card(progressione,todoCompletate,todoTotali)
 
                 Row(
                     modifier = Modifier

@@ -36,8 +36,8 @@ class LeMieAttivitaViewModel() : ViewModel() {
     val _taskCompletate = MutableStateFlow(0)
     val taskCompletate: StateFlow<Int> = _taskCompletate
 
-    val _taskNonCompletate = MutableStateFlow(0)
-    val taskNonCompletate: StateFlow<Int> = _taskNonCompletate
+    val _taskTotali = MutableStateFlow(0)
+    val taskTotali: StateFlow<Int> = _taskTotali
 
     private val _fileUri = MutableLiveData<Uri?>()
     val fileUri: LiveData<Uri?> get() = _fileUri
@@ -128,10 +128,10 @@ class LeMieAttivitaViewModel() : ViewModel() {
         erroreEditTask.value = null
     }
 
-    fun updateTaskNonCompletate(id: String) {
+    fun updateTaskTotali(id: String) {
         viewModelScope.launch {
             val completedTasks = repositoryLeMieAttivita.countAllTodo(id)
-            _taskNonCompletate.value = completedTasks
+            _taskTotali.value = completedTasks
         }
     }
 
@@ -172,7 +172,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
                 continuation.resume(appoggio)
                 updateProgress(progetto)
                 updateTaskCompletate(progetto)
-                updateTaskNonCompletate(progetto)
+                updateTaskTotali(progetto)
             }
         }
     }
@@ -195,7 +195,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
             leMieAttivitaNonCompletate = allTodo.filter { it.progetto == progetto && !it.completato }
             updateProgress(progetto)
             updateTaskCompletate(progetto)
-            updateTaskNonCompletate(progetto)
+            updateTaskTotali(progetto)
 
         }
     }
@@ -220,7 +220,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
                 leMieAttivitaCompletate = allTodo.filter { it.progetto == progetto && it.completato }
                 updateProgress(progetto)
                 updateTaskCompletate(progetto)
-                updateTaskNonCompletate(progetto)
+                updateTaskTotali(progetto)
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -251,7 +251,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
                 callback(completateAttivita)
                 updateProgress(progetto)
                 updateTaskCompletate(progetto)
-                updateTaskNonCompletate(progetto)
+                updateTaskTotali(progetto)
             }
         }
     }
@@ -358,23 +358,3 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

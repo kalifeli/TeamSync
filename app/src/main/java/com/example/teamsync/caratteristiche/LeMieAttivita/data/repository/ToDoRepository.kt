@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.data.repository
 
+import android.util.Log
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.data.models.Priorità
 import com.google.firebase.firestore.FirebaseFirestore
@@ -8,7 +9,6 @@ import java.util.Date
 
 
 class ToDoRepository {
-
     private val database = FirebaseFirestore.getInstance()
 
     suspend fun addTodo(titolo: String,
@@ -31,7 +31,6 @@ class ToDoRepository {
         database.collection("Todo").add(leMieAttivita).await()
     }
 
-
     suspend fun getAllTodo(progetto: String): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", false)
@@ -51,7 +50,6 @@ class ToDoRepository {
             .await()
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
     }
-
 
     suspend fun deleteTodo(id: String) {
         try {

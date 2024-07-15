@@ -219,7 +219,7 @@ fun MenuItem(icon: ImageVector, text: String, navController: NavHostController) 
 
                 .pointerInput(Unit) {
                     detectTapGestures(
-                        onTap = { navController.navigate("dettaglio_progetto/$text") }
+                        onTap = { navController.navigate("faq/$text") }
                     )
                 }
         )

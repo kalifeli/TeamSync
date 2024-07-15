@@ -47,7 +47,6 @@ import androidx.navigation.NavHostController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
-import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
@@ -359,7 +358,7 @@ fun ListaColleghi(
 @Composable
 fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel, id_task : String, id_prog: String, view_model_notifiche: ViewModelNotifiche) {
 
-    val notificheRepo = RepositoryNotifiche()
+
 
 
     var amicizia = false
@@ -432,7 +431,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                                 Log.d("IconClick", "Icona cliccata")
                                 val contenuto = (user_loggato?.nome + " " + (user_loggato?.cognome
                                     ?: "") + " " + "ti ha assegnato una task")
-                                notificheRepo.creaNotifica(
+                                view_model_notifiche.creaNotificaViewModel(
                                     utente.id,
                                     utente.id ?: "",
                                     "Assegnazione_Task",

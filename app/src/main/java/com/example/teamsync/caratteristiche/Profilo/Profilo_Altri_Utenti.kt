@@ -51,6 +51,7 @@ import coil.request.ImageRequest
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.ProfiloAmici.StatBox
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
@@ -63,7 +64,7 @@ import com.example.teamsync.util.ThemePreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostController, id: String, amicizia: String, provenienza: String, notificheRepo : RepositoryNotifiche, task: String, progetto : String, viewModelprogetto: ViewModelProgetto ) {
+fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostController, id: String, amicizia: String, provenienza: String, notificheRepo : RepositoryNotifiche, task: String, progetto : String, viewModelprogetto: ViewModelProgetto, viewModelNotifiche: ViewModelNotifiche ) {
 
 
     var viewModelTodo = LeMieAttivitaViewModel()
@@ -160,7 +161,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                     ?: "") + " " + "ti ha inviato una richiesta di amicizia"
 
                 if (userProfile != null) {
-                    notificheRepo.creaNotifica(
+                    viewModelNotifiche.creaNotificaViewModel(
                         userProfile!!.id,
                         profile?.id ?: "",
                         "Richiesta_Amicizia",
@@ -181,7 +182,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                     ?: "") + " " + "ha accettato la tua richiesta di amicizia"
 
                 if (userProfile != null) {
-                    notificheRepo.creaNotifica(
+                    viewModelNotifiche.creaNotificaViewModel(
                         userProfile!!.id,
                         profile?.id ?: "",
                         "Accetta_Amicizia",
@@ -230,7 +231,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                         navController.navigate("task_selezionata/${task}/${progetto}")
                                     }
                                     if(provenienza == "progetto"){
-                                        navController.navigate("progetto_da_accettare/${progetto}")
+                                        navController.navigate("progetto_da_accettare/${progetto}/progetto")
                                     }
                                     else {
                                         navController.navigate(Schermate.Profilo.route)
@@ -490,7 +491,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                     .padding(horizontal = 16.dp),
                                 onClick =
                                 { avvia_notifica = true
-                                    navController.navigate("progetto_da_accettare/${progetto}")
+                                    navController.navigate("progetto_da_accettare/${progetto}/progetto")
                                 },
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
@@ -530,8 +531,8 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                     viewModel.getUserProfile()
                                     if (provenienza == "profilo")
                                         navController.navigate(Schermate.Profilo.route)
-                                    if( provenienza == "profilo")
-                                        navController.navigate("progetto_da_accettare/${progetto}")
+                                    if( provenienza == "progetto")
+                                        navController.navigate("progetto_da_accettare/${progetto}/progetto")
                                     if (provenienza == "task")
                                         navController.navigate("task_selezionata/${task}/${progetto}")
                                 }
@@ -599,7 +600,7 @@ fun AddTodoDialog(
 ) {
     val viewModelProgetto = remember { ViewModelProgetto() }
     val viewModel = remember { ViewModelUtente() }
-    val notificheRepo = remember { RepositoryNotifiche() }
+    val viewModelNotifiche = remember { ViewModelNotifiche() }
 
     var isLoading by remember { mutableStateOf(true) }
     var progetti by remember { mutableStateOf<List<Progetto>>(emptyList()) }
@@ -635,12 +636,14 @@ fun AddTodoDialog(
                                             ?: "") + " " + (viewModel.userProfile?.cognome
                                             ?: "") + " ti ha invitato in un progetto"
                                         if (viewModel.userProfile != null) {
-                                            notificheRepo.creaNotifica(
+                                            (
+                                                    viewModelNotifiche.creaNotificaViewModel(
                                                 viewModel.userProfile!!.id,
                                                 profile?.id ?: "",
                                                 "Richiesta_Progetto",
                                                 contenuto,
                                                 progetto.id.toString()
+                                                    )
                                             )
                                         }
                                     }

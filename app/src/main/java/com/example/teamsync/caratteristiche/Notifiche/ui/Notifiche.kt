@@ -57,7 +57,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.Notifiche.data.model.Notifiche
-import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
@@ -259,7 +258,6 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
     val apertura = remember { mutableStateOf(false) }
     val viewmodelUtente = ViewModelUtente()
     val viewmodelProgetto = ViewModelProgetto()
-    val repoNotifiche = RepositoryNotifiche()
     var listap by remember { mutableStateOf<List<String>?>(emptyList()) }
     var nomeProgetto by remember { mutableStateOf("") }
     val isLoading by viewmodelProgetto.carica_nome.collectAsState()
@@ -302,7 +300,7 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
                 when (notifica.Tipo) {
                     "Richiesta_Amicizia" -> navController.navigate("utente/${notifica.mittente}/false/notifica/2/0")
                     "Accetta_Amicizia" -> navController.navigate(Schermate.Profilo.route)
-                    "Richiesta_Progetto" -> navController.navigate("progetto_da_accettare/${notifica.progetto_id}")
+                    "Richiesta_Progetto" -> navController.navigate("progetto_da_accettare/${notifica.progetto_id}/notifiche")
                     "Assegnazione_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
                     "Entra_Progetto" -> navController.navigate("progetto/${notifica.progetto_id}")
                     "Completamento_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
@@ -381,7 +379,7 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
                                         { var contenuto = viewmodelUtente.userProfile?.nome + " " + (viewmodelUtente.userProfile?.cognome
                                             ?: "") + " " + "è entrato nel progetto " + nomeProgetto
                                             viewmodelUtente.userProfile?.id?.let {
-                                                repoNotifiche.creaNotifica(
+                                                vmNotifiche.creaNotificaViewModel(
                                                     it,
                                                     p.toString(),
                                                     "Entra_Progetto",
@@ -410,7 +408,7 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
                                                 val contenuto = (viewmodelUtente.userProfile?.nome ?: "") + " " + (viewmodelUtente.userProfile?.cognome ?: "") + " " + "ha accettato la tua richiesta di amicizia"
 
                                                 if (viewmodelUtente.userProfile != null) {
-                                                    repoNotifiche.creaNotifica(
+                                                    vmNotifiche.creaNotificaViewModel(
                                                         viewmodelUtente.userProfile!!.id,
                                                         notifica.mittente,
                                                         "Accetta_Amicizia",

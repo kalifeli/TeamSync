@@ -90,7 +90,7 @@ import androidx.navigation.NavHostController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
-import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
@@ -111,11 +111,10 @@ import java.util.Locale
 @SuppressLint("StateFlowValueCalledInComposition")
 @ExperimentalMaterial3Api
 @Composable
-fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaViewModel, viewModelUtente: ViewModelUtente, viewmodelprogetto: ViewModelProgetto,  id_prog: String) {
+fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaViewModel, viewModelUtente: ViewModelUtente, viewmodelprogetto: ViewModelProgetto,  id_prog: String, viewModelNotifiche: ViewModelNotifiche) {
     viewModel.getTodoByProject(id_prog)
     viewModel.getTodoCompletateByProject(id_prog)
     viewModelUtente.getUserProfile()
-    val repoNotifiche = RepositoryNotifiche()
     val utente = viewModelUtente.userProfile
     val coroutineScope = rememberCoroutineScope()
     var addTodoDialog by remember { mutableStateOf(false) }
@@ -260,7 +259,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                 openDialog.value = false
             },
             navController,
-            progettoNome = progetto_nome.value
+            progettoNome = progetto_nome.value,
+            viewModelNotifiche = viewModelNotifiche
 
 
         )
@@ -281,7 +281,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         {
                             var contenuto = (viewModelUtente.userProfile?.nome ?: " ") + " " + (viewModelUtente.userProfile?.cognome
                                 ?: " ") + " ha completato una task del progetto: " + progetto_nome.value
-                            repoNotifiche.creaNotifica(viewModelUtente.userProfile?.id ?: " ",p,"Completamento_Task", contenuto, id_prog)
+                            viewModelNotifiche.creaNotificaViewModel(viewModelUtente.userProfile?.id ?: " ",p,"Completamento_Task", contenuto, id_prog)
                         }
                     }
                 }
@@ -346,7 +346,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 text = { Text(text = "Info Progetto") },
                                 onClick = {
                                     expended = false
-                                    navController.navigate("progetto_da_accettare/${id_prog}")
+                                    navController.navigate("progetto_da_accettare/${id_prog}/progetto")
                                 },
                                 leadingIcon = { Icon(Icons.Default.Info, contentDescription = "informazioni progetto")},
                                 modifier = Modifier.background(Grey20)
@@ -838,7 +838,7 @@ fun EditTodoDialog(
     navController: NavHostController,
     viewModel: LeMieAttivitaViewModel = LeMieAttivitaViewModel(),
     viewModelUtente: ViewModelUtente = ViewModelUtente(),
-    repoNotifiche: RepositoryNotifiche = RepositoryNotifiche(),
+    viewModelNotifiche: ViewModelNotifiche,
     progettoNome: String
 ) {
     var titolo by remember { mutableStateOf(todoItem.titolo) }
@@ -971,7 +971,7 @@ fun EditTodoDialog(
                         for (p1 in updatedTodo.utenti) {
                             if (p1 != viewModelUtente.userProfile?.id) {
                                 val contenuto = "${viewModelUtente.userProfile?.nome ?: " "} ${viewModelUtente.userProfile?.cognome ?: " "} ha modificato la vostra task: ${updatedTodo.titolo} del progetto: $progettoNome"
-                                repoNotifiche.creaNotifica(viewModelUtente.userProfile?.id ?: " ", p1, "Modifica_Task", contenuto, updatedTodo.progetto)
+                                viewModelNotifiche.creaNotificaViewModel(viewModelUtente.userProfile?.id ?: " ", p1, "Modifica_Task", contenuto, updatedTodo.progetto)
                             }
                         }
                     }

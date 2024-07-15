@@ -48,10 +48,12 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
+import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import java.text.SimpleDateFormat
@@ -61,19 +63,20 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, view_model_prog: ViewModelProgetto, id_prog : String, viewNotifiche: RepositoryNotifiche) {
+fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, view_model_prog: ViewModelProgetto, id_prog : String, viewNotifiche: ViewModelNotifiche, provenienza : String) {
 
     val searchQuery by remember { mutableStateOf("") }
     var progetto_ by remember { mutableStateOf<Progetto?>(null) }
     var listap by remember { mutableStateOf<List<String>?>(emptyList()) }
     //var mostraPulsante by remember { mutableStateOf(true) }
     var nomeProgetto by remember { mutableStateOf("") }
-    val progettiUtente = view_model_prog.progetti.value
-    var mostraPulsante = !(view_model_prog.utentePartecipa(progettiUtente = progettiUtente,id_prog))
+
+
+
     LaunchedEffect(Unit) {
         viewModel.getUserProfile()
         progetto_ = view_model_prog.get_progetto_by_id(id_prog)
-        listap =  view_model_prog.getLista_Partecipanti(id_prog)
+        listap = view_model_prog.getLista_Partecipanti(id_prog)
 
         nomeProgetto = view_model_prog.getnome_progetto(id_prog)
 
@@ -92,87 +95,62 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {navController.popBackStack()}) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "icona indietro", tint = Color.Black)
+                    IconButton(onClick = {
+
+                        when(provenienza){
+                            "notifiche" -> navController.navigate(Schermate.Notifiche.route)
+                            "progetto" -> navController.navigate("progetto/${id_prog}")
+                        }
+
+
+                    }) {
+                        Icon(
+                            Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "icona indietro",
+                            tint = Color.Black
+                        )
                     }
                 }
             )
         }
-    ){ padding ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
         ) {
+
+
             ProfiloProgetto(
-                viewModel,
-                view_model_prog,
-                navController,
-                id_prog
-            )
+                        viewModel,
+                        view_model_prog,
+                        navController,
+                        id_prog
+                    )
             Spacer(modifier = Modifier.height(16.dp))
 
-            ListaColleghi(
-                viewModel,
-                navController,
-                searchQuery,
-                viewModel_att,
-                view_model_prog,
-                id_prog
-            )
-
-            if (mostraPulsante) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .padding(horizontal = 16.dp),
-                    onClick =
-                    {
-                        view_model_prog.aggiungiPartecipanteAlProgetto(
-                            id_prog,
-                            viewModel.userProfile?.id ?: ""
-                        )
-                        for (p in listap!!) {
-                            if(p != viewModel.userProfile?.id)
-                            {
-                                val contenuto =
-                                    viewModel.userProfile?.nome + " " + (viewModel.userProfile?.cognome
-                                        ?: "") + " " + "è entrato nel progetto " + nomeProgetto
-                                viewModel.userProfile?.id?.let {
-                                    viewNotifiche.creaNotifica(
-                                        it,
-                                        p,
-                                        "Entra_Progetto",
-                                        contenuto,
-                                        id_prog
-                                    )
-                                }
-                            }
 
 
-                        }
-
-                        mostraPulsante = false
-                    },
-                    shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Blue, // Cambia il colore di sfondo del pulsante
-                        contentColor = Color.White
-                    )
+            listap?.let {
+                ListaColleghi(
+                    viewModel,
+                    navController,
+                    searchQuery,
+                    viewModel_att,
+                    view_model_prog,
+                    id_prog,
+                    it,
+                    nomeProgetto,
+                    viewNotifiche
                 )
-                {
-                    Text(
-                        text = "Entra nel progetto",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    )
+            }
+
+
                 }
             }
         }
-    }
-}
+
 
 
 @Composable
@@ -233,7 +211,10 @@ fun ListaColleghi(
     searchQuery: String,
     viewModel_att: LeMieAttivitaViewModel,
     viewModel_Prog : ViewModelProgetto,
-    id_progetto : String
+    id_progetto : String,
+    listap : List<String>,
+    nomeProgetto : String,
+    viewNotifiche: ViewModelNotifiche
 ) {
     val userProfile = viewModel.userProfile
     var amici by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -241,9 +222,14 @@ fun ListaColleghi(
 
     val cache = remember { mutableStateMapOf<String, ProfiloUtente?>() } // Utilizzo di mutableStateMapOf per la cache
 
-    var lista_ricerca by remember { mutableStateOf<List<String>>(emptyList()) }
-    var mostra_ricerca by remember { mutableStateOf(false) }
     var visualizza_amici by remember { mutableStateOf(true) }
+    val progettiUtente = viewModel_Prog.progetti.value
+
+
+    var mostraPulsante = remember {
+        mutableStateOf( !(viewModel_Prog.utentePartecipa(progettiUtente = progettiUtente, id_progetto)))
+    }
+
 
     LaunchedEffect(Unit) {
         if (userProfile != null) {
@@ -308,69 +294,64 @@ fun ListaColleghi(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+
             }
-        }
-    }
 
-    LaunchedEffect(searchQuery) {
-        if (searchQuery.isNotBlank()) {
-            viewModel.filterAmici(searchQuery) { risultati ->
-                visualizza_amici = false
-                mostra_ricerca = true
-                lista_ricerca = risultati
+
             }
-        } else if (searchQuery == ""){
-            visualizza_amici = true
-            mostra_ricerca = false
-        }
-        else{
-            visualizza_amici = true
-            mostra_ricerca = false
+        if (mostraPulsante.value) {
 
-        }
-    }
-    if (mostra_ricerca) {
-        LazyColumn {
-            items(lista_ricerca) { amico ->
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .padding(horizontal = 16.dp),
+                onClick =
+                {
+                    viewModel_Prog.aggiungiPartecipanteAlProgetto(
+                        id_progetto,
+                        viewModel.userProfile?.id ?: ""
+                    )
+                    for (p in listap!!) {
+                        if (p != viewModel.userProfile?.id) {
+                            val contenuto =
+                                viewModel.userProfile?.nome + " " + (viewModel.userProfile?.cognome
+                                    ?: "") + " " + "è entrato nel progetto " + nomeProgetto
+                            viewModel.userProfile?.id?.let {
+                                viewNotifiche.creaNotificaViewModel(
+                                    it,
+                                    p,
+                                    "Entra_Progetto",
+                                    contenuto,
+                                    id_progetto
+                                )
+                            }
+                        }
 
-                var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
 
-
-                if (cache.contains(amico)) {
-                    user_amico = cache[amico]
-                } else {
-
-                    viewModel.ottieni_utente(amico) { profile ->
-                        user_amico = profile
-                        cache[amico] = profile // Aggiungi il profilo alla cache
-                        Log.d("Singolo Collega", "Dati: $user_amico")
                     }
 
-
-                }
-
-                user_amico?.let { collega ->
-                    CollegaItem(
-                        collega,
-                        color = Red70,
-                        navController,
-                        userProfile,
-                        true,
-                        viewModel_att,
-                        id_progetto
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
+                    mostraPulsante.value = false
+                },
+                shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                    containerColor = Red70, // Cambia il colore di sfondo del pulsante
+                    contentColor = Color.White
+                )
+            )
+            {
+                Text(
+                    text = "Entra nel progetto",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
             }
+        }
         }
     }
 
 
 
-
-
-}
 
 
 @Composable
@@ -406,7 +387,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 .padding(16.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.logo_teamsync),
+                painter = painterResource(id = R.drawable.logo_white),
                 contentDescription = null,
 
                 modifier = Modifier

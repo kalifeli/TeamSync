@@ -64,7 +64,6 @@ import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
-import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
 
@@ -534,7 +533,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
     ) {
 
         Icon(
-            painter = painterResource(id = R.drawable.logo_teamsync),
+            painter = painterResource(id = R.drawable.logo_white ),
             contentDescription = null,
             modifier = Modifier
                 .size(32.dp)

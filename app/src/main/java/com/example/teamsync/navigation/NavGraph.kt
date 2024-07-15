@@ -46,12 +46,11 @@ import com.example.teamsync.screen.UserProfileScreen
 @Composable
 fun NavGraph(){
     val navController = rememberNavController()
-
-
     val viewModelUtente = ViewModelUtente()
     val viewModelProgetto = ViewModelProgetto()
     val viewModelLeMieAttivita = LeMieAttivitaViewModel()
     val viewModelNotifiche = ViewModelNotifiche()
+
     NavHost(navController = navController, startDestination = Schermate.Login.route) {
 
         composable(route = Schermate.Registrazione.route){ Registrazione(navController,viewModelUtente)}
@@ -104,13 +103,14 @@ fun NavGraph(){
         }
 
         composable(
-            route = "dettaglio_progetto/{sezioneFaq}",
+            route = "faq/{sezioneFaq}",
             arguments = listOf(navArgument("sezioneFaq") { type = NavType.StringType })
         ) { backStackEntry ->
             // Recupera il parametro projectId dalla rotta
             val projectId = backStackEntry.arguments?.getString("sezioneFaq")
             Faq(navController = navController, sezioneFaq = projectId ?: "")
         }
+
 
         composable(
             route = "utente/{id}/{amicizia}/{provenienza}/{id_task}/{id_progetto}",
@@ -133,12 +133,13 @@ fun NavGraph(){
                 if (provenienza != null) {
                     if (task != null) {
                         if (pro != null) {
-                            ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, progetto = pro,viewModelProgetto)
+                            ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, progetto = pro,viewModelProgetto, viewModelNotifiche)
                         }
                     }
                 }
             }
         }
+
 
         composable(
             route = "task_selezionata/{id_task}/{id_prog}",
@@ -175,26 +176,33 @@ fun NavGraph(){
             val projectId = backStackEntry.arguments?.getString("id_prog")
 
             if (projectId != null) {
-                LeMieAttivitaUI(navController, viewModelLeMieAttivita,viewModelUtente,viewModelProgetto,projectId)
+                LeMieAttivitaUI(navController, viewModelLeMieAttivita,viewModelUtente,viewModelProgetto,projectId, viewModelNotifiche)
             }
         }
 
         composable(
-            route = "progetto_da_accettare/{id_prog}",
-            arguments = listOf(navArgument("id_prog") { type = NavType.StringType })
+            route = "progetto_da_accettare/{id_prog}/{provenienza}",
+            arguments = listOf(
+                navArgument("id_prog") { type = NavType.StringType },
+                navArgument("provenienza") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
-            // Recupera il parametro projectId dalla rotta
+
             val projectId = backStackEntry.arguments?.getString("id_prog")
+            val provenienza = backStackEntry.arguments?.getString("provenienza")
 
             if (projectId != null) {
-                Progetto(
-                    viewModel = viewModelUtente,
-                    navController = navController,
-                    viewModel_att = viewModelLeMieAttivita,
-                    view_model_prog = viewModelProgetto,
-                    id_prog = projectId,
-                    viewNotifiche = RepositoryNotifiche()
-                )
+                if (provenienza != null) {
+                    Progetto(
+                        viewModel = viewModelUtente,
+                        navController = navController,
+                        viewModel_att = viewModelLeMieAttivita,
+                        view_model_prog = viewModelProgetto,
+                        id_prog = projectId,
+                        viewNotifiche = viewModelNotifiche,
+                        provenienza = provenienza,
+                    )
+                }
             }
         }
 

@@ -96,6 +96,17 @@ class ViewModelNotifiche : ViewModel() {
         }
     }
 
+    fun creaNotificaViewModel(mittenteId: String, destinatarioId: String, tipo: String, contenuto: String, progetto: String) {
+        viewModelScope.launch {
+            try {
+                repositoryNotifiche.creaNotifica(mittenteId, destinatarioId, tipo, contenuto, progetto)
+            } catch (e: Exception) {
+                println("Eccezione durante la creazione della notifica nel ViewModel: $e")
+
+            }
+        }
+    }
+
 
     fun cambiaStato_Accettato_Notifica(notificaId: String) {
         viewModelScope.launch {

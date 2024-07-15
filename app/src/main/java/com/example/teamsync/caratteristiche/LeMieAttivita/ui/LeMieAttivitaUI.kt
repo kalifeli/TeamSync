@@ -140,7 +140,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
-    val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "cronologico" )) }
+
+    val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "creazione" )) }
 
     LaunchedEffect(Unit) {
         progetto_nome.value = viewmodelprogetto.getnome_progetto(id_prog)
@@ -340,7 +341,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 text = { Text(text = "Info Progetto") },
                                 onClick = {
                                     expended = false
-                                    navController.navigate("progetto_da_accettare/${id_prog}/progetto")
+                                    navController.navigate("progetto_da_accettare/${id_prog}/progetto/progetto")
                                 },
                                 leadingIcon = { Icon(Icons.Default.Info, contentDescription = "informazioni progetto")},
                                 modifier = Modifier.background(Grey20)
@@ -664,6 +665,8 @@ fun TodoItem
         var lista_utenti by remember { mutableStateOf("") }
         val modifica = remember {mutableStateOf(false) }
 
+
+
         LaunchedEffect(item.utenti) {
             lista_utenti = ""
             val size = item.utenti.size
@@ -699,27 +702,30 @@ fun TodoItem
             modifier = Modifier
                 .align(Alignment.CenterVertically)
         ) {
-            if (!item.completato)
-            {
-                IconButton(onClick = {
-                    onComplete(item)
-
-                })
-                {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Completata",
-                        tint = Green50,
-                        modifier = Modifier.size(15.dp)
-                    )
+            if (modifica.value) {
+                if (!item.completato) {
+                    IconButton(onClick = {
+                        onComplete(item)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Completata",
+                            tint = Green50,
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                } else {
+                    IconButton(onClick = { onComplete(item) }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Non Completata",
+                            tint = Red70,
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
                 }
-            }else {
-                IconButton(onClick = { onComplete(item) }) {
-                    Icon(imageVector = Icons.Default.Clear,
-                        contentDescription = "Non Completata",
-                        tint = Red70,
-                        modifier = Modifier.size(15.dp))
-                }
+            } else {
+                Spacer(modifier = Modifier.size(50.dp))
             }
         }
         Column(modifier = Modifier

@@ -489,14 +489,6 @@ fun ListaColleghi(
     }
 }
 
-
-
-
-
-
-
-
-
 @Composable
 fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, y : String) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
@@ -513,8 +505,6 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
 
     }
 
-
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -525,7 +515,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 detectTapGestures(
                     onTap = {
 
-                        navController.navigate("utente/${utente.id}/${amicizia}/profilo/0/0")
+                        navController.navigate("utente/${utente.id}/${amicizia}/profilo/0/0/profilo")
 
                     }
                 )

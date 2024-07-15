@@ -233,17 +233,19 @@ class ViewModelProgetto : ViewModel() {
     }
 
 
+
+
     suspend fun getProgettiUtenteByIdUtente(
-        userId: String,
-        callback: (List<Progetto>?, String?) -> Unit
-    ) {
-        try {
-            val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
-            callback(progettiUtente, null)
-        } catch (e: Exception) {
-            callback(null, "Errore durante il recupero dei progetti: ${e.message}")
-        }
-    }
+                userId: String,
+                callback: (List<Progetto>, String?) -> Unit
+            ) {
+                try {
+                    val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
+                    callback(progettiUtente, null)
+                } catch (e: Exception) {
+                    callback(emptyList(), "Errore durante il recupero dei progetti: ${e.message}")
+                }
+            }
 
     fun creaProgetto(
         nome: String,
@@ -314,18 +316,34 @@ class ViewModelProgetto : ViewModel() {
         }
     }
 
-    // Questa funzione consente ad un utente di abbandonare un progetto
-    fun abbandonaProgetto(userId: String?, progettoId: String) {
+            // Questa funzione consente ad un utente di abbandonare un progetto
+            fun abbandonaProgetto(userId: String?, progettoId: String) {
+                viewModelScope.launch {
+                    try {
+                        repositoryProgetto.abbandonaProgetto(userId, progettoId) { vuoto ->
+                            if (vuoto)
+                                elimina_notifiche(progettoId)
+
+                        erroreAbbandonaProgetto.value = null
+
+                    }
+                    } catch (e: Exception) {
+                        erroreAbbandonaProgetto.value =
+                            "Si è verificato un errore. Per favore riprovare"
+                    }
+                }
+            }
+
+    fun elimina_notifiche(progettoId: String) {
         viewModelScope.launch {
             try {
-                repositoryProgetto.abbandonaProgetto(userId, progettoId)
-                erroreAbbandonaProgetto.value = null
+                repositoryProgetto.eliminaNotificheDelProgetto(progettoId)
             } catch (e: Exception) {
-                erroreAbbandonaProgetto.value =
-                    "Si è verificato un errore. Per favore riprovare"
+                Log.e("ViewModelProgetto", "Errore durante l'eliminazione delle notifiche", e)
             }
         }
     }
+
 
     // Questa funzione ha il compito di verificare se un progetto è scaduto tornando un valore booleano. True nel caso in cui il progetto è scaduto, altrimenti False.
     fun progettoScaduto(progetto: Progetto): Boolean = progetto.dataScadenza < Date()

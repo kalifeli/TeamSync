@@ -97,7 +97,7 @@ class RepositoryProgetto {
      * Funzione che permette a un utente di abbandonare un progetto.
      *
      * @param userId L'ID dell'utente che vuole abbandonare il progetto. Può essere null, ma in tal caso la funzione non farà nulla.
-     * @param progettoId L'ID del progetto che l'utente vuole abbandonare. Può essere null, ma in tal caso la funzione non farà nulla.
+     * @pxaram progettoId L'ID del progetto che l'utente vuole abbandonare. Può essere null, ma in tal caso la funzione non farà nulla.
      *
      * La funzione utilizza Firestore per rimuovere l'utente dalla lista dei partecipanti del progetto specificato.
      * Se uno dei parametri è null, il documento del progetto non sarà aggiornato.
@@ -105,17 +105,26 @@ class RepositoryProgetto {
      *
      * @throws Exception Se si verifica un errore durante l'aggiornamento del documento su Firestore, l'eccezione sarà rilanciata.
      */
-    suspend fun abbandonaProgetto(userId: String?, progettoId: String) {
+
+    suspend fun abbandonaProgetto(userId: String?, progettoId: String, callback: (Boolean) -> Unit) {
         try {
             val progettoRef = firestore.collection("progetti").document(progettoId)
             progettoRef.update("partecipanti", FieldValue.arrayRemove(userId)).await()
-            if (getPartecipantiDelProgetto(progettoId).isEmpty()) {
+            val listaPartecipanti = getPartecipantiDelProgetto(progettoId)
+            if (listaPartecipanti.isEmpty())
+            {
                 eliminaProgetto(progettoId)
+                callback(listaPartecipanti.isEmpty())
+
             }
         } catch (e: Exception) {
             throw e
         }
     }
+
+
+
+
 
     /**
      * Funzione che recupera l'utente attualmente autenticato.
@@ -208,9 +217,29 @@ class RepositoryProgetto {
 
     private fun eliminaProgetto(progettoId: String) {
         try {
+
             firestore.collection("progetti")
                 .document(progettoId)
                 .delete()
+
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun eliminaNotificheDelProgetto(progettoId: String) {
+        try {
+            // Ottieni tutte le notifiche associate al progetto
+            val querySnapshot = firestore.collection("Notifiche")
+                .whereEqualTo("progetto_id", progettoId)
+                .get()
+                .await()
+
+            // Itera su tutte le notifiche e elimina ciascuna
+            for (document in querySnapshot.documents) {
+                val notificaId = document.id
+                firestore.collection("Notifiche").document(notificaId).delete().await()
+            }
         } catch (e: Exception) {
             throw e
         }

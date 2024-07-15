@@ -20,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,7 +48,6 @@ import androidx.navigation.NavHostController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
-import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
@@ -63,7 +63,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, view_model_prog: ViewModelProgetto, id_prog : String, viewNotifiche: ViewModelNotifiche, provenienza : String) {
+fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, view_model_prog: ViewModelProgetto, id_prog : String, viewNotifiche: ViewModelNotifiche, provenienza : String, sottoprovenienza: String) {
 
     val searchQuery by remember { mutableStateOf("") }
     var progetto_ by remember { mutableStateOf<Progetto?>(null) }
@@ -97,10 +97,17 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
                 navigationIcon = {
                     IconButton(onClick = {
 
-                        when(provenienza){
+                        when (provenienza) {
                             "notifiche" -> navController.navigate(Schermate.Notifiche.route)
-                            "progetto" -> navController.navigate("progetto/${id_prog}")
+                            "progetto" -> {
+                                when (sottoprovenienza) {
+                                    "progetto"->navController.navigate("progetto/${id_prog}")
+                                    "notifiche"->navController.navigate(Schermate.Notifiche.route)
+
+                                }
+                            }
                         }
+
 
 
                     }) {
@@ -142,7 +149,9 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
                     id_prog,
                     it,
                     nomeProgetto,
-                    viewNotifiche
+                    viewNotifiche,
+                    sottoprovenienza,
+                    provenienza
                 )
             }
 
@@ -214,27 +223,50 @@ fun ListaColleghi(
     id_progetto : String,
     listap : List<String>,
     nomeProgetto : String,
-    viewNotifiche: ViewModelNotifiche
+    viewNotifiche: ViewModelNotifiche,
+    sottoprovenienza : String,
+    provenienza: String
 ) {
     val userProfile = viewModel.userProfile
     var amici by remember { mutableStateOf<List<String>>(emptyList()) }
     val task by remember { mutableStateOf<LeMieAttivita?>(null) }
 
     val cache = remember { mutableStateMapOf<String, ProfiloUtente?>() } // Utilizzo di mutableStateMapOf per la cache
-
     var visualizza_amici by remember { mutableStateOf(true) }
-    val progettiUtente = viewModel_Prog.progetti.value
-
-
     var mostraPulsante = remember {
-        mutableStateOf( !(viewModel_Prog.utentePartecipa(progettiUtente = progettiUtente, id_progetto)))
+        mutableStateOf(false)
     }
+    var caricamento_tasto =  remember{
+        mutableStateOf(true)
+    }
+
+
+
+
+
+
+
+
 
 
     LaunchedEffect(Unit) {
         if (userProfile != null) {
             amici = viewModel_Prog.getLista_Partecipanti(id_progetto,userProfile.id)
         }
+        userProfile?.let {
+            viewModel_Prog.getProgettiUtenteByIdUtente(it.id) { progetti, id ->
+                mostraPulsante.value = !(viewModel_Prog.utentePartecipa(progetti,id_progetto))
+                Log.d("utente", "valore: ${viewModel.userProfile?.id}")
+                Log.d("lista", "valore: $progetti")
+                Log.d("progetto da controllare", "valore: $id_progetto")
+                Log.d("mostra pulsante1", "Dati: ${!(viewModel_Prog.utentePartecipa(progettiUtente = progetti, id_progetto))}")
+                Log.d("mostra pulsante2", "valore: $mostraPulsante")
+                caricamento_tasto.value = false
+
+            }
+
+        }
+
     }
     // Utilizzo di LaunchedEffect per gestire il cambio di stato di amici
     LaunchedEffect(userProfile) {
@@ -289,7 +321,9 @@ fun ListaColleghi(
                             userProfile,
                             partecipa,
                             viewModel_att,
-                            id_progetto
+                            id_progetto,
+                            sottoprovenienza,
+                            provenienza
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -299,52 +333,57 @@ fun ListaColleghi(
 
 
             }
-        if (mostraPulsante.value) {
+        if (caricamento_tasto.value) {
+            CircularProgressIndicator(color = Color.Black)
+        }
+        else {
+            if (mostraPulsante.value) {
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .padding(horizontal = 16.dp),
-                onClick =
-                {
-                    viewModel_Prog.aggiungiPartecipanteAlProgetto(
-                        id_progetto,
-                        viewModel.userProfile?.id ?: ""
-                    )
-                    for (p in listap!!) {
-                        if (p != viewModel.userProfile?.id) {
-                            val contenuto =
-                                viewModel.userProfile?.nome + " " + (viewModel.userProfile?.cognome
-                                    ?: "") + " " + "è entrato nel progetto " + nomeProgetto
-                            viewModel.userProfile?.id?.let {
-                                viewNotifiche.creaNotificaViewModel(
-                                    it,
-                                    p,
-                                    "Entra_Progetto",
-                                    contenuto,
-                                    id_progetto
-                                )
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(70.dp)
+                        .padding(horizontal = 16.dp),
+                    onClick =
+                    {
+                        viewModel_Prog.aggiungiPartecipanteAlProgetto(
+                            id_progetto,
+                            viewModel.userProfile?.id ?: ""
+                        )
+                        for (p in listap!!) {
+                            if (p != viewModel.userProfile?.id) {
+                                val contenuto =
+                                    viewModel.userProfile?.nome + " " + (viewModel.userProfile?.cognome
+                                        ?: "") + " " + "è entrato nel progetto " + nomeProgetto
+                                viewModel.userProfile?.id?.let {
+                                    viewNotifiche.creaNotificaViewModel(
+                                        it,
+                                        p,
+                                        "Entra_Progetto",
+                                        contenuto,
+                                        id_progetto
+                                    )
+                                }
                             }
+
+
                         }
 
-
-                    }
-
-                    mostraPulsante.value = false
-                },
-                shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = Red70, // Cambia il colore di sfondo del pulsante
-                    contentColor = Color.White
+                        mostraPulsante.value = false
+                    },
+                    shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Red70, // Cambia il colore di sfondo del pulsante
+                        contentColor = Color.White
+                    )
                 )
-            )
-            {
-                Text(
-                    text = "Entra nel progetto",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
+                {
+                    Text(
+                        text = "Entra nel progetto",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 12.dp)
+                    )
+                }
             }
         }
         }
@@ -355,9 +394,10 @@ fun ListaColleghi(
 
 
 @Composable
-fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel,  id_prog: String) {
+fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean,
+                viewModel_att: LeMieAttivitaViewModel,  id_prog: String, sottoprovenienza : String, provenienza: String) {
 
-    val notificheRepo = RepositoryNotifiche()
+
 
     LaunchedEffect(utente.id) {
         println("l'utente è cambiato " + utente.id)
@@ -368,9 +408,10 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
         amicizia = true
 
     }
-
+    Log.d("Amici?", "Dati: $amicizia")
     ElevatedCard(
-        onClick = {navController.navigate("utente/${utente.id}/${amicizia}/progetto/1/${id_prog}")},
+        onClick = {
+            navController.navigate("utente/${utente.id}/${amicizia}/${provenienza}/1/${id_prog}/${sottoprovenienza}")},
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 8.dp
         ),

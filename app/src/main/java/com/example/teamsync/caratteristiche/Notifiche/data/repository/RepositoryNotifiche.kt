@@ -11,8 +11,6 @@ import java.util.UUID
 
 
 class RepositoryNotifiche {
-
-
     suspend fun getNotifiche(): List<Notifiche> {
         val db = FirebaseFirestore.getInstance()
         val notificheList = mutableListOf<Notifiche>()
@@ -33,7 +31,6 @@ class RepositoryNotifiche {
     }
 
     private val firestore: FirebaseFirestore = Firebase.firestore
-
 
     fun creaNotifica(mittenteId: String, destinatarioId: String, tipo: String, contenuto: String, progetto: String) {
         try {

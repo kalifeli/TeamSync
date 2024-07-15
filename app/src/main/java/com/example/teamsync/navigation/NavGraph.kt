@@ -113,13 +113,14 @@ fun NavGraph(){
 
 
         composable(
-            route = "utente/{id}/{amicizia}/{provenienza}/{id_task}/{id_progetto}",
+            route = "utente/{id}/{amicizia}/{provenienza}/{id_task}/{id_progetto}/{sottoprovenienza}",
             arguments = listOf(
                 navArgument("id") { type = NavType.StringType },
                 navArgument("amicizia") { type = NavType.StringType },
                 navArgument("provenienza") { type = NavType.StringType },
                 navArgument("id_task") { type = NavType.StringType },
-                navArgument("id_progetto") { type = NavType.StringType },// Aggiungi qui l'argomento "amicizia"
+                navArgument("id_progetto") { type = NavType.StringType },
+                navArgument("sottoprovenienza") { type = NavType.StringType }// Aggiungi qui l'argomento "amicizia"
             )
         ) { backStackEntry ->
             // Recupera i parametri "id" e "amicizia" dalla rotta
@@ -128,12 +129,15 @@ fun NavGraph(){
             val provenienza = backStackEntry.arguments?.getString("provenienza")
             val task = backStackEntry.arguments?.getString("id_task")
             val pro = backStackEntry.arguments?.getString("id_progetto")
+            val sottoprovenienza = backStackEntry.arguments?.getString("sottoprovenienza")
 
             if (id_u != null) {
                 if (provenienza != null) {
                     if (task != null) {
                         if (pro != null) {
-                            ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, progetto = pro,viewModelProgetto, viewModelNotifiche)
+                            if (sottoprovenienza != null) {
+                                ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, progetto = pro,viewModelProgetto, viewModelNotifiche, sottoprovenienza)
+                            }
                         }
                     }
                 }
@@ -181,27 +185,32 @@ fun NavGraph(){
         }
 
         composable(
-            route = "progetto_da_accettare/{id_prog}/{provenienza}",
+            route = "progetto_da_accettare/{id_prog}/{provenienza}/{sottoprovenienza}",
             arguments = listOf(
                 navArgument("id_prog") { type = NavType.StringType },
-                navArgument("provenienza") { type = NavType.StringType }
+                navArgument("provenienza") { type = NavType.StringType },
+                navArgument("sottoprovenienza") { type = NavType.StringType }
             )
         ) { backStackEntry ->
 
             val projectId = backStackEntry.arguments?.getString("id_prog")
             val provenienza = backStackEntry.arguments?.getString("provenienza")
+            val sottoprovenienza = backStackEntry.arguments?.getString("sottoprovenienza")
 
             if (projectId != null) {
                 if (provenienza != null) {
-                    Progetto(
-                        viewModel = viewModelUtente,
-                        navController = navController,
-                        viewModel_att = viewModelLeMieAttivita,
-                        view_model_prog = viewModelProgetto,
-                        id_prog = projectId,
-                        viewNotifiche = viewModelNotifiche,
-                        provenienza = provenienza,
-                    )
+                    if (sottoprovenienza != null) {
+                        Progetto(
+                            viewModel = viewModelUtente,
+                            navController = navController,
+                            viewModel_att = viewModelLeMieAttivita,
+                            view_model_prog = viewModelProgetto,
+                            id_prog = projectId,
+                            viewNotifiche = viewModelNotifiche,
+                            provenienza = provenienza,
+                            sottoprovenienza = sottoprovenienza,
+                        )
+                    }
                 }
             }
         }

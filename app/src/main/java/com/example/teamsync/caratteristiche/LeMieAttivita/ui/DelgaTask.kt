@@ -298,7 +298,26 @@ fun ListaColleghi(
             )
         }
         if (visualizza_amici) {
+
             LazyColumn {
+                item { if (!isLoading) {
+
+                    if (task != null && userProfile != null && task!!.utenti.contains(userProfile.id)) {
+                        CollegaItem(
+                            userProfile,
+                            color = Red70,
+                            navController = navController,
+                            userProfile,
+                            true,
+                            viewModel_att,
+                            id_task,
+                            id_progetto,
+                            view_model_notifiche
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+                }
+                }
                 items(amici) { amico ->
 
                     var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
@@ -307,7 +326,6 @@ fun ListaColleghi(
                     if (cache.contains(amico)) {
                         user_amico = cache[amico]
                     } else {
-
                         viewModel.ottieni_utente(amico) { profile ->
                             user_amico = profile
                             cache[amico] = profile // Aggiungi il profilo alla cache
@@ -358,21 +376,14 @@ fun ListaColleghi(
 @Composable
 fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel, id_task : String, id_prog: String, view_model_notifiche: ViewModelNotifiche) {
 
-
-
-
     var amicizia = false
-    if (utente.amici.contains(user_loggato?.id)) {
+    if (utente.amici.contains(user_loggato?.id) && ( user_loggato!!.id != utente.id) ) {
         amicizia = true
     }
-
-
     ElevatedCard(
         onClick = {
-                println(
-                    "BelloFigo" + " " + utente.id + " " + amicizia + " " + id_task + " " + id_prog
-                )
-                navController.navigate("utente/${utente.id}/${amicizia}/task/${id_task}/${id_prog}")
+
+                navController.navigate("utente/${utente.id}/${amicizia}/task/${id_task}/${id_prog}/progetto")
         },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -416,7 +427,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 Text(text = utente.matricola, fontSize = 14.sp)
             }
 
-            if (!partecipa) {
+            if (!partecipa && user_loggato!!.id != utente.id ) {
                 Spacer(modifier = Modifier.weight(1f))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Spacer(modifier = Modifier.width(8.dp))

@@ -43,6 +43,7 @@ import com.example.teamsync.R.string.Notifiche
 import com.example.teamsync.R.string.Unutentecompletaunatask
 import com.example.teamsync.R.string.avvisamiquando
 import com.example.teamsync.R.string.unutenteentranelprogetto
+import com.example.teamsync.R.string.*
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.util.ThemePreferences
@@ -226,7 +227,7 @@ fun NotificheImp(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SingolaScelta(
-                        label = stringResource(id = Unutentecompletaunatask),
+                        label = stringResource(id = UnUtenteModificaUnaTask),
 
                         isSelected = isModificaTaskSelected,
                         onSelectionChange = { isSelected ->

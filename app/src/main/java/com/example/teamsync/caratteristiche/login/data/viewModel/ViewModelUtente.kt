@@ -265,6 +265,25 @@ class ViewModelUtente : ViewModel() {
         }
     }
 
+    fun sonoAmici(idUtente2: String, callback: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                var sonoAmici = userProfile?.amici?.contains(idUtente2)
+                while(userProfile == null) {
+                    sonoAmici = userProfile?.amici?.contains(idUtente2)
+                }
+
+                if (sonoAmici != null) {
+                    callback(sonoAmici)
+                }
+
+            } catch (e: Exception) {
+                Log.e("ViewModelUtente", "Errore durante la verifica dell'amicizia", e)
+                // Se si verifica un errore, ritorna false
+                callback(false)
+            }
+        }
+    }
     fun fai_amicizia(id_u: String, id_a: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
@@ -372,7 +391,11 @@ class ViewModelUtente : ViewModel() {
         else
             return lista_elementi
     }
+
+    fun sonoAmici(idUtente2: String) {
+
     }
+}
 
 
 

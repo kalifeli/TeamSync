@@ -262,6 +262,9 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
     var nomeProgetto by remember { mutableStateOf("") }
     val isLoading by viewmodelProgetto.carica_nome.collectAsState()
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+    var loadingRichiestaAmicizia = remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(Unit) {
         viewmodelUtente.getUserProfile()
@@ -272,7 +275,8 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
             nomeProgetto = "Nome progetto non disponibile"
         }
     }
-/*
+
+    /*
     LaunchedEffect(Unit) {
         viewmodelUtente.getUserProfile()
         listap =  viewmodelProgetto.getLista_Partecipanti(notifica.progetto_id)
@@ -289,151 +293,162 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
         }
     }
 
-    ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
-        ),
-        onClick = {
-            if(!isLoading)
-            {
-                apertura.value = true
-                when (notifica.Tipo) {
-                    "Richiesta_Amicizia" -> navController.navigate("utente/${notifica.mittente}/false/notifica/2/0")
-                    "Accetta_Amicizia" -> navController.navigate(Schermate.Profilo.route)
-                    "Richiesta_Progetto" -> navController.navigate("progetto_da_accettare/${notifica.progetto_id}/notifiche")
-                    "Assegnazione_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
-                    "Entra_Progetto" -> navController.navigate("progetto/${notifica.progetto_id}")
-                    "Completamento_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
-                    "Modifica_Task" ->navController.navigate("progetto/${notifica.progetto_id}")
-                }
-            }
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp
+            ),
+            onClick = {
+                if (!isLoading && !loadingRichiestaAmicizia.value) {
+                    apertura.value = true
+                    when (notifica.Tipo) {
+                        "Richiesta_Amicizia" -> {
+                            loadingRichiestaAmicizia.value = true
+                            viewmodelUtente.sonoAmici(notifica.mittente) { amicizia ->
+                            loadingRichiestaAmicizia.value = false
+                                navController.navigate("utente/${notifica.mittente}/${amicizia}/notifiche/2/0/Richiesta_Amicizia")
 
-        },
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = if (isDarkTheme) Color.Black else White
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Row(
+                            }
+                        }
+
+                        "Accetta_Amicizia" -> navController.navigate(Schermate.Profilo.route)
+                        "Richiesta_Progetto" -> navController.navigate("progetto_da_accettare/${notifica.progetto_id}/notifiche/progetto")
+                        "Assegnazione_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
+                        "Entra_Progetto" -> navController.navigate("progetto/${notifica.progetto_id}")
+                        "Completamento_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
+                        "Modifica_Task" -> navController.navigate("progetto/${notifica.progetto_id}")
+                    }
+                }
+
+            },
+            colors = CardDefaults.outlinedCardColors(
+                containerColor = if (isDarkTheme) Color.Black else White
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Box(
+            Row(
                 modifier = Modifier
-                    .size(40.dp)
-                    .background(iconColor, CircleShape)
-                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                }
-                else
-                {
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon), // Sostituisci con l'icona della notifica
-                        contentDescription = "Notification Icon",
-                        tint = if(notifica.aperto) Color.Black  else Color.White,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = notifica.Contenuto,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = if(isDarkTheme)  Color.White else Color.Black
-            )
-        }
-
-
-        if (notifica.Tipo == "Richiesta_Amicizia" || notifica.Tipo == "Richiesta_Progetto")
-            if(notifica.accettato == "false" && notifica.aperto == false)
-            {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
+                        .background(iconColor, CircleShape)
                         .padding(8.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = "Aggiungi",
-                        tint = Color.Gray,
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon), // Sostituisci con l'icona della notifica
+                            contentDescription = "Notification Icon",
+                            tint = if (notifica.aperto) Color.Black else Color.White,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = notifica.Contenuto,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isDarkTheme) Color.White else Color.Black
+                )
+            }
+
+
+            if (notifica.Tipo == "Richiesta_Amicizia" || notifica.Tipo == "Richiesta_Progetto")
+                if (notifica.accettato == "false" && notifica.aperto == false) {
+                    Box(
                         modifier = Modifier
-                            .size(24.dp)
-                            .clickable {
-                                if (notifica.Tipo == "Richiesta_Progetto") {
-                                    vmNotifiche.cambiaStato_Accettato_Notifica(notifica.id)
-                                    viewmodelProgetto.aggiungiPartecipanteAlProgetto(
-                                        notifica.progetto_id,
-                                        viewmodelUtente.userProfile?.id ?: ""
-                                    )
+                            .size(40.dp)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = "Aggiungi",
+                            tint = Color.Gray,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable {
+                                    if (notifica.Tipo == "Richiesta_Progetto") {
+                                        vmNotifiche.cambiaStato_Accettato_Notifica(notifica.id)
+                                        viewmodelProgetto.aggiungiPartecipanteAlProgetto(
+                                            notifica.progetto_id,
+                                            viewmodelUtente.userProfile?.id ?: ""
+                                        )
 
-                                    for (p in listap!!) {
-                                        if(p != viewmodelUtente.userProfile?.id)
-                                        { var contenuto = viewmodelUtente.userProfile?.nome + " " + (viewmodelUtente.userProfile?.cognome
-                                            ?: "") + " " + "è entrato nel progetto " + nomeProgetto
-                                            viewmodelUtente.userProfile?.id?.let {
-                                                vmNotifiche.creaNotificaViewModel(
-                                                    it,
-                                                    p.toString(),
-                                                    "Entra_Progetto",
-                                                    contenuto,
-                                                    notifica.progetto_id
-                                                )
-                                            }
-
-                                        }
-
-
-                                    }
-
-                                    navController.navigate(Schermate.Notifiche.route)
-
-                                } else {
-                                    viewmodelUtente.userProfile?.let { profile ->
-                                        viewmodelUtente.fai_amicizia(profile.id, notifica.mittente)
-                                        {
-                                            viewmodelUtente.getUserProfile()
-                                            println("Prima dell'aggiornamento: ${notifica.id}")
-                                            vmNotifiche.cambiaStato_Accettato_Notifica(notifica.id)
-
-
-                                            viewmodelUtente.ottieni_utente(viewmodelUtente.userProfile!!.id) { profile ->
-                                                val contenuto = (viewmodelUtente.userProfile?.nome ?: "") + " " + (viewmodelUtente.userProfile?.cognome ?: "") + " " + "ha accettato la tua richiesta di amicizia"
-
-                                                if (viewmodelUtente.userProfile != null) {
+                                        for (p in listap!!) {
+                                            if (p != viewmodelUtente.userProfile?.id) {
+                                                var contenuto =
+                                                    viewmodelUtente.userProfile?.nome + " " + (viewmodelUtente.userProfile?.cognome
+                                                        ?: "") + " " + "è entrato nel progetto " + nomeProgetto
+                                                viewmodelUtente.userProfile?.id?.let {
                                                     vmNotifiche.creaNotificaViewModel(
-                                                        viewmodelUtente.userProfile!!.id,
-                                                        notifica.mittente,
-                                                        "Accetta_Amicizia",
+                                                        it,
+                                                        p.toString(),
+                                                        "Entra_Progetto",
                                                         contenuto,
-                                                        ""
+                                                        notifica.progetto_id
                                                     )
                                                 }
+
                                             }
-                                            navController.navigate(Schermate.Notifiche.route)
+
+
                                         }
+
+                                        navController.navigate(Schermate.Notifiche.route)
+
+                                    } else {
+                                        viewmodelUtente.userProfile?.let { profile ->
+                                            viewmodelUtente.fai_amicizia(
+                                                profile.id,
+                                                notifica.mittente
+                                            )
+                                            {
+                                                viewmodelUtente.getUserProfile()
+                                                println("Prima dell'aggiornamento: ${notifica.id}")
+                                                vmNotifiche.cambiaStato_Accettato_Notifica(notifica.id)
+
+
+                                                viewmodelUtente.ottieni_utente(viewmodelUtente.userProfile!!.id) { profile ->
+                                                    val contenuto =
+                                                        (viewmodelUtente.userProfile?.nome
+                                                            ?: "") + " " + (viewmodelUtente.userProfile?.cognome
+                                                            ?: "") + " " + "ha accettato la tua richiesta di amicizia"
+
+                                                    if (viewmodelUtente.userProfile != null) {
+                                                        vmNotifiche.creaNotificaViewModel(
+                                                            viewmodelUtente.userProfile!!.id,
+                                                            notifica.mittente,
+                                                            "Accetta_Amicizia",
+                                                            contenuto,
+                                                            ""
+                                                        )
+                                                    }
+                                                }
+                                                navController.navigate(Schermate.Notifiche.route)
+                                            }
+                                        }
+
+
                                     }
 
 
                                 }
-
-
-                            }
-                    )
+                        )
+                    }
                 }
-            }
 
+
+        }
 
     }
-
-}
 
 
 

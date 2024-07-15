@@ -298,6 +298,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
     fun deleteTodo(id: String, sezione: Int, progetto: String) {
         viewModelScope.launch {
             try {
+
                 repositoryLeMieAttivita.deleteTodo(id)
                 if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
             } catch (e: Exception) {

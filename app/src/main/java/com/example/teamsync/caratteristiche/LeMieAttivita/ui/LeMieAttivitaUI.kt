@@ -132,18 +132,15 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
     val partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
-
+    val progressione by viewModel.progressione.collectAsState()
+    val attivitaCompletate by viewModel.attivitaCompletate.collectAsState()
+    val attivitaTotali by viewModel.attivitaTotali.collectAsState()
     var expended by remember { mutableStateOf(false) }
     var mostraDialogAbbandono by remember { mutableStateOf(false) }
     var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
     val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "cronologico" )) }
-
-    //Variabili per la progressBar
-    val progressione by viewModel.progressione.collectAsState()
-    val todoCompletate by viewModel.taskCompletate.collectAsState()
-    val todoTotali by viewModel.taskTotali.collectAsState()
 
     LaunchedEffect(Unit) {
         progetto_nome.value = viewmodelprogetto.getnome_progetto(id_prog)
@@ -316,7 +313,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navController.navigate(Schermate.ItuoiProgetti.route) }) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "torna indietro", tint = Color.Black)
                     }
                 },
@@ -420,7 +417,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     thickness = 2.dp
                 )
 
-                Card(progressione,todoCompletate,todoTotali)
+                Card(progressione,attivitaCompletate,attivitaTotali)
 
                 Row(
                     modifier = Modifier

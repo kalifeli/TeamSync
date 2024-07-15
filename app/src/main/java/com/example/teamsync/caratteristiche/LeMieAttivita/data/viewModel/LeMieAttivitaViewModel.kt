@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import kotlin.coroutines.resume
@@ -72,6 +73,10 @@ class LeMieAttivitaViewModel() : ViewModel() {
         priorita: Priorità,
         sezione: Int
     ) {
+        if (isDateBeforeToday(dataScad)) {
+            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task."
+            return
+        }
         viewModelScope.launch {
             var todo = getTodoById(id)
             val uri = _fileUri.value ?: return@launch
@@ -104,8 +109,8 @@ class LeMieAttivitaViewModel() : ViewModel() {
         utenti: List<String>,
         fileUri: String?
     ) {
-        if (dataScad < Date()) {
-            erroreEditTask.value = " MODIFICA RIFIUTATA : La data di scadenza non può essere precedente alla data della Task. "
+        if (isDateBeforeToday(dataScad)) {
+            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task."
             return
         }
         viewModelScope.launch {
@@ -252,9 +257,23 @@ class LeMieAttivitaViewModel() : ViewModel() {
     }
 
 
+    private fun isDateBeforeToday(date: Date): Boolean {
+        val cal = Calendar.getInstance()
+        cal.time = date
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val dateToCompare = cal.time
 
+        val today = Calendar.getInstance()
+        today.set(Calendar.HOUR_OF_DAY, 0)
+        today.set(Calendar.MINUTE, 0)
+        today.set(Calendar.SECOND, 0)
+        today.set(Calendar.MILLISECOND, 0)
 
-
+        return dateToCompare.before(today.time)
+    }
 
     fun addTodo(
         titolo: String,
@@ -265,8 +284,8 @@ class LeMieAttivitaViewModel() : ViewModel() {
         proprietario: String,
         progetto : String
     ) {
-        if (dataScad < Date()) {
-            erroreAggiungiTask.value = "AGGIUNGI RIFIUTATO : La data di scadenza non può essere precedente alla data di creazione della Task."
+        if (isDateBeforeToday(dataScad)) {
+            erroreAggiungiTask.value = "AGGIUNGI RIFIUTATO: La data di scadenza non può essere precedente alla data di creazione della Task."
             return
         }
         viewModelScope.launch {

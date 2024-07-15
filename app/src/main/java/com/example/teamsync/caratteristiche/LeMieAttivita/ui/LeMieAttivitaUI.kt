@@ -839,7 +839,7 @@ fun EditTodoDialog(
     var titolo by remember { mutableStateOf(todoItem.titolo) }
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
     var dataScadenza by remember { mutableStateOf(Date()) }
-    val priorita by remember { mutableStateOf(todoItem.priorita) }
+    var priorita by remember { mutableStateOf(todoItem.priorita) }
     val context = LocalContext.current
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     val uploadResult by viewModel.uploadResult.observeAsState()
@@ -850,6 +850,9 @@ fun EditTodoDialog(
             viewModel.setFileUri(it)
         }
     }
+
+    var expanded by remember { mutableStateOf(false) }
+
 
     val calendar = Calendar.getInstance()
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -921,17 +924,73 @@ fun EditTodoDialog(
                     textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
                     placeholder = { Text("dd/MM/yyyy") }
                 )
-                // Aggiungi il pulsante per selezionare un file
+
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = priorita.name,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = {
+                            Text(
+                                "Priorità",
+                                color = Color.Black
+                            )
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        trailingIcon = {
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown",
+                                modifier = Modifier.clickable { expanded = true })
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Grey35,
+                            unfocusedContainerColor = Grey50,
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.background(Grey35)
+                    ) {
+                        Priorità.entries.forEach { p ->
+                            DropdownMenuItem(
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(CircleShape)
+                                                .border(0.5.dp, Color.Black, CircleShape)
+                                                .background(p.colore)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(p.name)
+
+                                    }
+                                },
+                                onClick = {
+                                    priorita = p
+                                    expanded = false
+                                },
+                                modifier = Modifier.background(Grey35)
+                            )
+                        }
+                    }
+                }
                 Button(onClick = { launcher.launch("*/*") }) {
                     Text("Seleziona File")
                 }
+
+
 
                 if (selectedFileUri != null) {
                     Text("File Selezionato: ${selectedFileUri!!.lastPathSegment}")
                 }
 
-                // Gestisci la priorità se necessario
-                // puoi usare un RadioButton o un DropdownMenu per gestire la priorità
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {

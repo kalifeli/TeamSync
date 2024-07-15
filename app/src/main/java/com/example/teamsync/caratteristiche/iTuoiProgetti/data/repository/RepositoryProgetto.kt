@@ -36,6 +36,20 @@ class RepositoryProgetto {
             emptyList()
         }
     }
+    suspend fun getProgettiCompletatiUtente(userId: String): List<Progetto>{
+        return try {
+            firestore.collection("progetti")
+                .whereArrayContains("partecipanti", userId)
+                .whereEqualTo("completato", true)
+                .get()
+                .await()
+                .toObjects(Progetto::class.java)
+
+        }catch (e: Exception){
+            emptyList()
+        }
+
+    }
 
     /**
      * Funzione che crea un nuovo progetto nel database Firestore.

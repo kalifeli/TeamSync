@@ -31,7 +31,7 @@ class ToDoRepository {
         database.collection("Todo").add(leMieAttivita).await()
     }
 
-    suspend fun getAllTodo(progetto: String): List<LeMieAttivita> {
+    suspend fun getAllTodo(): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", false)
             .orderBy("dataScadenza") // Ordina per data di scadenza
@@ -41,11 +41,10 @@ class ToDoRepository {
     }
 
 
-    suspend fun getAllTodoCompletate(progetto: String): List<LeMieAttivita> {
+    suspend fun getAllTodoCompletate(): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
             .whereEqualTo("completato", true)
-            .whereEqualTo("progetto", progetto)
-            .orderBy("dataScadenza")
+            .orderBy("dataScadenza") // Ordina per data di scadenza
             .get()
             .await()
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
@@ -163,6 +162,7 @@ class ToDoRepository {
             .await()
         return snapshot.size()
     }
+
     suspend fun countAllTodo(progetto: String): Int {
         val snapshot = database.collection("Todo")
             .whereEqualTo("progetto", progetto)

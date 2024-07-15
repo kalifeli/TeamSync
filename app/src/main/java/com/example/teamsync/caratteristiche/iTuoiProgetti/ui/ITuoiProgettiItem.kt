@@ -50,7 +50,9 @@ fun ITuoiProgettiItem(
 ){
     val dataScadenza = remember { progetto.dataScadenza }
     val formattatoreData = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    val dataFormattata = formattatoreData.format(dataScadenza)
+    val dataScadenzaSdf = formattatoreData.format(dataScadenza)
+    val dataConsegna = remember {progetto.dataConsegna}
+    val dataConsegnaSdf = formattatoreData.format(dataConsegna)
 
     ElevatedCard(
         onClick = {
@@ -77,17 +79,23 @@ fun ITuoiProgettiItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                if(progetto.completato){
+                    Icon(painter = painterResource(id = R.drawable.ic_progettocompletato), contentDescription = "progetto completato" )
+                }
+
                 Text(
                     text = progetto.nome,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
-                Box(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .background(progetto.priorita.colore)
-                )
+                if(!progetto.completato) {
+                    Box(
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clip(CircleShape)
+                            .background(progetto.priorita.colore)
+                    )
+                }
             }
             HorizontalDivider(
                 modifier = Modifier
@@ -95,42 +103,87 @@ fun ITuoiProgettiItem(
                     .padding(vertical = 8.dp)
             )
 
-            Row(
-                modifier = Modifier.align(Alignment.End),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_task_da_completare),
-                    contentDescription = "attività da completare",
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "10 Attività",
-                    textAlign = TextAlign.End,
-                    fontSize = 12.sp
-                )
-            }
-            Row(
-                modifier = Modifier.align(Alignment.End),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val progettoScaduto = viewModelProgetto.progettoScaduto(progetto)
-                val iconaCalendario = if(!progettoScaduto) R.drawable.ic_calendario_evento else R.drawable.ic_progettoscaduto
-                Icon(
-                    painter = painterResource(iconaCalendario),
-                    contentDescription = "data scadenza",
-                    modifier = Modifier.size(16.dp),
-                    tint = if(viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+            if(progetto.completato) {
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_votoprogetto),
+                        contentDescription = "voto progetto",
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = progetto.voto,
+                        textAlign = TextAlign.End,
+                        fontSize = 12.sp
+                    )
+                }
 
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = dataFormattata,
-                    textAlign = TextAlign.End,
-                    fontSize = 12.sp,
-                    color = if(viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
-                )
+            } else {
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_task_da_completare),
+                        contentDescription = "attività da completare",
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "10 Attività",
+                        textAlign = TextAlign.End,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            if(progetto.completato){
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_progettoconsegnato),
+                        contentDescription = "data consegna progetto",
+                        modifier = Modifier.size(16.dp),
+                        tint = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = dataConsegnaSdf,
+                        textAlign = TextAlign.End,
+                        fontSize = 12.sp,
+                        color = Color.Black
+                    )
+                }
+
+            }else {
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val progettoScaduto = viewModelProgetto.progettoScaduto(progetto)
+                    val iconaCalendario =
+                        if (!progettoScaduto) R.drawable.ic_calendario_evento else R.drawable.ic_progettoscaduto
+                    Icon(
+                        painter = painterResource(iconaCalendario),
+                        contentDescription = "data scadenza",
+                        modifier = Modifier.size(16.dp),
+                        tint = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = dataScadenzaSdf,
+                        textAlign = TextAlign.End,
+                        fontSize = 12.sp,
+                        color = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+                    )
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository
 
+import android.util.Log
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -31,6 +32,7 @@ class RepositoryProgetto {
                 .await()
                 .toObjects(Progetto::class.java)
         } catch (e: Exception) {
+            Log.e("RepositoryProgetto", "Errore nel caricamento dei progetti dell'utente", e)
             emptyList()
         }
     }
@@ -210,6 +212,7 @@ class RepositoryProgetto {
                 null
             }
         } catch (e: Exception) {
+            Log.e("RepositoryProgetto", "Errore nel caricamento del progetto", e)
             null
         }
     }
@@ -220,7 +223,8 @@ class RepositoryProgetto {
                 firestore.collection("progetti").document(id).set(progetto).await()
             }
         } catch (e: Exception) {
-            throw Exception("Errore durante l'aggiornamento del progetto: ${e.message}")
+            Log.e("RepositoryProgetto", "Errore durante l'aggiornamento del progetto", e)
+            throw e
 
         }
     }

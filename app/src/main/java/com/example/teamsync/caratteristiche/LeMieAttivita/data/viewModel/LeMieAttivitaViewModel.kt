@@ -33,11 +33,11 @@ class LeMieAttivitaViewModel() : ViewModel() {
     val _progressione = MutableStateFlow(0.0f)
     val progressione: StateFlow<Float> = _progressione // Esponi solo lo StateFlow
 
-    val _taskCompletate = MutableStateFlow(0)
-    val taskCompletate: StateFlow<Int> = _taskCompletate
+    private val _attivitaCompletate = MutableStateFlow(0)
+    val attivitaCompletate: StateFlow<Int> = _attivitaCompletate
 
-    val _taskTotali = MutableStateFlow(0)
-    val taskTotali: StateFlow<Int> = _taskTotali
+    private val _attivitaTotali = MutableStateFlow(0)
+    val attivitaTotali: StateFlow<Int> = _attivitaTotali
 
     private val _fileUri = MutableLiveData<Uri?>()
     val fileUri: LiveData<Uri?> get() = _fileUri
@@ -78,7 +78,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
             return
         }
         viewModelScope.launch {
-            var todo = getTodoById(id)
+            val todo = getTodoById(id)
             val uri = _fileUri.value ?: return@launch
             val storageReference = FirebaseStorage.getInstance().reference.child("files/${UUID.randomUUID()}")
             try {
@@ -131,14 +131,14 @@ class LeMieAttivitaViewModel() : ViewModel() {
     fun updateTaskTotali(id: String) {
         viewModelScope.launch {
             val completedTasks = repositoryLeMieAttivita.countAllTodo(id)
-            _taskTotali.value = completedTasks
+            _attivitaTotali.value = completedTasks
         }
     }
 
     fun updateTaskCompletate(id: String) {
         viewModelScope.launch {
             val completedTasks = repositoryLeMieAttivita.countCompletedTodo(id)
-            _taskCompletate.value = completedTasks
+            _attivitaCompletate.value = completedTasks
 
         }
     }

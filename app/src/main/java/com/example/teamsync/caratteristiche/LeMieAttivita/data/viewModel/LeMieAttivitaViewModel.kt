@@ -110,7 +110,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         fileUri: String?
     ) {
         if (isDateBeforeToday(dataScad)) {
-            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task."
+            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task..."
             return
         }
         viewModelScope.launch {

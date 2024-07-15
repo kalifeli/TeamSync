@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import androidx.compose.ui.text.font.FontWeight
+import com.example.teamsync.ui.theme.Grey35
 
 @Composable
-fun SezioneProgressiProgetti(progress: Float, completedProjects: Int){
+fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int){
+    val progressi = progettiCompletati/progettiUtente.toFloat() // la conversione a float è necessaria per la circular progress indicator
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp
@@ -54,13 +56,14 @@ fun SezioneProgressiProgetti(progress: Float, completedProjects: Int){
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
-                    progress = { progress },
+                    progress = { progressi },
                     modifier = Modifier.size(80.dp),
                     color = Red70,
                     strokeWidth = 8.dp,
+                    trackColor = Grey35,
                 )
                 Text(
-                    text = "${(progress * 100).toInt()}%",
+                    text = "$progettiCompletati / $progettiUtente",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -79,5 +82,5 @@ fun SezioneProgressiProgetti(progress: Float, completedProjects: Int){
 @Preview
 @Composable
 fun PreviewSezioneProgressiProgetti(){
-    SezioneProgressiProgetti(0.55f, 3)
+    SezioneProgressiProgetti(3, 10)
 }

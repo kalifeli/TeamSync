@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
-import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.data.models.Priorità
@@ -45,8 +43,8 @@ import com.example.teamsync.ui.theme.White
 fun SezioneITUoiProgetti(
     progetti: List<Progetto>,
     navController: NavController,
+    attivitaProgetti: Map<String, Int>,
     viewModelProgetto: ViewModelProgetto,
-    viewModelLeMieAttivita: LeMieAttivitaViewModel
 ){
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_progetti", Context.MODE_PRIVATE)
@@ -59,7 +57,6 @@ fun SezioneITUoiProgetti(
         when {
             priorita1 == Priorità.ALTA && priorita2 != Priorità.ALTA -> -1 // ALTA prima di qualsiasi altra
             priorita1 != Priorità.ALTA && priorita2 == Priorità.ALTA -> 1  // ALTA prima di qualsiasi altra
-
 
             priorita1 == Priorità.MEDIA && priorita2 == Priorità.BASSA -> -1 // MEDIA prima di BASSA
             priorita1 == Priorità.BASSA && priorita2 == Priorità.MEDIA -> 1  // MEDIA prima di BASSA
@@ -74,8 +71,8 @@ fun SezioneITUoiProgetti(
         }
     }
 
-    var visualizza_completati by remember { mutableStateOf(preferences.getBoolean("preferenza_progetti_completati", false)) }
-    var ordine_progetti by remember {
+    val visualizza_completati by remember { mutableStateOf(preferences.getBoolean("preferenza_progetti_completati", false)) }
+    val ordine_progetti by remember {
         mutableStateOf(
             preferences.getString(
                 "ordine_progetti",
@@ -83,6 +80,7 @@ fun SezioneITUoiProgetti(
             )
         )
     }
+
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -138,14 +136,15 @@ fun SezioneITUoiProgetti(
                 "cronologico" ->
                 {
                     items(progetti.sortedByDescending { it.dataCreazione }) { progetto ->
+                        val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
                         }
 
 
@@ -155,33 +154,34 @@ fun SezioneITUoiProgetti(
                 "scadenza" ->
                 {
                     items(progetti.sortedBy { it.dataScadenza }) { progetto ->
+                        val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
                         }
                     }
                 }
                 "priorità" ->
                 {
                     items(progetti.sortedWith(comparatore)) { progetto ->
+                        val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
                         }
                     }
                 }
             }
-
         }
     }
 }
@@ -189,5 +189,5 @@ fun SezioneITUoiProgetti(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewSezioneITuoiProgetti(){
-    SezioneITUoiProgetti(navController = rememberNavController(), progetti = emptyList(), viewModelProgetto = ViewModelProgetto(), viewModelLeMieAttivita = LeMieAttivitaViewModel())
+    //SezioneITUoiProgetti(navController = rememberNavController(), progetti = emptyList(), viewModelProgetto = ViewModelProgetto(), attivitaProgetti = )
 }

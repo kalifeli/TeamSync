@@ -20,8 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
-import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.ui.theme.Red70
@@ -50,16 +47,18 @@ fun ITuoiProgettiItem(
     progetto: Progetto,
     navController: NavController,
     viewModelProgetto: ViewModelProgetto,
-    viewModelLeMieAttivita: LeMieAttivitaViewModel
+    attivitaNonCompletate: Int
 ){
     val dataScadenza = remember { progetto.dataScadenza }
     val formattatoreData = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
     val dataScadenzaSdf = formattatoreData.format(dataScadenza)
     val dataConsegna = remember {progetto.dataConsegna}
     val dataConsegnaSdf = formattatoreData.format(dataConsegna)
-    val attivitaTotali by viewModelLeMieAttivita.attivitaTotali.collectAsState()
-    val attivitaCompletate by viewModelLeMieAttivita.attivitaCompletate.collectAsState()
-    val attivitaDaCompletare = attivitaTotali - attivitaCompletate
+
+    //val attivitaNonCompletate by viewModelProgetto.attivitaCompletate
+    //val attivitaCompletate by viewModelProgetto.attivitaCompletate
+    //val attivitaTotali = attivitaNonCompletate.size + attivitaCompletate.size
+    //val attivitaDaCompletare = attivitaNonCompletate.size
 
     ElevatedCard(
         onClick = {
@@ -140,7 +139,7 @@ fun ITuoiProgettiItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "$attivitaDaCompletare attività",
+                        text = "$attivitaNonCompletate attività",
                         textAlign = TextAlign.End,
                         fontSize = 12.sp
                     )
@@ -199,5 +198,5 @@ fun ITuoiProgettiItem(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewITuoiProgettiItem(){
-    ITuoiProgettiItem( navController = rememberNavController(),progetto = Progetto(nome = "TeamSync"), viewModelProgetto = ViewModelProgetto(), viewModelLeMieAttivita = LeMieAttivitaViewModel())
+    ITuoiProgettiItem( navController = rememberNavController(),progetto = Progetto(nome = "TeamSync"), viewModelProgetto = ViewModelProgetto(), attivitaNonCompletate = 3)
 }

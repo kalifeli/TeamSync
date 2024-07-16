@@ -461,6 +461,7 @@ fun SchermataModificaProgetto(
                                 voto,
                                 dataConsegnaProgetto
                             )
+                            navController.popBackStack()
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)

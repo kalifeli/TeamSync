@@ -11,13 +11,14 @@ import java.util.Date
 class ToDoRepository {
     private val database = FirebaseFirestore.getInstance()
 
-    suspend fun addTodo(titolo: String,
-                        descrizione: String,
-                        dataScad: Date,
-                        priorita: Priorità,
-                        completato: Boolean,
-                        utenti : String,
-                        progetto: String
+    suspend fun addTodo(
+        titolo: String,
+        descrizione: String,
+        dataScad: Date,
+        priorita: Priorità,
+        completato: Boolean,
+        utenti : String,
+        progetto: String
     ) {
         val leMieAttivita = LeMieAttivita(
             titolo = titolo,
@@ -50,6 +51,18 @@ class ToDoRepository {
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
     }
 
+    suspend fun getAttivitaByProgettoId(progettoId: String): List<LeMieAttivita>{
+        return try {
+            database.collection("Todo")
+                .whereEqualTo("progettoId", progettoId)
+                .get()
+                .await()
+                .toObjects(LeMieAttivita::class.java)
+        }catch (e: Exception){
+            emptyList()
+        }
+    }
+
     suspend fun deleteTodo(id: String) {
         try {
             database.collection("Todo").document(id).delete().await()
@@ -58,8 +71,6 @@ class ToDoRepository {
             throw Exception("Errore durante l'eliminazione del Todo: ${e.message}")
         }
     }
-
-
 
     suspend fun updateTodo(
         id: String,
@@ -166,6 +177,15 @@ class ToDoRepository {
     suspend fun countAllTodo(progetto: String): Int {
         val snapshot = database.collection("Todo")
             .whereEqualTo("progetto", progetto)
+            .get()
+            .await()
+        return snapshot.size()
+    }
+
+    suspend fun countNonCompletedTodoByProject(progettoId: String) : Int {
+        val snapshot = database.collection("Todo")
+            .whereEqualTo("progetto", progettoId)
+            .whereEqualTo("completato", false)
             .get()
             .await()
         return snapshot.size()

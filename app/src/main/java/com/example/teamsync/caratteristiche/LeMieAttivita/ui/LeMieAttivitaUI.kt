@@ -92,6 +92,7 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
@@ -132,6 +133,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
     val partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
+    val progettoCompletato = remember { mutableStateOf(false) }
     val progressione by viewModel.progressione.collectAsState()
     val attivitaCompletate by viewModel.attivitaCompletate.collectAsState()
     val attivitaTotali by viewModel.attivitaTotali.collectAsState()
@@ -146,6 +148,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     LaunchedEffect(Unit) {
         progetto_nome.value = viewmodelprogetto.getnome_progetto(id_prog)
         partecipanti.value = viewmodelprogetto.getLista_Partecipanti(id_prog)
+        progettoCompletato.value = viewmodelprogetto.get_progetto_by_id(id_prog).completato
     }
 
     LaunchedEffect(viewmodelprogetto.cambia_lista_partecipanti.value) {
@@ -533,7 +536,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         }
 
                 }
-
                 }
 
                 if (!isLoadingCompletate) {

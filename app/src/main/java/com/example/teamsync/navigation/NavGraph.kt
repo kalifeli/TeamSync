@@ -74,7 +74,7 @@ fun NavGraph(){
                 }
             ){innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)){
-                    ITuoiProgetti(navController, viewModelProgetto, viewModelUtente, viewModelLeMieAttivita)
+                    ITuoiProgetti(navController, viewModelProgetto, viewModelUtente)
                 }
             }
         }

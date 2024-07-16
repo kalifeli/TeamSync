@@ -48,6 +48,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,7 +67,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
-import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
@@ -86,7 +86,6 @@ fun ITuoiProgetti(
     navController: NavController,
     viewModelProgetto: ViewModelProgetto,
     viewModelUtente: ViewModelUtente,
-    viewModelLeMieAttivita: LeMieAttivitaViewModel
 ){
     var expended by remember {
         mutableStateOf(false)
@@ -102,9 +101,15 @@ fun ITuoiProgetti(
     val context = LocalContext.current
     val loading = viewModelProgetto.isLoading.value
 
+    // CAMBIAMENTI
+    val progetti1 by viewModelProgetto.progetti1.observeAsState(emptyList())
+    val attivitaProgetti by viewModelProgetto.attivitaProgetti.observeAsState(emptyMap())
+
+
     LaunchedEffect(Unit) {
         viewModelProgetto.utenteCorrenteId.value?.let {
-            viewModelProgetto.caricaProgettiUtente(it, false)
+            //viewModelProgetto.caricaProgettiUtente(it, false)
+            viewModelProgetto.caricaProgettiUtente1(it, false)
             viewModelProgetto.caricaProgettiCompletatiUtente(it)
         }
         Log.d("View", "utente corrente : ${viewModelProgetto.utenteCorrenteId.value}")
@@ -231,7 +236,7 @@ fun ITuoiProgetti(
 
                Spacer(modifier = Modifier.height(16.dp))
 
-               SezioneITUoiProgetti(navController = navController, progetti = progetti, viewModelProgetto = viewModelProgetto, viewModelLeMieAttivita = viewModelLeMieAttivita)
+               SezioneITUoiProgetti(navController = navController, progetti = progetti1, viewModelProgetto = viewModelProgetto, attivitaProgetti = attivitaProgetti)
 
                Spacer(modifier = Modifier.height(16.dp))
 
@@ -583,7 +588,7 @@ fun AggiungiProgettoDialog(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewITuoiProgetti(){
-    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(), ViewModelUtente(), viewModelLeMieAttivita = LeMieAttivitaViewModel())
+    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(), ViewModelUtente())
 }
 @Preview(showSystemUi = true)
 @Composable

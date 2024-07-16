@@ -9,6 +9,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
+import com.example.teamsync.caratteristiche.LeMieAttivita.data.repository.ToDoRepository
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
@@ -43,9 +45,22 @@ class ViewModelProgetto : ViewModel() {
     val codiceProgetto: LiveData<String?> get() = _codiceProgetto
 
     var repositoryUtente = RepositoryUtente()
+    val repositoryLeMieAttivita = ToDoRepository()
+
+    var attivitaNonCompletate = mutableStateOf<List<LeMieAttivita>>(emptyList())
+        private set
+    var attivitaCompletate = mutableStateOf<List<LeMieAttivita>>(emptyList())
+        private set
 
     private val _carica_nome = MutableStateFlow(false)
     val carica_nome: StateFlow<Boolean> get() = _carica_nome
+
+
+    private val _progetti = MutableLiveData<List<Progetto>>()
+    val progetti1: LiveData<List<Progetto>> get() = _progetti
+
+    private val _attivitaProgetti = MutableLiveData<Map<String, Int>>()
+    val attivitaProgetti: LiveData<Map<String, Int>> get() = _attivitaProgetti
 
     init {
         aggiornaUtenteCorrente()
@@ -63,6 +78,19 @@ class ViewModelProgetto : ViewModel() {
                 _codiceProgetto.value = progetto?.codice
             } catch (e: Exception) {
                 _codiceProgetto.value = null
+            }
+        }
+    }
+
+    fun caricaAttivitaUtente(progettoId: String){
+        viewModelScope.launch {
+            try {
+                val attivitaProgetto = repositoryLeMieAttivita.getAttivitaByProgettoId(progettoId)
+                attivitaNonCompletate.value = attivitaProgetto.filter { !it.completato }
+                attivitaCompletate.value = attivitaProgetto.filter{ it.completato}
+
+            }catch (e: Exception){
+                Log.e("ViewModelProgetto", "Errore nel caricamento delle attivita del progetto : $progettoId", e)
             }
         }
     }
@@ -195,6 +223,30 @@ class ViewModelProgetto : ViewModel() {
                 erroreCaricamentoProgetto.value = "Errore nel caricamento dei progetti."
                 Log.e("ViewModelProgetto", "Errore nel caricamento dei progetti", e)
             } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+    fun caricaProgettiUtente1(userId: String, loadingInit: Boolean){
+        viewModelScope.launch {
+            isLoading.value = loadingInit
+            try {
+                delay(700)
+                val progetti = repositoryProgetto.getProgettiUtente(userId)
+                _progetti.value = progetti
+
+                // carichiamo le attività di ogni progetto
+                val attivitaMap = mutableMapOf<String, Int>()
+                for(progetto in progetti){
+                    val attivitaNonCompletate = repositoryLeMieAttivita.countNonCompletedTodoByProject(progetto.id ?: "") // da rivedere
+                    attivitaMap[progetto.id ?: ""] = attivitaNonCompletate // da rivedere
+                }
+                _attivitaProgetti.value = attivitaMap
+
+            }catch (e: Exception){
+                Log.e("ViewModelProgetto", "Errore nel caricemento dei progetti", e)
+            }finally {
                 isLoading.value = false
             }
         }

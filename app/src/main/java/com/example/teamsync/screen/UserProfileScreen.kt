@@ -111,7 +111,7 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
     val context = LocalContext.current
     val datePickerDialog = android.app.DatePickerDialog(
         context,
-        R.style.CustomDatePickerDialog,
+        if(isDarkTheme) R.style.CustomDatePickerDialogDark else R.style.CustomDatePickerDialog,
         { _, year, month, dayOfMonth ->
             calendar.set(year, month, dayOfMonth)
             dataDiNascita = calendar.time
@@ -425,6 +425,7 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
+                        readOnly = true,
                         label = { Text("Email", color = if(isDarkTheme) Color.White else Color.Black) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = if(isDarkTheme) Color.White else Red70,

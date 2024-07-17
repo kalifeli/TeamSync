@@ -225,7 +225,7 @@ fun SchermataModificaProgetto(
                             focusedBorderColor = Red70
                         ),
                         shape = RoundedCornerShape(16.dp),
-                        maxLines = 15,
+                        maxLines = 5,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)

@@ -77,7 +77,6 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     val background: Painter = painterResource(id = registrazione)
     val backgroundB: Painter = painterResource(id = background_black)
 
-
     var matricola by remember {
         mutableStateOf("")
     }

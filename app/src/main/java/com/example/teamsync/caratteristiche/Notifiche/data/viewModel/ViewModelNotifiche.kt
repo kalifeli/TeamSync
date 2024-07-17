@@ -1,6 +1,8 @@
 package com.example.teamsync.caratteristiche.Notifiche.data.viewModel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.Notifiche.data.model.Notifiche
@@ -20,6 +22,8 @@ class ViewModelNotifiche : ViewModel() {
     var isLoading = mutableStateOf(true)
         private set
 
+    // AGGIUNTA per tenere traccia delle notifiche non lette
+    val notificheNonLette = MutableLiveData<Boolean>().apply { value = false }
 
 
     init {
@@ -55,6 +59,9 @@ class ViewModelNotifiche : ViewModel() {
                     it.destinatario == userId
                 }
 
+                Log.d("ViewModelNotifiche", "Notifiche caricate: ${notificheList.value}")
+                aggiornaNotificheNonLette()
+
                 println("Notifiche caricate: ${notificheList.value}")
 
             } catch (e: Exception) {
@@ -66,10 +73,14 @@ class ViewModelNotifiche : ViewModel() {
         }
     }
 
-
-
-
-
+    private fun aggiornaNotificheNonLette(){
+        val nonLette = notificheList.value.any { !it.aperto }
+        notificheList.value.forEach { notifica ->
+            Log.d("ViewModelNotifiche", "Notifica ID: ${notifica.id}, Aperto: ${notifica.aperto}")
+        }
+        Log.d("ViewModelNotifiche", "aggiornaNotificheNonLette: $nonLette")
+        notificheNonLette.value = nonLette
+    }
 
 
     fun cambiaStatoNotifica(notificaId: String) {
@@ -88,6 +99,11 @@ class ViewModelNotifiche : ViewModel() {
                         it
                     }
                 }
+
+                Log.d("ViewModelNotifiche", "Dopo cambiaStatoNotifica: ${notificheList.value}")
+                // Aggiorna lo stato delle notifiche non lette
+                aggiornaNotificheNonLette()
+
 
                 println("Stato della notifica cambiato con successo")
             } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package com.example.teamsync.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -11,18 +12,26 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Red70
 
 @Composable
-fun BottomNav(navController: NavHostController) {
+fun BottomNav(
+    navController: NavHostController,
+    notificheViewModel: ViewModelNotifiche
+) {
     NavigationBar(
         containerColor = Color.Transparent,
         tonalElevation = 16.dp,
@@ -30,7 +39,9 @@ fun BottomNav(navController: NavHostController) {
             .height(60.dp)
 
     ) {
+
         val rottaCorrente = navController.currentBackStackEntryAsState().value?.destination?.route
+        val notificheNonLette by notificheViewModel.notificheNonLette.observeAsState(false)
 
         NavigationBarItem(
             selected = rottaCorrente == Schermate.ItuoiProgetti.route,
@@ -71,7 +82,9 @@ fun BottomNav(navController: NavHostController) {
                       },
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Notifications,
+                    painter = painterResource(
+                        if (notificheNonLette) R.drawable.ic_notifichenonaperte else R.drawable.ic_notifiche
+                    ),
                     contentDescription = "icona notifiche"
                 )
                    },

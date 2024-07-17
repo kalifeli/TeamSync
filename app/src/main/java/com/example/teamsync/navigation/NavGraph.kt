@@ -70,7 +70,7 @@ fun NavGraph(){
         composable(route = Schermate.ItuoiProgetti.route){
             Scaffold (
                 bottomBar = {
-                    BottomNav(navController = navController)
+                    BottomNav(navController = navController, viewModelNotifiche)
                 }
             ){innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)){
@@ -81,7 +81,7 @@ fun NavGraph(){
         composable(route = Schermate.Notifiche.route) {
             Scaffold (
                 bottomBar = {
-                    BottomNav(navController = navController)
+                    BottomNav(navController = navController, viewModelNotifiche)
                 }
             ){innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)){
@@ -93,7 +93,7 @@ fun NavGraph(){
         composable(route = Schermate.Profilo.route) {
             Scaffold (
                 bottomBar = {
-                    BottomNav(navController = navController)
+                    BottomNav(navController = navController, viewModelNotifiche)
                 }
             ){innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)){

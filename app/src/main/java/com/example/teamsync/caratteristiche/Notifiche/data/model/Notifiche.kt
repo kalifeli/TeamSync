@@ -11,5 +11,4 @@ data class Notifiche(
     var id : String = "",
     var progetto_id : String = "",
     var accettato : String = "",
-
     )

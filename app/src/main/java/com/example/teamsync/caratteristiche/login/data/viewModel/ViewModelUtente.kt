@@ -132,6 +132,7 @@ class ViewModelUtente : ViewModel() {
         }
 
     }
+
     private fun validateRegistrationField(
         matricola: String,
         nome: String,

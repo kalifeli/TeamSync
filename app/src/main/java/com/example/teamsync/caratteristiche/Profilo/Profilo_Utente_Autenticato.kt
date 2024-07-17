@@ -4,6 +4,7 @@ package com.example.teamsync.caratteristiche.ProfiloAmici
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -223,7 +224,8 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(250.dp),
+            .height(250.dp)
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.elevatedCardColors(
             containerColor =  if(isDarkTheme) Color.Black else Red70
         ),

@@ -3,8 +3,8 @@ package com.example.teamsync.caratteristiche.login.ui
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,7 +40,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -176,7 +174,6 @@ fun LoginScreen(
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .padding(horizontal = 40.dp),
                     ) {
                         // campo Email Login
@@ -184,19 +181,20 @@ fun LoginScreen(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Red70,
-                                focusedTextColor = Color.Black,
+                                focusedBorderColor = if(isDarkTheme) Color.Black else Red70,
+                                focusedTextColor =  Color.Black,
                                 focusedContainerColor = White,
-                                focusedLabelColor = Red70,
-                                unfocusedBorderColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
+                                focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                                unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
+                                unfocusedTextColor =  Color.Black,
                                 unfocusedContainerColor = Grey20,
                                 unfocusedLabelColor = Color.Black,
-                                cursorColor = Red70
+                                cursorColor = if(isDarkTheme) Color.Black else  Red70,
+
                             ),
                             value = email,
                             onValueChange = { email = it },
-                            label = { Text("Email") },
+                            label = { Text("Email")},
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.icona_mail),
@@ -214,15 +212,15 @@ fun LoginScreen(
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Red70,
-                                    focusedTextColor = Color.Black,
+                                    focusedBorderColor = if(isDarkTheme) Color.Black else Red70,
+                                    focusedTextColor =  Color.Black,
                                     focusedContainerColor = White,
-                                    focusedLabelColor = Red70,
-                                    unfocusedBorderColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    unfocusedLabelColor = Color.Black,
+                                    focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                                    unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
+                                    unfocusedTextColor =  Color.Black,
                                     unfocusedContainerColor = Grey20,
-                                    cursorColor = Red70
+                                    unfocusedLabelColor = Color.Black,
+                                    cursorColor = if(isDarkTheme) Color.Black else Red70,
 
                                 ),
                             value = password,
@@ -267,9 +265,13 @@ fun LoginScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Box(
-                            modifier = Modifier.clickable {
-                                navController.navigate(Schermate.RecuperoPassword.route)
-                            }
+                            modifier = Modifier
+                                .clickable(
+                                    indication = null, // Rimuove l'ombra di selezione
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) {
+                                    navController.navigate(Schermate.RecuperoPassword.route)
+                                }
                         ) {
                             if (isDarkTheme)
                                 Text(

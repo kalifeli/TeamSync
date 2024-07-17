@@ -3,6 +3,7 @@ package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,81 +54,99 @@ import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewMod
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
 import com.example.teamsync.ui.theme.WhiteFacebook
+import com.example.teamsync.util.ThemePreferences
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @Composable
 fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, id_task : String, view_model_prog: ViewModelProgetto, id_prog : String, view_model_notifiche : ViewModelNotifiche) {
     var task by remember { mutableStateOf<LeMieAttivita?>(null) }
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     LaunchedEffect(id_task) {
         task = viewModel_att.getTodoById(id_task)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
+    Box(modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Color.White)) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.08f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxSize()
+                .padding(16.dp)
+
         ) {
-
-            Box(
+            Row(
                 modifier = Modifier
-                    .size(35.dp)
-                    .background(
-                        Color.White,
-                        RoundedCornerShape(20.dp)
-                    ) // Imposta il rettangolo di sfondo a nero
-                    .clickable { navController.navigate("progetto/${id_prog}") },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "close_impostazioni",
-                    tint = Color.DarkGray // Assicurati che l'icona sia visibile impostando il colore a bianco
-                )
-            }
-            // Centra il testo all'interno della Row
-            Row(
-                modifier = Modifier.weight(8f),
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.08f),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text =  "Aggiungi Persone",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
+
+                Box(
+                    modifier = Modifier
+                        .size(35.dp)
+                        .background(
+                            Color.White,
+                            RoundedCornerShape(20.dp)
+                        ) // Imposta il rettangolo di sfondo a nero
+                        .clickable { navController.navigate("progetto/${id_prog}") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "close_impostazioni",
+                        tint = Color.DarkGray // Assicurati che l'icona sia visibile impostando il colore a bianco
+                    )
+                }
+                // Centra il testo all'interno della Row
+                Row(
+                    modifier = Modifier.weight(8f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Aggiungi Persone",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isDarkTheme) Color.White else Color.Black,
+                    )
+                }
+
+                // Row vuota per bilanciare il layout
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {}
+
             }
 
-            // Row vuota per bilanciare il layout
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically
-            ) {}
-
+            task?.let { ProfiloHeader(viewModel, navController, it) }
+            Spacer(modifier = Modifier.height(16.dp))
+            task?.let {
+                ListaColleghi(
+                    viewModel,
+                    navController,
+                    viewModel_att,
+                    id_task,
+                    view_model_prog,
+                    id_prog,
+                    view_model_notifiche
+                )
+            }
         }
+    }
 
-        task?.let { ProfiloHeader(viewModel, navController, it) }
-        Spacer(modifier = Modifier.height(16.dp))
-        task?.let {ListaColleghi(viewModel, navController, viewModel_att, id_task, view_model_prog,id_prog, view_model_notifiche) }}
 }
-
-
 
 
 @Composable
 fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, task : LeMieAttivita) {
     viewModel.getUserProfile()
     val userProfile = viewModel.userProfile
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
     var amici by remember { mutableStateOf(userProfile?.amici ?: "") }
     var id_task by remember { mutableStateOf(task.id) }
@@ -145,9 +165,10 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
             defaultElevation = 6.dp
         ),
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Red70
+            containerColor = if(isDarkTheme) Color.Black else Red70
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -181,7 +202,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
                         text = "Dettagli Task",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
-                        color = Color.White,
+                        color =Color.White,
                         modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
                     )
                 }
@@ -210,7 +231,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Data scadenza: ${task.dataScadenza}",
+                text = "Data scadenza: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(task.dataScadenza)}",
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
@@ -239,7 +260,7 @@ fun ListaColleghi(
     id_progetto : String,
     view_model_notifiche: ViewModelNotifiche
 ) {
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val userProfile = viewModel.userProfile
     var amici by remember { mutableStateOf<List<String>>(emptyList()) }
     var task by remember { mutableStateOf<LeMieAttivita?>(null) }
@@ -280,10 +301,11 @@ fun ListaColleghi(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp),
+            .padding(top = 10.dp)
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = WhiteFacebook
+            containerColor = if (isDarkTheme) Color.Black else WhiteFacebook
         ),
     ) {
         Row(
@@ -292,80 +314,88 @@ fun ListaColleghi(
             modifier = Modifier.padding(start = 10.dp, top = 15.dp, bottom = 25.dp)
         ) {
             Text(
-                text =  "Lista Partecipanti->",
+                text = "Lista Partecipanti->",
                 fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = if (isDarkTheme) Color.White else Color.Black
             )
         }
-        if (visualizza_amici) {
+        Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp)){
 
-            LazyColumn {
-                item { if (!isLoading) {
 
-                    if (task != null && userProfile != null && task!!.utenti.contains(userProfile.id)) {
-                        CollegaItem(
-                            userProfile,
-                            color = Red70,
-                            navController = navController,
-                            userProfile,
-                            true,
-                            viewModel_att,
-                            id_task,
-                            id_progetto,
-                            view_model_notifiche
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
+            if (visualizza_amici) {
+
+                LazyColumn {
+                    item {
+                        if (!isLoading) {
+
+                            if (task != null && userProfile != null && task!!.utenti.contains(
+                                    userProfile.id
+                                )
+                            ) {
+                                CollegaItem(
+                                    userProfile,
+                                    color = Red70,
+                                    navController = navController,
+                                    userProfile,
+                                    true,
+                                    viewModel_att,
+                                    id_task,
+                                    id_progetto,
+                                    view_model_notifiche
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                        }
                     }
-                }
-                }
-                items(amici) { amico ->
+                    items(amici) { amico ->
 
-                    var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
+                        var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
 
 
-                    if (cache.contains(amico)) {
-                        user_amico = cache[amico]
-                    } else {
-                        viewModel.ottieni_utente(amico) { profile ->
-                            user_amico = profile
-                            cache[amico] = profile // Aggiungi il profilo alla cache
-                            Log.d("Singolo Collega", "Dati: $user_amico")
+                        if (cache.contains(amico)) {
+                            user_amico = cache[amico]
+                        } else {
+                            viewModel.ottieni_utente(amico) { profile ->
+                                user_amico = profile
+                                cache[amico] = profile // Aggiungi il profilo alla cache
+                                Log.d("Singolo Collega", "Dati: $user_amico")
+                            }
+
+
+                        }
+
+
+                        var partecipa = task?.utenti?.contains(amico) ?: false
+
+                        if (!isLoading) {
+                            user_amico?.let { collega ->
+
+                                CollegaItem(
+                                    collega,
+                                    color = Red70,
+                                    navController,
+                                    userProfile,
+                                    partecipa,
+                                    viewModel_att,
+                                    id_task,
+                                    id_progetto,
+                                    view_model_notifiche
+
+
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
                         }
 
 
                     }
-
-
-                    var partecipa = task?.utenti?.contains(amico) ?: false
-
-                    if (!isLoading) {
-                        user_amico?.let { collega ->
-
-                            CollegaItem(
-                                collega,
-                                color = Red70,
-                                navController,
-                                userProfile,
-                                partecipa,
-                                viewModel_att,
-                                id_task,
-                                id_progetto,
-                                view_model_notifiche
-
-
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                        }
-                    }
-
-
                 }
             }
-        }
 
+        }
     }
 }
-
 
 
 
@@ -376,7 +406,7 @@ fun ListaColleghi(
 @Composable
 fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel, id_task : String, id_prog: String, view_model_notifiche: ViewModelNotifiche) {
 
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var amicizia = false
     if (utente.amici.contains(user_loggato?.id) && ( user_loggato!!.id != utente.id) ) {
         amicizia = true
@@ -394,7 +424,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
         modifier = Modifier
             .fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color.White
+            containerColor = if(isDarkTheme) Color.Gray else Color.White
         ),
         shape = RoundedCornerShape(16.dp),
 
@@ -415,7 +445,10 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
 
                 modifier = Modifier
                     .size(32.dp)
-                    .background(color.copy(alpha = 0.05f), CircleShape)
+                    .background(
+                        if (isDarkTheme) Color.White else color.copy(alpha = 0.05f),
+                        CircleShape
+                    )
                     .padding(8.dp)
             )
 
@@ -425,9 +458,10 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 Text(
                     text = utente.nome + " " + utente.cognome,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = if(isDarkTheme) Color.White else Color.Black
                 )
-                Text(text = utente.matricola, fontSize = 14.sp)
+                Text(text = utente.matricola, fontSize = 14.sp, color = if(isDarkTheme) Color.White else Color.Black)
             }
 
             if (!partecipa && user_loggato!!.id != utente.id ) {
@@ -437,7 +471,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                     Icon(
                         Icons.Default.Add,
                         contentDescription = "Aggiungi",
-                        tint = Color.Gray,
+                        tint = if(isDarkTheme) Color.White else Color.Gray,
                         modifier = Modifier
                             .size(24.dp)
                             .clickable {
@@ -468,7 +502,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                     Icon(
                         Icons.Default.Clear,
                         contentDescription = "rimuovi delega",
-                        tint = Color.Gray,
+                        tint = if(isDarkTheme) Color.White else Color.Gray,
                         modifier = Modifier
                             .size(24.dp)
                             .clickable {

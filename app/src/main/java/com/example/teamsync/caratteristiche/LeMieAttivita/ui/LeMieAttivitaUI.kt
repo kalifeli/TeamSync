@@ -126,10 +126,10 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val isClicked1 = remember { mutableStateOf(false) }
     val isClicked2 = remember { mutableStateOf(false) }
     var sezione by remember { mutableIntStateOf(1) }
-    val caricanome = remember { mutableStateOf(false) }
+    val caricanome = remember { mutableStateOf(true) }
     var carica by remember { mutableStateOf(false) }
     var isCompletedSection by remember { mutableStateOf(false) }
-    val progetto_nome  = remember { mutableStateOf("") }
+    val progetto_nome = remember { mutableStateOf("") }
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
     var isLoadingNonCompletateUtente by remember { mutableStateOf(true) }
@@ -145,7 +145,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
 
 
-    val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "creazione" )) }
+    val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "creazione")) }
 
     LaunchedEffect(Unit) {
         progetto_nome.value = viewmodelprogetto.getnome_progetto(id_prog)
@@ -154,7 +154,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     }
 
     LaunchedEffect(viewmodelprogetto.cambia_lista_partecipanti.value) {
-        if(viewmodelprogetto.cambia_lista_partecipanti.value) {
+        if (viewmodelprogetto.cambia_lista_partecipanti.value) {
             viewModel.getAllTodo_BY_Project(id_prog)
             val progettoId = viewModel.leMieAttivita.firstOrNull()?.progetto
 
@@ -190,8 +190,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     }
 
     LaunchedEffect(isClicked1.value) {
-        if(isClicked1.value)
-        {
+        if (isClicked1.value) {
             carica = true
             isLoadingCompletate = true
             isLoadingNonCompletate = true
@@ -204,8 +203,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     }
 
     LaunchedEffect(isClicked.value) {
-        if(isClicked.value)
-        {
+        if (isClicked.value) {
             carica = true
             isLoadingNonCompletate = true
             isLoadingCompletate = true
@@ -291,14 +289,24 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                 coroutineScope.launch {
                     // Chiama la funzione completa nel viewModel
 
-                    viewModel.completeTodo(id = completeTodo.id ?: "", completeTodo.completato, sezione,id_prog)
-                    for(p in partecipanti.value)
-                    {
-                        if (p != viewModelUtente.userProfile?.id )
-                        {
-                            val contenuto = (viewModelUtente.userProfile?.nome ?: " ") + " " + (viewModelUtente.userProfile?.cognome
+                    viewModel.completeTodo(
+                        id = completeTodo.id ?: "",
+                        completeTodo.completato,
+                        sezione,
+                        id_prog
+                    )
+                    for (p in partecipanti.value) {
+                        if (p != viewModelUtente.userProfile?.id) {
+                            val contenuto = (viewModelUtente.userProfile?.nome
+                                ?: " ") + " " + (viewModelUtente.userProfile?.cognome
                                 ?: " ") + " ha completato una task del progetto: " + progetto_nome.value
-                            viewModelNotifiche.creaNotificaViewModel(viewModelUtente.userProfile?.id ?: " ",p,"Completamento_Task", contenuto, id_prog)
+                            viewModelNotifiche.creaNotificaViewModel(
+                                viewModelUtente.userProfile?.id ?: " ",
+                                p,
+                                "Completamento_Task",
+                                contenuto,
+                                id_prog
+                            )
                         }
                     }
                 }
@@ -308,25 +316,34 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         )
     }
 
-        LaunchedEffect(viewModel.erroreAggiungiTask.value) {
-            if(viewModel.erroreAggiungiTask.value != null){
-                Toast.makeText(contesto, viewModel.erroreAggiungiTask.value, Toast.LENGTH_LONG).show()
-                viewModel.erroreAggiungiTask.value
-            }
+    LaunchedEffect(viewModel.erroreAggiungiTask.value) {
+        if (viewModel.erroreAggiungiTask.value != null) {
+            Toast.makeText(contesto, viewModel.erroreAggiungiTask.value, Toast.LENGTH_LONG).show()
+            viewModel.erroreAggiungiTask.value
+        }
+    }
+
+    LaunchedEffect(viewModel.erroreEditTask.value) {
+        if (viewModel.erroreEditTask.value != null) {
+            Toast.makeText(contesto, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
+            viewModel.resetErroreAggiungiTask()
         }
 
-        LaunchedEffect(viewModel.erroreEditTask.value) {
-            if(viewModel.erroreEditTask.value != null){
-                Toast.makeText(contesto, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
-                viewModel.resetErroreAggiungiTask()
-            }
-
-        }
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
+                    if (caricanome.value) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            color = Grey50,
+                            trackColor = Red70,
+                            strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                        )
+                    }
                     Text(
                         text = progetto_nome.value,
                         style = MaterialTheme.typography.headlineSmall,
@@ -336,56 +353,90 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Schermate.ItuoiProgetti.route) }) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "torna indietro", tint = Color.Black)
+                    if (!(caricanome.value)) {
+                        IconButton(onClick = { navController.navigate(Schermate.ItuoiProgetti.route) }) {
+                            Icon(
+                                Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = "torna indietro",
+                                tint = Color.Black
+                            )
+                        }
                     }
                 },
                 actions = {
-                    Box{
-                        IconButton(onClick = {expended = true}) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "menu a tendina", tint = Color.Black)
-                        }
-                        DropdownMenu(
-                            expanded = expended ,
-                            onDismissRequest = { expended = false },
-                            modifier = Modifier.background(Grey20)
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(text = "Condividi") },
-                                onClick = {
-                                    expended = false
-                                    mostraDialogCodiceProgetto = true
-                                },
-                                leadingIcon = { Icon(Icons.Default.Share, contentDescription = "condividi progetto")},
+                    if (!(caricanome.value)) {
+                        Box {
+                            IconButton(onClick = { expended = true }) {
+                                Icon(
+                                    Icons.Default.MoreVert,
+                                    contentDescription = "menu a tendina",
+                                    tint = Color.Black
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = expended,
+                                onDismissRequest = { expended = false },
                                 modifier = Modifier.background(Grey20)
-                            )
-                            DropdownMenuItem(
-                                text = { Text(text = "Info Progetto") },
-                                onClick = {
-                                    expended = false
-                                    navController.navigate("progetto_da_accettare/${id_prog}/progetto/progetto")
-                                },
-                                leadingIcon = { Icon(Icons.Default.Info, contentDescription = "informazioni progetto")},
-                                modifier = Modifier.background(Grey20)
-                            )
-                            DropdownMenuItem(
-                                text = { Text(text = "Modifica Progetto") },
-                                onClick = {
-                                    expended = false
-                                    navController.navigate("modificaProgetto/${id_prog}")
-                                },
-                                leadingIcon = { Icon(Icons.Default.Create, contentDescription = "modifica informazioni progetto")},
-                                modifier = Modifier.background(Grey20)
-                            )
-                            DropdownMenuItem(
-                                text = { Text(text = "Abbandona", color = Red70) },
-                                onClick = {
-                                    expended = false
-                                    mostraDialogAbbandono = true
-                                },
-                                leadingIcon = { Icon(painter = painterResource(id = R.drawable.ic_logout), contentDescription = "informazioni progetto", modifier = Modifier.size(20.dp), tint = Red70)},
-                                modifier = Modifier.background(Grey20)
-                            )
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(text = "Condividi") },
+                                    onClick = {
+                                        expended = false
+                                        mostraDialogCodiceProgetto = true
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Share,
+                                            contentDescription = "condividi progetto"
+                                        )
+                                    },
+                                    modifier = Modifier.background(Grey20)
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(text = "Info Progetto") },
+                                    onClick = {
+                                        expended = false
+                                        navController.navigate("progetto_da_accettare/${id_prog}/progetto/progetto")
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Info,
+                                            contentDescription = "informazioni progetto"
+                                        )
+                                    },
+                                    modifier = Modifier.background(Grey20)
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(text = "Modifica Progetto") },
+                                    onClick = {
+                                        expended = false
+                                        navController.navigate("modificaProgetto/${id_prog}")
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Create,
+                                            contentDescription = "modifica informazioni progetto"
+                                        )
+                                    },
+                                    modifier = Modifier.background(Grey20)
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(text = "Abbandona", color = Red70) },
+                                    onClick = {
+                                        expended = false
+                                        mostraDialogAbbandono = true
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_logout),
+                                            contentDescription = "informazioni progetto",
+                                            modifier = Modifier.size(20.dp),
+                                            tint = Red70
+                                        )
+                                    },
+                                    modifier = Modifier.background(Grey20)
+                                )
+                            }
                         }
                     }
                 },
@@ -396,374 +447,382 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                 )
             )
         }
-    ){ padding ->
-        Box(
-            modifier = Modifier
-                .background(White)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            Column(
+    ) { padding ->
+        if (!(caricanome.value)) {
+            Box(
                 modifier = Modifier
+                    .background(White)
                     .fillMaxSize()
-                    .padding(padding),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(horizontal = 16.dp)
             ) {
-                if(caricanome.value)
-                {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .padding(8.dp),
-                        color = Grey50,
-                        trackColor = Red70,
-                        strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
-                    )
-                }
-
-                Text(
-                    textAlign = TextAlign.Center,
-                    text = stringResource(id = R.string.project_tasks_description),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Grey70,
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.CenterHorizontally),
-                    color = Red70,
-                    thickness = 2.dp
-                )
-
-                Card(progressione,attivitaCompletate,attivitaTotali)
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Start)
+                        .fillMaxSize()
+                        .padding(padding),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = {
-                            viewModel.getTodoCompletateByProject(id_prog)
-                            isCompletedSection = true
-                            isClicked1.value = true
-                            isClicked.value = false
-                            isClicked2.value = false
-                            sezione = 0
-                        },
+
+
+                    Text(
+                        textAlign = TextAlign.Center,
+                        text = stringResource(id = R.string.project_tasks_description),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Grey70,
                         modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            if (isClicked1.value) Red70 else Grey35
-                        )
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.CenterHorizontally),
+                        color = Red70,
+                        thickness = 2.dp
+                    )
+
+                    Card(progressione, attivitaCompletate, attivitaTotali)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Start)
                     ) {
-                        Text(text = stringResource(id = R.string.bottoneCompletate), fontSize = 12.sp)
-                    }
-                    Button(
-                        onClick = {
-                            viewModel.getTodoByProject(id_prog)
-                            isCompletedSection = false
-                            isClicked.value = true
-                            isClicked1.value = false
-                            isClicked2.value = false
-                            sezione = 1
-                        },
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            if (isClicked.value) Red70 else Grey35
-                        ),
-
+                        Button(
+                            onClick = {
+                                viewModel.getTodoCompletateByProject(id_prog)
+                                isCompletedSection = true
+                                isClicked1.value = true
+                                isClicked.value = false
+                                isClicked2.value = false
+                                sezione = 0
+                            },
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                if (isClicked1.value) Red70 else Grey35
+                            )
                         ) {
-                        Text(text = stringResource(id = R.string.bottoneNonCompletate), fontSize = 12.sp)
+                            Text(
+                                text = stringResource(id = R.string.bottoneCompletate),
+                                fontSize = 12.sp
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                viewModel.getTodoByProject(id_prog)
+                                isCompletedSection = false
+                                isClicked.value = true
+                                isClicked1.value = false
+                                isClicked2.value = false
+                                sezione = 1
+                            },
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                if (isClicked.value) Red70 else Grey35
+                            ),
+
+                            ) {
+                            Text(
+                                text = stringResource(id = R.string.bottoneNonCompletate),
+                                fontSize = 12.sp
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                utente?.let {
+                                    viewModel.getTodoUtente(id_prog, it.id)
+                                }
+                                isCompletedSection = false
+                                isClicked.value = false
+                                isClicked1.value = false
+                                isClicked2.value = true
+                                sezione = 2
+                            },
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                if (isClicked2.value) Red70 else Grey35
+                            ),
+
+                            ) {
+                            Text(text = "Le Mie", fontSize = 12.sp)
+                        }
                     }
-                    Button(
-                        onClick = {
-                            utente?.let {
-                                viewModel.getTodoUtente(id_prog, it.id)
+                    if (carica) {
+                        CircularProgressIndicator(color = Color.Black)
+                    }
+
+                    if (!isLoadingNonCompletate) {
+                        when (ordine) {
+                            "data_di_scadenza" -> {
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaNonCompletate) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
                             }
-                            isCompletedSection = false
-                            isClicked.value = false
-                            isClicked1.value = false
-                            isClicked2.value = true
-                            sezione = 2
-                        },
+
+                            "priorità" -> {
+
+
+                                LazyColumn {
+                                    items(
+                                        viewModel.leMieAttivitaNonCompletate.sortedWith(
+                                            comparatore
+                                        )
+                                    ) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
+                            }
+
+                            "creazione" -> {
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaNonCompletate.sortedByDescending { it.dataCreazione }) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                    if (!isLoadingNonCompletateUtente) {
+                        when (ordine) {
+                            "data_di_scadenza" -> {
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaPerUtente) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
+                            }
+
+                            "priorità" -> {
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaPerUtente.sortedWith(comparatore)) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
+                            }
+
+                            "creazione" -> {
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaPerUtente.sortedByDescending { it.dataCreazione }) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+
+                    if (!isLoadingCompletate) {
+
+                        when (ordine) {
+                            "data_di_scadenza" -> {
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaCompletate) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
+                            }
+
+                            "priorità" -> {
+
+
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaCompletate.sortedWith(comparatore)) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+                                }
+                            }
+
+                            "creazione" -> {
+                                LazyColumn {
+                                    items(viewModel.leMieAttivitaCompletate.sortedByDescending { it.dataCreazione }) { attivita ->
+                                        TodoItem(
+                                            item = attivita,
+                                            onDelete = { id ->
+                                                viewModel.deleteTodo(id, sezione, id_prog)
+                                            },
+                                            onEdit = { item ->
+                                                currentTodoItem.value = item
+                                                openDialog.value = true
+                                            },
+                                            onComplete = { item ->
+                                                currentTodoItem.value = item
+                                                dialogComplete = true
+                                            },
+                                            viewModelUtente
+                                        )
+                                    }
+
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
+                if (sezione == 1) {
+                    FloatingActionButton(
+                        containerColor = Red70,
+                        shape = FloatingActionButtonDefaults.shape,
                         modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            if (isClicked2.value) Red70 else Grey35
-                        ),
-
-                        ) {
-                        Text(text = "Le Mie", fontSize = 12.sp)
+                            .align(Alignment.BottomEnd)
+                            .padding(8.dp),
+                        onClick = { addTodoDialog = true }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "add Todo",
+                            tint = Color.White
+                        )
                     }
-                }
-                if(carica) {
-                    CircularProgressIndicator(color = Color.Black)
-                }
-
-                if (!isLoadingNonCompletate)
-                {
-                    when(ordine) {
-                        "data_di_scadenza"-> {
-                            LazyColumn{
-                                items(viewModel.leMieAttivitaNonCompletate) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-                        "priorità" -> {
-
-
-                            LazyColumn{
-                                items(viewModel.leMieAttivitaNonCompletate.sortedWith(comparatore)) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-                        "creazione" -> {
-                            LazyColumn{
-                                items(viewModel.leMieAttivitaNonCompletate.sortedByDescending{ it.dataCreazione}) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-
-                }
-
-                }
-                if (!isLoadingNonCompletateUtente) {
-                    when (ordine) {
-                        "data_di_scadenza" -> {
-                            LazyColumn {
-                                items(viewModel.leMieAttivitaPerUtente) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-                        "priorità" -> {
-                            LazyColumn {
-                                items(viewModel.leMieAttivitaPerUtente.sortedWith(comparatore)) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-                        "creazione" -> {
-                            LazyColumn {
-                                items(viewModel.leMieAttivitaPerUtente.sortedByDescending { it.dataCreazione }) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-
-                if (!isLoadingCompletate) {
-
-                    when(ordine) {
-                        "data_di_scadenza"-> {
-                            LazyColumn{
-                                items(viewModel.leMieAttivitaCompletate) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-                        "priorità" -> {
-
-
-                            LazyColumn{
-                                items(viewModel.leMieAttivitaCompletate.sortedWith(comparatore)) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-                            }
-                        }
-                        "creazione" -> {
-                            LazyColumn{
-                                items(viewModel.leMieAttivitaCompletate.sortedByDescending{ it.dataCreazione}) { attivita ->
-                                    TodoItem(
-                                        item = attivita,
-                                        onDelete = { id ->
-                                            viewModel.deleteTodo(id, sezione, id_prog)
-                                        },
-                                        onEdit = { item ->
-                                            currentTodoItem.value = item
-                                            openDialog.value = true
-                                        },
-                                        onComplete = { item ->
-                                            currentTodoItem.value = item
-                                            dialogComplete = true
-                                        },
-                                        viewModelUtente
-                                    )
-                                }
-
-                            }
-                        }
-
-                    }
-
-                }
-
-            }
-            if (sezione == 1) {
-                FloatingActionButton(
-                    containerColor = Red70,
-                    shape = FloatingActionButtonDefaults.shape,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp),
-                    onClick = { addTodoDialog = true }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "add Todo",
-                        tint = Color.White
-                    )
                 }
             }
         }
-    }
 
-    if(mostraDialogAbbandono){
-        AbbandonaProgettoDialog(
-            onDismissRequest = { mostraDialogAbbandono = false },
-            viewModelProgetto = viewmodelprogetto,
-            navController = navController,
-            progettoId = id_prog
-        )
-    }
+        if (mostraDialogAbbandono) {
+            AbbandonaProgettoDialog(
+                onDismissRequest = { mostraDialogAbbandono = false },
+                viewModelProgetto = viewmodelprogetto,
+                navController = navController,
+                progettoId = id_prog
+            )
+        }
 
-    if(mostraDialogCodiceProgetto){
-        CondividiProgettoDialog(
-            onDismissRequest = { mostraDialogCodiceProgetto = false },
-            viewModelProgetto = viewmodelprogetto,
-            contesto = contesto,
-            progettoId = id_prog
-        )
-    }
+        if (mostraDialogCodiceProgetto) {
+            CondividiProgettoDialog(
+                onDismissRequest = { mostraDialogCodiceProgetto = false },
+                viewModelProgetto = viewmodelprogetto,
+                contesto = contesto,
+                progettoId = id_prog
+            )
+        }
 
+    }
 }
 
 @Composable

@@ -2,6 +2,7 @@ package com.example.teamsync.caratteristiche.Profilo
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,6 +60,7 @@ import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
 
 
@@ -301,11 +303,13 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp))
                         .background(
                             if (isDarkTheme) Color.Black else (Red70),
+
                             RoundedCornerShape(16.dp)
                         )
-                        .padding(16.dp),
+                        .padding(top = 15.dp, end = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
@@ -660,7 +664,7 @@ fun AddTodoDialog(
     val viewModelProgetto = remember { ViewModelProgetto() }
     val viewModel = remember { ViewModelUtente() }
     val viewModelNotifiche = remember { ViewModelNotifiche() }
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var isLoading by remember { mutableStateOf(true) }
     var progetti by remember { mutableStateOf<List<Progetto>>(emptyList()) }
 
@@ -672,8 +676,11 @@ fun AddTodoDialog(
     }
 
     AlertDialog(
+        containerColor = if(isDarkTheme) Color.Black else Color.White,
+        modifier = Modifier.border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
         onDismissRequest = { onDismiss() },
-        title = { Text(text = "Seleziona un progetto") },
+        title = { Text(text = "Seleziona un progetto", color =  if(isDarkTheme) Color.White else Color.Black) },
         text = {
             Column {
                 if (isLoading) {
@@ -681,7 +688,7 @@ fun AddTodoDialog(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = if(isDarkTheme) Color.White else Color.Black)
                     }
                 } else {
                     progetti.forEach { progetto ->
@@ -708,7 +715,8 @@ fun AddTodoDialog(
                                     }
                                     onDismiss()
                                 }
-                                .padding(8.dp)
+                                .padding(8.dp),
+                            color = if(isDarkTheme) Color.White else Color.Black
                         )
                     }
                 }
@@ -716,7 +724,7 @@ fun AddTodoDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Chiudi")
+                Text("Chiudi", color = if(isDarkTheme) Color.White else Color.Black)
             }
         }
     )

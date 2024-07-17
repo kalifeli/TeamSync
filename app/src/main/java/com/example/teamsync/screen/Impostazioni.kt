@@ -460,6 +460,7 @@ fun ImpostazioniContent_dark(navController: NavHostController) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
+
                     .clip(
                         RoundedCornerShape(
                             topStart = 20.dp,
@@ -553,7 +554,7 @@ fun SettingItemRow_dark(setting: SettingItem, navController: NavHostController) 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (setting.label == R.string.logout.toString()) Color(0xFFC1092A) else Color(0xFF333333)),
+            .background(if (setting.label == R.string.logout.toString()) Color(0xFFC1092A) else Color.Black) ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
 

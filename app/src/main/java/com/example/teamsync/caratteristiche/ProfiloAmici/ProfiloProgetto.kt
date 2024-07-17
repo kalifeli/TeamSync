@@ -1,6 +1,7 @@
 package com.example.teamsync.caratteristiche.ProfiloAmici
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +59,7 @@ import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -68,9 +72,8 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
     val searchQuery by remember { mutableStateOf("") }
     var progetto_ by remember { mutableStateOf<Progetto?>(null) }
     var listap by remember { mutableStateOf<List<String>?>(emptyList()) }
-    //var mostraPulsante by remember { mutableStateOf(true) }
     var nomeProgetto by remember { mutableStateOf("") }
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
 
     LaunchedEffect(Unit) {
@@ -91,7 +94,8 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color.Black
+                        color = if(isDarkTheme) Color.White else Color.Black
+
                     )
                 },
                 navigationIcon = {
@@ -107,23 +111,24 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
                                 }
                             }
                         }
-
-
-
                     }) {
                         Icon(
                             Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = "icona indietro",
-                            tint = Color.Black
+                            tint = if (isDarkTheme)Color.White else Color.Black
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = if(isDarkTheme) Color.DarkGray else White
+                )
             )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(if(isDarkTheme) Color.DarkGray else White)
                 .padding(padding)
                 .padding(16.dp)
         ) {
@@ -173,16 +178,19 @@ fun ProfiloProgetto(viewModel: ViewModelUtente, viewModelProgetto: ViewModelProg
     val formatoData = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val dataCreazione = formatoData.format(progetto_?.dataCreazione ?: Date())
     val dataScadenza = formatoData.format(progetto_?.dataScadenza ?: Date())
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp
         ),
-        colors = CardDefaults.cardColors(Red70),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = if(isDarkTheme)CardDefaults.cardColors(Color.Black) else CardDefaults.cardColors(Red70),
+
     ) {
         Text(
             text = "Informazioni",
@@ -230,7 +238,7 @@ fun ListaColleghi(
     val userProfile = viewModel.userProfile
     var amici by remember { mutableStateOf<List<String>>(emptyList()) }
     val task by remember { mutableStateOf<LeMieAttivita?>(null) }
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val cache = remember { mutableStateMapOf<String, ProfiloUtente?>() } // Utilizzo di mutableStateMapOf per la cache
     var visualizza_amici by remember { mutableStateOf(true) }
     var mostraPulsante = remember {
@@ -283,14 +291,15 @@ fun ListaColleghi(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = White)
+                .fillMaxWidth()
+                .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            colors = if(isDarkTheme)CardDefaults.cardColors(containerColor = Color.Black) else  CardDefaults.cardColors(containerColor = White)
         ) {
             Text(
                 text = "Partecipanti",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
+                color = if(isDarkTheme) Color.White else Color.Black,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
@@ -334,7 +343,7 @@ fun ListaColleghi(
 
             }
         if (caricamento_tasto.value) {
-            CircularProgressIndicator(color = Color.Black)
+            CircularProgressIndicator(color = if (isDarkTheme)Color.White else Color.Black)
         }
         else {
             if (mostraPulsante.value) {
@@ -397,7 +406,7 @@ fun ListaColleghi(
 fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean,
                 viewModel_att: LeMieAttivitaViewModel,  id_prog: String, sottoprovenienza : String, provenienza: String) {
 
-
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     LaunchedEffect(utente.id) {
         println("l'utente è cambiato " + utente.id)
@@ -418,23 +427,22 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        colors = if(isDarkTheme)CardDefaults.cardColors(Color.Gray) else CardDefaults.cardColors(White)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
                 .padding(16.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.logo_white),
                 contentDescription = null,
-
                 modifier = Modifier
                     .size(32.dp)
-                    .background(color.copy(alpha = 0.2f), CircleShape)
-                    .padding(8.dp)
+                    .background(if(isDarkTheme) Color.White else color.copy(alpha = 0.2f), CircleShape)
+                    .padding(8.dp),
+                painter = painterResource(id = R.drawable.logo_white),
             )
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -442,11 +450,13 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 Text(
                     text = "${utente.nome} ${utente.cognome}",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = if(isDarkTheme) Color.White else Color.Black
                 )
                 Text(
                     text = utente.matricola,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    color = if(isDarkTheme) Color.White else Color.Black
                 )
             }
         }

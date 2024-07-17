@@ -21,8 +21,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -136,9 +135,20 @@ fun PasswordDimenticata(
                     contentDescription = "icona mail",
                     modifier = Modifier.size(20.dp),
                 )},
-                colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Grey20,
-                        focusedContainerColor = White
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedLeadingIconColor = Color.Black,
+                    focusedTrailingIconColor = Color.Black,
+                    unfocusedLeadingIconColor = Color.Black,
+                    unfocusedTrailingIconColor = Color.Black,
+                    focusedBorderColor = if(isDarkTheme) Color.Black else Red70,
+                    unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
+                    focusedTextColor =  Color.Black,
+                    focusedContainerColor = White,
+                    focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                    unfocusedTextColor =  Color.Black,
+                    unfocusedContainerColor = Grey20,
+                    unfocusedLabelColor =   Color.Black,
+                    cursorColor = if(isDarkTheme) Color.Black else Red70,
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 shape = RoundedCornerShape(25.dp),

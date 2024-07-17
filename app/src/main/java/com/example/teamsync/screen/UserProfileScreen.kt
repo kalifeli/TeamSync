@@ -1,10 +1,6 @@
 package com.example.teamsync.screen
 
-import android.content.ContentValues
-import android.content.Context
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -15,8 +11,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -37,7 +35,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,6 +65,7 @@ import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.ui.theme.metaGrigiometaNero
 import com.example.teamsync.util.ThemePreferences
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -192,35 +190,31 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                     )
                 },
                 navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() }
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "icona per tornare indietro",
-                            tint = Color.Black
-                        )
-                    }
+
+                    IconButton(onClick = { navController.navigate(Schermate.Impostazioni.route) }) {
+                            Icon(
+                                Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = "torna indietro",
+                                tint = if (isDarkTheme) Color.White else Color.Black
+                            )
+                        }
+
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent,
+                    containerColor = if(isDarkTheme) Color.DarkGray else Color.White,
                     titleContentColor = Color.Black,
                     actionIconContentColor = Color.Black,
-                )
-
+                ) ,
             )
         },
     ) { padding ->
 
         Box(modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Color.White))
         {
-
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
-                    .padding(start = 16.dp, end = 16.dp),
+                    .padding(padding),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
@@ -258,7 +252,7 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                         )
                     }
                 }
-
+                Spacer(modifier = Modifier.height(10.dp))
                 if (loading) {
                     Text(
                         stringResource(id = R.string.caricamento),
@@ -286,6 +280,12 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                             unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
                             unfocusedTextColor =  if(isDarkTheme) Color.White else Color.Black,
                             focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) metaGrigiometaNero else White,
+                            focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                            unfocusedContainerColor = if (isDarkTheme) Color.Black else Grey20,
+                            unfocusedLabelColor =  if(isDarkTheme) Color.White else Color.Black,
+                            cursorColor = if(isDarkTheme) Color.Black else Red70,
+
                         ),
                         shape = RoundedCornerShape(16.dp),
                     )
@@ -303,6 +303,11 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                             unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
                             unfocusedTextColor =  if(isDarkTheme) Color.White else Color.Black,
                             focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) metaGrigiometaNero else White,
+                            focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                            unfocusedContainerColor = if (isDarkTheme) Color.Black else Grey20,
+                            unfocusedLabelColor =  if(isDarkTheme) Color.White else Color.Black,
+                            cursorColor = if(isDarkTheme) Color.Black else Red70,
                         ),
                         shape = RoundedCornerShape(16.dp),
                     )
@@ -320,6 +325,12 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                             unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
                             unfocusedTextColor =  if(isDarkTheme) Color.White else Color.Black,
                             focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) metaGrigiometaNero else White,
+                            focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                            unfocusedContainerColor = if (isDarkTheme) Color.Black else Grey20,
+                            unfocusedLabelColor =  if(isDarkTheme) Color.White else Color.Black,
+                            cursorColor = if(isDarkTheme) Color.Black else Red70,
+
                         ),
                         shape = RoundedCornerShape(16.dp),
                     )
@@ -349,17 +360,35 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                             unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
                             unfocusedTextColor =  if(isDarkTheme) Color.White else Color.Black,
                             focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) metaGrigiometaNero else White,
+                            focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                            unfocusedContainerColor = if (isDarkTheme) Color.Black else Grey20,
+                            unfocusedLabelColor =  if(isDarkTheme) Color.White else Color.Black,
+                            cursorColor = if(isDarkTheme) Color.Black else Red70,
+                            focusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                         ),
                         shape = RoundedCornerShape(16.dp),
                     )
                     var expanded by remember { mutableStateOf(false) }
                     Box {
                         OutlinedTextField(
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = if(isDarkTheme) Color.Transparent else Grey20,
-                                focusedContainerColor = if (isDarkTheme) Color.Transparent else White,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if(isDarkTheme) Color.White else Red70,
+                                unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
                                 unfocusedTextColor =  if(isDarkTheme) Color.White else Color.Black,
                                 focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                                focusedContainerColor = if(isDarkTheme) metaGrigiometaNero else White,
+                                focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                                unfocusedContainerColor = if (isDarkTheme) Color.Black else Grey20,
+                                unfocusedLabelColor =  if(isDarkTheme) Color.White else Color.Black,
+                                cursorColor = if(isDarkTheme) Color.Black else Red70,
+                                focusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                                focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                                unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                                unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
 
                             ),
                             value = sesso.name,
@@ -398,10 +427,15 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                         onValueChange = { email = it },
                         label = { Text("Email", color = if(isDarkTheme) Color.White else Color.Black) },
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = if(isDarkTheme) Color.Gray else Grey20,
-                            focusedContainerColor = if (isDarkTheme) Color.White else Red70,
+                            focusedBorderColor = if(isDarkTheme) Color.White else Red70,
+                            unfocusedBorderColor = if (isDarkTheme) Color.Gray else Color.Black,
                             unfocusedTextColor =  if(isDarkTheme) Color.White else Color.Black,
                             focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) metaGrigiometaNero else White,
+                            focusedLabelColor = if(isDarkTheme) Color.White else Red70,
+                            unfocusedContainerColor = if (isDarkTheme) Color.Black else Grey20,
+                            unfocusedLabelColor =  if(isDarkTheme) Color.White else Color.Black,
+                            cursorColor = if(isDarkTheme) Color.Black else Red70,
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -442,7 +476,7 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                         Text(
                             stringResource(id = R.string.caricamento),
                             style = MaterialTheme.typography.labelMedium,
-                            color = Color.Black,
+                            color = if(isDarkTheme) Color.White else Color.Black,
                             modifier = Modifier.padding(8.dp)
                         )
                     }

@@ -54,6 +54,7 @@ android {
     buildToolsVersion = "34.0.0"
 }
 
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -102,5 +103,7 @@ dependencies {
     // Lottie Animation
     implementation (libs.lottie.compose)
 
+    testImplementation ("org.mockito:mockito-core:3.8.0") // Aggiorna la versione se necessario
+    testImplementation ("org.mockito.kotlin:mockito-kotlin:3.2.0" ) // Dipendenza per Kotlin
 
 }

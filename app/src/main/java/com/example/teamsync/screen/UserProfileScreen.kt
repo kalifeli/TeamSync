@@ -422,6 +422,7 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                             }
                         }
                     }
+
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },

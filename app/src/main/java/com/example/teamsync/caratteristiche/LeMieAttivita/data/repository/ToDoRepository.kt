@@ -159,6 +159,17 @@ class ToDoRepository {
             } else {
                 throw Exception("Todo non trovato")
             }
+
+            val task = getTodoById(id)
+
+            if (task != null) {
+                Log.d("la elimina??? ", task.utenti.isEmpty().toString())
+                if(task.utenti.isEmpty()) {
+                    Log.d("la elimina? ", task.toString())
+                    deleteTodo(id)
+
+                }
+            }
         } catch (e: Exception) {
             // Gestisci l'errore se necessario
             throw Exception("Errore durante la rimozione dell'utente dal Todo: ${e.message}")

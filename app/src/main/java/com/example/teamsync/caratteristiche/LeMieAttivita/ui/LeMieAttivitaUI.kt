@@ -92,7 +92,6 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
@@ -892,12 +891,18 @@ fun TodoItem
 
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                IconButton(onClick = { dialogDelete = true }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_delete_24),
-                        contentDescription = "Delete",
-                        tint = Color.Red
-                    )
+                if (modifica.value) {
+                    IconButton(onClick = { dialogDelete = true }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
+                }
+                else
+                {
+                    Spacer(modifier = Modifier.size(25.dp))
                 }
                 if (dialogDelete) {
                     AlertDialog(

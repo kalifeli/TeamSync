@@ -2,6 +2,7 @@ package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +35,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun SezioneCalendario(){
+fun SezioneCalendario(isDarkTheme: Boolean){
     val currentDate = remember { Date() }
     val dateFormatter = remember { SimpleDateFormat("d MMMM", Locale.getDefault()) }
     val formattedDate = dateFormatter.format(currentDate)
@@ -42,7 +43,7 @@ fun SezioneCalendario(){
     val calendario = Calendar.getInstance()
     val visualizzaCalendario = DatePickerDialog(
         contesto,
-        R.style.CustomDatePickerDialog,
+        if(isDarkTheme) R.style.CustomDatePickerDialogDark else R.style.CustomDatePickerDialog,
         { _, year, month, dayOfMonth ->
             calendario.set(year, month, dayOfMonth)
         },
@@ -59,9 +60,10 @@ fun SezioneCalendario(){
             visualizzaCalendario.show()
         },
         modifier = Modifier
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp))
             .size(width = 160.dp, height = 100.dp),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = White
+            containerColor = if(isDarkTheme) Color.Black else White
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -75,20 +77,21 @@ fun SezioneCalendario(){
                 text = "Calendario",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = if(isDarkTheme) White else Color.Black
             )
             Spacer(modifier = Modifier.size(8.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .background(Grey35, shape = RoundedCornerShape(16.dp))
+                    .background(if(isDarkTheme) White else Grey35, shape = RoundedCornerShape(16.dp))
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_calendario_evento),
                     contentDescription = "Icona Calendario",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Black
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(
@@ -105,5 +108,5 @@ fun SezioneCalendario(){
 @Preview(showSystemUi = false)
 @Composable
 fun PreviewSezioneCalendario(){
-    SezioneCalendario()
+    SezioneCalendario(isDarkTheme = true)
 }

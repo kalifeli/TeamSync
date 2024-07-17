@@ -80,9 +80,9 @@ fun NotificationScreen(
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val context = LocalContext.current
     val preferences = context.getSharedPreferences("preferenze_notifiche", Context.MODE_PRIVATE)
-    var isEntraProgettoSelected by remember { mutableStateOf(preferences.getBoolean("utente_entra_progetto", true)) }
-    var isCompletaTaskSelected by remember { mutableStateOf(preferences.getBoolean("utente_completa_task", true)) }
-    var isModificaTaskSelected by remember { mutableStateOf(preferences.getBoolean("utente_modifica_mia_task", true)) }
+    val isEntraProgettoSelected by remember { mutableStateOf(preferences.getBoolean("utente_entra_progetto", true)) }
+    val isCompletaTaskSelected by remember { mutableStateOf(preferences.getBoolean("utente_completa_task", true)) }
+    val isModificaTaskSelected by remember { mutableStateOf(preferences.getBoolean("utente_modifica_mia_task", true)) }
 
     Log.d("SharedPreferences", "5: $isEntraProgettoSelected")
     Log.d("SharedPreferences", "6: $isCompletaTaskSelected")
@@ -101,7 +101,6 @@ fun NotificationScreen(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = if(isDarkTheme) Color.White else Color.Black
                     )
                 },
                 actions = {
@@ -112,14 +111,14 @@ fun NotificationScreen(
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Refresh Notifications",
-                            tint = Color.Black
                         )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = if(isDarkTheme) Color.DarkGray else Color.Transparent,
-                    titleContentColor = if(isDarkTheme) Color.White else Color.Black,
-                    actionIconContentColor = if(isDarkTheme) Color.White else Color.Black,
+                    containerColor = if(isDarkTheme) Color.DarkGray else White,
+                    titleContentColor = if(isDarkTheme) White else Color.Black,
+                    actionIconContentColor = if(isDarkTheme) White else Color.Black,
+                    navigationIconContentColor = if(isDarkTheme) White else Color.Black
                 )
             )
         },
@@ -142,8 +141,9 @@ fun NotificationScreen(
                             .height(4.dp),
                         color = Red70
                     )
-
-                }
+                },
+                containerColor = if(isDarkTheme) Color.Black else White,
+                contentColor = if(isDarkTheme) White else Color.Black
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
@@ -262,17 +262,17 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
     var nomeProgetto by remember { mutableStateOf("") }
     val isLoading by viewmodelProgetto.carica_nome.collectAsState()
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
-    var loadingRichiestaAmicizia = remember {
+    val loadingRichiestaAmicizia = remember {
         mutableStateOf(false)
     }
 
     LaunchedEffect(Unit) {
         viewmodelUtente.getUserProfile()
         listap = viewmodelProgetto.getLista_Partecipanti(notifica.progetto_id)
-        if (notifica.progetto_id.isNotEmpty()) {
-            nomeProgetto = viewmodelProgetto.getnome_progetto(notifica.progetto_id)
+        nomeProgetto = if (notifica.progetto_id.isNotEmpty()) {
+            viewmodelProgetto.getnome_progetto(notifica.progetto_id)
         } else {
-            nomeProgetto = "Nome progetto non disponibile"
+            "Nome progetto non disponibile"
         }
     }
 
@@ -362,7 +362,7 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
 
 
             if (notifica.Tipo == "Richiesta_Amicizia" || notifica.Tipo == "Richiesta_Progetto")
-                if (notifica.accettato == "false" && notifica.aperto == false) {
+                if (notifica.accettato == "false" && !notifica.aperto) {
                     Box(
                         modifier = Modifier
                             .size(40.dp)
@@ -384,13 +384,13 @@ fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHo
 
                                         for (p in listap!!) {
                                             if (p != viewmodelUtente.userProfile?.id) {
-                                                var contenuto =
+                                                val contenuto =
                                                     viewmodelUtente.userProfile?.nome + " " + (viewmodelUtente.userProfile?.cognome
                                                         ?: "") + " " + "è entrato nel progetto " + nomeProgetto
                                                 viewmodelUtente.userProfile?.id?.let {
                                                     vmNotifiche.creaNotificaViewModel(
                                                         it,
-                                                        p.toString(),
+                                                        p,
                                                         "Entra_Progetto",
                                                         contenuto,
                                                         notifica.progetto_id

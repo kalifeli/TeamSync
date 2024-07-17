@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,16 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.teamsync.ui.theme.Grey35
 
 @Composable
-fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int){
+fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int, isDarkTheme: Boolean){
     val progressi = progettiCompletati/progettiUtente.toFloat() // la conversione a float è necessaria per la circular progress indicator
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp
         ),
         modifier = Modifier
-            .size(width = 160.dp, height = 200.dp),
+            .size(width = 160.dp, height = 200.dp)
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = White
+            containerColor = if(isDarkTheme) Color.Black else White
         ),
         shape = RoundedCornerShape(16.dp)
 
@@ -48,9 +50,10 @@ fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int){
                 text = "Progressi",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = if(isDarkTheme) White else Color.Black
             )
             Spacer(modifier = Modifier.size(8.dp))
+
             Box(
                 modifier = Modifier.size(100.dp),
                 contentAlignment = Alignment.Center
@@ -60,20 +63,20 @@ fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int){
                     modifier = Modifier.size(80.dp),
                     color = Red70,
                     strokeWidth = 8.dp,
-                    trackColor = Grey35,
+                    trackColor = if(isDarkTheme) White else Grey35,
                 )
                 Text(
                     text = "$progettiCompletati / $progettiUtente",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = if(isDarkTheme) White else Color.Black
                 )
             }
             Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = "Continua così!",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Black
+                color = if(isDarkTheme) White else Color.Black
             )
         }
     }
@@ -82,5 +85,5 @@ fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int){
 @Preview
 @Composable
 fun PreviewSezioneProgressiProgetti(){
-    SezioneProgressiProgetti(3, 10)
+    SezioneProgressiProgetti(3, 10, isDarkTheme = false)
 }

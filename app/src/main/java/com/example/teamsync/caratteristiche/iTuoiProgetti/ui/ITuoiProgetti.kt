@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -37,7 +38,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -72,9 +75,11 @@ import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
+import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -87,6 +92,8 @@ fun ITuoiProgetti(
     viewModelProgetto: ViewModelProgetto,
     viewModelUtente: ViewModelUtente,
 ){
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
     var expended by remember {
         mutableStateOf(false)
     }
@@ -124,22 +131,27 @@ fun ITuoiProgetti(
                        style = MaterialTheme.typography.headlineSmall,
                        fontWeight = FontWeight.Bold,
                        textAlign = TextAlign.Center,
-                       color = Color.Black
+                       color = if(isDarkTheme) White else Color.Black,
                    )
                },
 
                actions = {
                    Box{
-                       IconButton(onClick = {expended = true }) {
-                           Icon(Icons.Default.MoreVert, contentDescription = "Menu a tendina")
+                       IconButton(
+                           onClick = {expended = true },
+                           colors = IconButtonDefaults.iconButtonColors(
+                               contentColor = if(isDarkTheme) White else Color.Black,
+                           )
+                       ) {
+                           Icon(Icons.Default.MoreVert, contentDescription = "Menu a tendina", tint = if(isDarkTheme) White else Color.Black)
                        }
                        DropdownMenu(
                            expanded = expended,
                            onDismissRequest = { expended = false },
-                           modifier = Modifier.background(Grey20)
+                           modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                        ) {
                            DropdownMenuItem(
-                               text = { Text(text = "Sincronizza") },
+                               text = { Text(text = "Sincronizza", color = if(isDarkTheme) White else Color.Black)},
                                onClick = {
                                    expended = false
                                    utenteCorrenteId?.let {
@@ -148,24 +160,24 @@ fun ITuoiProgetti(
                                    }
                                },
                                leadingIcon = {
-                                   Icon(Icons.Default.Refresh, contentDescription = "icona sincronizzazione", tint = Color.Black)
+                                   Icon(Icons.Default.Refresh, contentDescription = "icona sincronizzazione", tint = if(isDarkTheme) White else Color.Black)
                                },
-                               modifier = Modifier.background(Grey20)
+                               modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                            )
 
                            DropdownMenuItem(
-                               text = { Text(text = "Impostazioni") },
+                               text = { Text(text = "Impostazioni", color = if(isDarkTheme) White else Color.Black) },
                                onClick = {
                                    expended = false
                                    navController.navigate(Schermate.Impostazioni.route)
                                          },
                                leadingIcon = {
-                                   Icon(Icons.Default.Settings, contentDescription = "icona Impostazioni", tint = Color.Black)
+                                   Icon(Icons.Default.Settings, contentDescription = "icona Impostazioni", tint = if(isDarkTheme) White else Color.Black)
                                },
-                               modifier = Modifier.background(Grey20)
+                               modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                            )
                            DropdownMenuItem(
-                               text = { Text(text = "Esci")},
+                               text = { Text(text = "Esci", color = if(isDarkTheme) White else Color.Black)},
                                onClick = {
                                    expended = false
                                    viewModelProgetto.logout()
@@ -175,11 +187,11 @@ fun ITuoiProgetti(
                                    Icon(
                                        painter = painterResource(id = R.drawable.ic_logout),
                                        contentDescription = "icona Logout",
-                                       tint = Color.Black,
+                                       tint = if(isDarkTheme) White else Color.Black,
                                        modifier = Modifier.size(20.dp),
                                    )
                                },
-                               modifier = Modifier.background(Grey20)
+                               modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                            )
                            
                        }
@@ -187,9 +199,10 @@ fun ITuoiProgetti(
 
                },
                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                   containerColor = Color.Transparent,
-                   titleContentColor = Color.Black,
-                   actionIconContentColor = Color.Black,
+                   containerColor = if(isDarkTheme) Color.DarkGray else White,
+                   titleContentColor = if(isDarkTheme) White else Color.Black,
+                   actionIconContentColor = if(isDarkTheme) White else Color.Black,
+                   navigationIconContentColor = if(isDarkTheme) White else Color.Black
                )
            )
        },
@@ -209,6 +222,7 @@ fun ITuoiProgetti(
            Column(
                modifier = Modifier
                    .fillMaxSize()
+                   .background(if (isDarkTheme) Color.DarkGray else White)
                    .padding(padding)
                    .padding(horizontal = 16.dp)
            ) {
@@ -232,11 +246,13 @@ fun ITuoiProgetti(
                }
 
 
-               SezioneProfiloUtente(navController, viewModelUtente)
+               SezioneProfiloUtente(navController, viewModelUtente, isDarkTheme)
 
                Spacer(modifier = Modifier.height(16.dp))
 
-               SezioneITUoiProgetti(navController = navController, progetti = progetti1, viewModelProgetto = viewModelProgetto, attivitaProgetti = attivitaProgetti)
+               SezioneITUoiProgetti(navController = navController, progetti = progetti1, viewModelProgetto = viewModelProgetto, attivitaProgetti = attivitaProgetti,
+                   isDarkTheme = isDarkTheme
+               )
 
                Spacer(modifier = Modifier.height(16.dp))
 
@@ -246,9 +262,9 @@ fun ITuoiProgetti(
                        .fillMaxSize(),
                    horizontalArrangement = Arrangement.spacedBy(32.dp)
                ) {
-                   SezioneProgressiProgetti(progettiCompletati = progettiCompletati.size, progettiUtente = progetti.size)
+                   SezioneProgressiProgetti(progettiCompletati = progettiCompletati.size, progettiUtente = progetti.size, isDarkTheme = isDarkTheme)
 
-                   SezioneCalendario()
+                   SezioneCalendario(isDarkTheme)
                }
            }
        }
@@ -256,7 +272,8 @@ fun ITuoiProgetti(
     if (mostraCreaProgettoDialog) {
         CreaProgettoDialog(
             onDismissRequest = { mostraCreaProgettoDialog = false },
-            viewModelProgetto = viewModelProgetto
+            viewModelProgetto = viewModelProgetto,
+            isDarkTheme = isDarkTheme
         )
     }
 
@@ -290,6 +307,7 @@ fun ITuoiProgetti(
 fun CreaProgettoDialog(
     onDismissRequest: () -> Unit,
     viewModelProgetto: ViewModelProgetto,
+    isDarkTheme: Boolean
 ) {
     var nome by remember { mutableStateOf("") }
     var descrizione by remember { mutableStateOf("") }
@@ -303,7 +321,7 @@ fun CreaProgettoDialog(
 
     val datePickerDialog = DatePickerDialog(
         context,
-        R.style.CustomDatePickerDialog,
+        if(isDarkTheme) R.style.CustomDatePickerDialogDark else R.style.CustomDatePickerDialog,
         { _, year, month, dayOfMonth ->
             calendar.set(year, month, dayOfMonth)
             dataScadenza = calendar.time
@@ -323,9 +341,10 @@ fun CreaProgettoDialog(
         title = {
             Text(
                 "Crea un nuovo progetto",
+                color = if(isDarkTheme) White else Color.Black
             )
                 },
-        containerColor = White,
+        containerColor = if(isDarkTheme) Color.Black else White,
         text = {
             Column {
                 OutlinedTextField(
@@ -334,12 +353,21 @@ fun CreaProgettoDialog(
                     label = {
                         Text(
                             stringResource(id = R.string.nome),
-                            color = Color.Black
                         ) },
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Red70
-                    )
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                    ),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -347,11 +375,21 @@ fun CreaProgettoDialog(
                     onValueChange = { descrizione = it },
                     label = {
                         Text(
-                            stringResource(id = R.string.descrizioneEdit),
-                        color = Color.Black) },
+                            stringResource(id = R.string.descrizioneEdit)
+                        ) },
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Red70
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                     maxLines = 15
                 )
@@ -363,8 +401,8 @@ fun CreaProgettoDialog(
                     readOnly = true,
                     label = { Text(
                         "Data di Scadenza",
-                        color = Color.Black
                     ) },
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth(),
                     trailingIcon = { 
@@ -379,8 +417,17 @@ fun CreaProgettoDialog(
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Red70
-                    )
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                    ),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -395,8 +442,8 @@ fun CreaProgettoDialog(
                         label = {
                             Text(
                                 "Priorità",
-                                color = Color.Black
                             ) },
+                        shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .fillMaxWidth(),
                         trailingIcon = {
@@ -404,14 +451,23 @@ fun CreaProgettoDialog(
                                 modifier = Modifier.clickable { expanded = true })
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Red70
-                        )
+                            focusedBorderColor = Red70,
+                            unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                            unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                            focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                            focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        ),
                     )
 
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
-                        modifier = Modifier.background(Grey20)
+                        modifier = Modifier.background(if(isDarkTheme) Color.Black else Grey20),
                     ) {
                         Priorità.entries.forEach { p ->
                             DropdownMenuItem(
@@ -423,7 +479,11 @@ fun CreaProgettoDialog(
                                             modifier = Modifier
                                                 .size(10.dp)
                                                 .clip(CircleShape)
-                                                .border(0.5.dp, Color.Black, CircleShape)
+                                                .border(
+                                                    0.5.dp,
+                                                    if (isDarkTheme) White else Color.Black,
+                                                    CircleShape
+                                                )
                                                 .background(p.colore)
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
@@ -435,7 +495,12 @@ fun CreaProgettoDialog(
                                     priorita = p
                                     expanded = false
                                 },
-                                modifier = Modifier.background(Grey20)
+                                modifier = Modifier.background(if(isDarkTheme) Color.Black else Grey20),
+                                colors = MenuDefaults.itemColors(
+                                    textColor = if(isDarkTheme) White else Color.Black,
+                                    leadingIconColor = if(isDarkTheme) White else Color.Black,
+                                    trailingIconColor = if(isDarkTheme) White else Color.Black,
+                                )
                             )
                         }
                     }
@@ -457,7 +522,8 @@ fun CreaProgettoDialog(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = "Oppure unisciti a un progetto con ",
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = if(isDarkTheme) Color.White else Color.Black
                     )
                     Text(
                         text = "un codice",
@@ -484,7 +550,7 @@ fun CreaProgettoDialog(
                 },
                 colors = ButtonDefaults.buttonColors(Red70)
             ) {
-                Text("Crea")
+                Text("Crea", color = White)
             }
         },
         dismissButton = {
@@ -493,7 +559,7 @@ fun CreaProgettoDialog(
             ) {
                 Text(
                     "Annulla",
-                    color = Color.Black)
+                    color = if(isDarkTheme) White else Color.Black)
 
             }
         }
@@ -502,6 +568,7 @@ fun CreaProgettoDialog(
         AggiungiProgettoDialog(
             onDismissRequest = { mostraAggiungiProgetto = false },
             viewModelProgetto = viewModelProgetto ,
+            isDarkTheme = isDarkTheme
         )
     }
     LaunchedEffect(viewModelProgetto.erroreAggiungiProgetto.value) {
@@ -517,6 +584,7 @@ fun CreaProgettoDialog(
 fun AggiungiProgettoDialog(
     onDismissRequest: () -> Unit,
     viewModelProgetto: ViewModelProgetto,
+    isDarkTheme: Boolean
 ){
     var codiceProgetto by remember { mutableStateOf("") }
     val utenteId = viewModelProgetto.utenteCorrenteId.value
@@ -524,9 +592,10 @@ fun AggiungiProgettoDialog(
         title = {
             Text(
                 text = "Aggiungi un progetto",
+                color = if(isDarkTheme) White else Color.Black
             )
         },
-        containerColor = White,
+        containerColor = if(isDarkTheme) Color.Black else White,
         text = {
             Column {
                 Text(
@@ -534,7 +603,8 @@ fun AggiungiProgettoDialog(
                         .fillMaxWidth()
                         .padding(8.dp),
                     text = "Per unirti a un progetto esistente, inserisci il codice univoco fornito dal creatore del progetto.",
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = if(isDarkTheme) White else Color.Black
                 )
                 OutlinedTextField(
                     value = codiceProgetto , 
@@ -542,12 +612,21 @@ fun AggiungiProgettoDialog(
                     label = {
                         Text(
                             "Codice progetto",
-                            color = Color.Black
+                            color = if(isDarkTheme) White else Color.Black
                         ) },
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Red70,
-                        focusedBorderColor = Red70
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                     maxLines = 1
                 )
@@ -561,7 +640,12 @@ fun AggiungiProgettoDialog(
                         viewModelProgetto.aggiungiPartecipanteConCodice(it,codiceProgetto)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Red70),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Red70,
+                    contentColor = White,
+                    disabledContainerColor = if(isDarkTheme) White else Grey35,
+                    disabledContentColor = Color.Black
+                ),
                 enabled = codiceProgetto.length >= 8
             ) {
                 Text(text = "Unisciti")
@@ -573,7 +657,7 @@ fun AggiungiProgettoDialog(
             ){
                 Text(
                     text = "Annulla",
-                    color = Color.Black
+                    color = if(isDarkTheme) White else Color.Black
                 )
             }
         }

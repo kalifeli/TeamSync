@@ -1,10 +1,8 @@
 package com.example.teamsync.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -16,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -23,21 +22,22 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.navigation.Schermate
-import com.example.teamsync.ui.theme.Grey20
-import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
 
 @Composable
 fun BottomNav(
     navController: NavHostController,
-    notificheViewModel: ViewModelNotifiche
+    notificheViewModel: ViewModelNotifiche,
+
 ) {
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     NavigationBar(
-        containerColor = Color.Transparent,
+        containerColor = if(isDarkTheme) Color.Black else White,
         tonalElevation = 16.dp,
         modifier = Modifier
             .height(60.dp)
-
     ) {
 
         val rottaCorrente = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -65,8 +65,8 @@ fun BottomNav(
             colors = NavigationBarItemDefaults.colors(
                 indicatorColor = Color.Transparent,
                 selectedTextColor = Red70,
-                unselectedTextColor = Color.Black,
-                unselectedIconColor = Color.Black,
+                unselectedTextColor = if(isDarkTheme) White else Color.Black,
+                unselectedIconColor = if(isDarkTheme) White else Color.Black,
                 selectedIconColor = Red70
             ),
         )
@@ -94,8 +94,8 @@ fun BottomNav(
             colors = NavigationBarItemDefaults.colors(
                 indicatorColor = Color.Transparent,
                 selectedTextColor = Red70,
-                unselectedTextColor = Color.Black,
-                unselectedIconColor = Color.Black,
+                unselectedTextColor = if(isDarkTheme) White else Color.Black,
+                unselectedIconColor = if(isDarkTheme) White else Color.Black,
                 selectedIconColor = Red70
             ),
         )
@@ -121,8 +121,8 @@ fun BottomNav(
             colors = NavigationBarItemDefaults.colors(
                 indicatorColor = Color.Transparent,
                 selectedTextColor = Red70,
-                unselectedTextColor = Color.Black,
-                unselectedIconColor = Color.Black,
+                unselectedTextColor = if(isDarkTheme) White else Color.Black,
+                unselectedIconColor = if(isDarkTheme) White else Color.Black,
                 selectedIconColor = Red70
             ),
         )

@@ -35,11 +35,13 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
+import com.example.teamsync.ui.theme.White
 
 @Composable
 fun SezioneProfiloUtente(
     navController: NavController,
     viewModelUtente: ViewModelUtente,
+    isDarkTheme: Boolean
 ){
     val userProfile = viewModelUtente.userProfile
 
@@ -52,9 +54,10 @@ fun SezioneProfiloUtente(
         ),
         modifier = Modifier
             .fillMaxWidth()
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp))
             .height(150.dp),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Red70
+            containerColor = if(isDarkTheme) Color.Black else Red70
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -135,5 +138,5 @@ fun PreviewImmagineProfiloUtente(){
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewSezioneProfiloUtente(){
-    SezioneProfiloUtente(navController = rememberNavController(), viewModelUtente = ViewModelUtente())
+    SezioneProfiloUtente(navController = rememberNavController(), viewModelUtente = ViewModelUtente(), isDarkTheme = true)
 }

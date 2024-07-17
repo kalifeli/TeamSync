@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,6 +41,7 @@ import com.example.teamsync.screen.Registrazione
 import com.example.teamsync.screen.SchermataDiBenvenuto
 import com.example.teamsync.screen.Tema
 import com.example.teamsync.screen.UserProfileScreen
+import com.example.teamsync.util.ThemePreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 

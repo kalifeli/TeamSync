@@ -3,6 +3,7 @@ package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,6 +46,7 @@ fun SezioneITUoiProgetti(
     navController: NavController,
     attivitaProgetti: Map<String, Int>,
     viewModelProgetto: ViewModelProgetto,
+    isDarkTheme: Boolean
 ){
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_progetti", Context.MODE_PRIVATE)
@@ -90,7 +92,7 @@ fun SezioneITUoiProgetti(
         Text(
             text = "I Tuoi Progetti",
             style = MaterialTheme.typography.titleLarge,
-            color = Color.Black,
+            color = if(isDarkTheme) White else Color.Black,
         )
     }
     Spacer(modifier = Modifier.height(8.dp))
@@ -102,9 +104,10 @@ fun SezioneITUoiProgetti(
 
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp),
+                .height(140.dp)
+                .border(1.dp, White,shape = RoundedCornerShape(16.dp)),
             colors = CardDefaults.outlinedCardColors(
-                containerColor = White
+                containerColor = if(isDarkTheme) Color.Black else White
             ),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -124,7 +127,7 @@ fun SezioneITUoiProgetti(
                     text = "Oops! Sembra che non ci siano progetti. Inizia ora creandone uno.",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.Black,
+                    color = if(isDarkTheme) White else Color.Black,
                 )
             }
         }
@@ -139,12 +142,12 @@ fun SezioneITUoiProgetti(
                         val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
                         }
 
 
@@ -157,12 +160,12 @@ fun SezioneITUoiProgetti(
                         val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
                         }
                     }
                 }
@@ -172,12 +175,12 @@ fun SezioneITUoiProgetti(
                         val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
                         if(visualizza_completati)
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
 
                         }
                         else if (!(progetto.completato))
                         {
-                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate)
+                            ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
                         }
                     }
                 }

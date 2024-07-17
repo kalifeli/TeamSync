@@ -1,6 +1,7 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import java.text.SimpleDateFormat
@@ -47,18 +49,14 @@ fun ITuoiProgettiItem(
     progetto: Progetto,
     navController: NavController,
     viewModelProgetto: ViewModelProgetto,
-    attivitaNonCompletate: Int
+    attivitaNonCompletate: Int,
+    isDarkTheme: Boolean
 ){
     val dataScadenza = remember { progetto.dataScadenza }
     val formattatoreData = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
     val dataScadenzaSdf = formattatoreData.format(dataScadenza)
     val dataConsegna = remember {progetto.dataConsegna}
     val dataConsegnaSdf = formattatoreData.format(dataConsegna)
-
-    //val attivitaNonCompletate by viewModelProgetto.attivitaCompletate
-    //val attivitaCompletate by viewModelProgetto.attivitaCompletate
-    //val attivitaTotali = attivitaNonCompletate.size + attivitaCompletate.size
-    //val attivitaDaCompletare = attivitaNonCompletate.size
 
     ElevatedCard(
         onClick = {
@@ -68,9 +66,10 @@ fun ITuoiProgettiItem(
             defaultElevation = 16.dp
         ),
         modifier = Modifier
-            .size(width = 220.dp, height = 140.dp),
+            .size(width = 220.dp, height = 140.dp)
+            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = White
+            containerColor = if(isDarkTheme) Color.Black else White
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -86,13 +85,14 @@ fun ITuoiProgettiItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if(progetto.completato){
-                    Icon(painter = painterResource(id = R.drawable.ic_progettocompletato), contentDescription = "progetto completato" )
+                    Icon(painter = painterResource(id = R.drawable.ic_progettocompletato), contentDescription = "progetto completato", tint = if(isDarkTheme) White else Color.Black)
                 }
 
                 Text(
                     text = progetto.nome,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = if(isDarkTheme) White else Color.Black
                 )
                 if(!progetto.completato) {
                     Box(
@@ -106,7 +106,8 @@ fun ITuoiProgettiItem(
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
+                color = if(isDarkTheme) White else Grey35
             )
 
             if(progetto.completato) {
@@ -117,13 +118,15 @@ fun ITuoiProgettiItem(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_votoprogetto),
                         contentDescription = "voto progetto",
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
+                        tint = if(isDarkTheme) White else Color.Black
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = progetto.voto,
                         textAlign = TextAlign.End,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        color = if(isDarkTheme) White else Color.Black
                     )
                 }
 
@@ -135,13 +138,15 @@ fun ITuoiProgettiItem(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_task_da_completare),
                         contentDescription = "attività da completare",
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
+                        tint = if(isDarkTheme) White else Color.Black
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "$attivitaNonCompletate attività",
                         textAlign = TextAlign.End,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        color = if(isDarkTheme) White else Color.Black
                     )
                 }
             }
@@ -155,15 +160,16 @@ fun ITuoiProgettiItem(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_progettoconsegnato),
                         contentDescription = "data consegna progetto",
-                        modifier = Modifier.size(16.dp),
-                        tint = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+                        modifier = Modifier
+                            .size(16.dp),
+                        tint = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else if (isDarkTheme) White else Color.Black
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = dataConsegnaSdf,
                         textAlign = TextAlign.End,
                         fontSize = 12.sp,
-                        color = Color.Black
+                        color = if(isDarkTheme) White else Color.Black
                     )
                 }
 
@@ -179,7 +185,7 @@ fun ITuoiProgettiItem(
                         painter = painterResource(iconaCalendario),
                         contentDescription = "data scadenza",
                         modifier = Modifier.size(16.dp),
-                        tint = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+                        tint = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else if (isDarkTheme) White else Color.Black
 
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -187,7 +193,7 @@ fun ITuoiProgettiItem(
                         text = dataScadenzaSdf,
                         textAlign = TextAlign.End,
                         fontSize = 12.sp,
-                        color = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else Color.Black
+                        color = if (viewModelProgetto.progettoScaduto(progetto)) Red70 else if (isDarkTheme) White else Color.Black
                     )
                 }
             }
@@ -198,5 +204,5 @@ fun ITuoiProgettiItem(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewITuoiProgettiItem(){
-    ITuoiProgettiItem( navController = rememberNavController(),progetto = Progetto(nome = "TeamSync"), viewModelProgetto = ViewModelProgetto(), attivitaNonCompletate = 3)
+    ITuoiProgettiItem( navController = rememberNavController(),progetto = Progetto(nome = "TeamSync"), viewModelProgetto = ViewModelProgetto(), attivitaNonCompletate = 3 , isDarkTheme = false)
 }

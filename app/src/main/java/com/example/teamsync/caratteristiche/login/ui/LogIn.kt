@@ -3,6 +3,7 @@ package com.example.teamsync.caratteristiche.login.ui
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -174,16 +176,24 @@ fun LoginScreen(
                 ) {
                     Column(
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(horizontal = 40.dp),
                     ) {
                         // campo Email Login
                         OutlinedTextField(
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Grey20,
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Red70,
+                                focusedTextColor = Color.Black,
                                 focusedContainerColor = White,
-
-
-                                ),
+                                focusedLabelColor = Red70,
+                                unfocusedBorderColor = Color.Black,
+                                unfocusedTextColor = Color.Black,
+                                unfocusedContainerColor = Grey20,
+                                unfocusedLabelColor = Color.Black,
+                                cursorColor = Red70
+                            ),
                             value = email,
                             onValueChange = { email = it },
                             label = { Text("Email") },
@@ -201,10 +211,20 @@ fun LoginScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         // campo Password Login
                         OutlinedTextField(
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Grey20,
-                                focusedContainerColor = White
-                            ),
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Red70,
+                                    focusedTextColor = Color.Black,
+                                    focusedContainerColor = White,
+                                    focusedLabelColor = Red70,
+                                    unfocusedBorderColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    unfocusedLabelColor = Color.Black,
+                                    unfocusedContainerColor = Grey20,
+                                    cursorColor = Red70
+
+                                ),
                             value = password,
                             onValueChange = { password = it },
                             label = {

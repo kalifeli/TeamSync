@@ -28,8 +28,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -185,9 +185,20 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                    .padding(horizontal = 16.dp)
             ) {
                 OutlinedTextField(
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Red70,
+                        focusedTextColor = Color.Black,
+                        focusedContainerColor = White,
+                        focusedLabelColor = Red70,
+                        focusedLeadingIconColor = Color.Black,
+                        focusedTrailingIconColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
                         unfocusedContainerColor = Grey20,
-                        focusedContainerColor = White
+                        unfocusedLabelColor = Color.Black,
+                        unfocusedLeadingIconColor = Color.Black,
+                        unfocusedTrailingIconColor = Color.Black,
+                        cursorColor = Red70
                     ),
                     value = matricola,
                     onValueChange = {matricola = it},
@@ -196,18 +207,30 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         Icon(
                             painter = painterResource(id = R.drawable.ic_badge),
                             contentDescription = "icona matricola registrazione",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.Black
                         )
                     },
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(25.dp),
                     modifier = Modifier .fillMaxWidth(),
                     minLines = 1,
                     maxLines = 1
                 )
                 OutlinedTextField(
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Red70,
+                        focusedTextColor = Color.Black,
+                        focusedContainerColor = White,
+                        focusedLabelColor = Red70,
+                        focusedLeadingIconColor = Color.Black,
+                        focusedTrailingIconColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
                         unfocusedContainerColor = Grey20,
-                        focusedContainerColor = White
+                        unfocusedLabelColor = Color.Black,
+                        unfocusedLeadingIconColor = Color.Black,
+                        unfocusedTrailingIconColor = Color.Black,
+                        cursorColor = Red70
                     ),
                     value = email,
                     onValueChange = {email = it},
@@ -216,11 +239,12 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         Icon(
                             painter = painterResource(id = R.drawable.icona_mail),
                             contentDescription = "icona mail",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.Black
                         )
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(25.dp),
                     modifier = Modifier .fillMaxWidth(),
                     minLines = 1,
                     maxLines = 1
@@ -233,14 +257,25 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
 
                 ) {
                     OutlinedTextField(
-                        colors = TextFieldDefaults.colors(
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Red70,
+                            focusedTextColor = Color.Black,
+                            focusedContainerColor = White,
+                            focusedLabelColor = Red70,
+                            focusedLeadingIconColor = Color.Black,
+                            focusedTrailingIconColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
                             unfocusedContainerColor = Grey20,
-                            focusedContainerColor = White
+                            unfocusedLabelColor = Color.Black,
+                            unfocusedLeadingIconColor = Color.Black,
+                            unfocusedTrailingIconColor = Color.Black,
+                            cursorColor = Red70
                         ),
                         value = nome,
                         onValueChange = {nome = it},
                         label = { Text(stringResource(id = R.string.nome)) },
-                        shape = RoundedCornerShape(15.dp),
+                        shape = RoundedCornerShape(25.dp),
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                             .padding(end = 5.dp),
@@ -248,14 +283,25 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         maxLines = 1
                     )
                     OutlinedTextField(
-                        colors = TextFieldDefaults.colors(
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Red70,
+                            focusedTextColor = Color.Black,
+                            focusedContainerColor = White,
+                            focusedLabelColor = Red70,
+                            focusedLeadingIconColor = Color.Black,
+                            focusedTrailingIconColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
                             unfocusedContainerColor = Grey20,
-                            focusedContainerColor = White
+                            unfocusedLabelColor = Color.Black,
+                            unfocusedLeadingIconColor = Color.Black,
+                            unfocusedTrailingIconColor = Color.Black,
+                            cursorColor = Red70
                         ),
                         value = cognome,
                         onValueChange = {cognome = it},
                         label = { Text(stringResource(id = R.string.cognome)) },
-                        shape = RoundedCornerShape(15.dp),
+                        shape = RoundedCornerShape(25.dp),
                         modifier = Modifier
                             .fillMaxWidth(1f)
                             .padding(start = 5.dp),
@@ -269,15 +315,26 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedTextField(
-                        colors = TextFieldDefaults.colors(
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Red70,
+                            focusedTextColor = Color.Black,
+                            focusedContainerColor = White,
+                            focusedLabelColor = Red70,
+                            focusedLeadingIconColor = Color.Black,
+                            focusedTrailingIconColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
                             unfocusedContainerColor = Grey20,
-                            focusedContainerColor = White
+                            unfocusedLabelColor = Color.Black,
+                            unfocusedLeadingIconColor = Color.Black,
+                            unfocusedTrailingIconColor = Color.Black,
+                            cursorColor = Red70
                         ),
                         value = dataNascitaSdf,
                         onValueChange = {},
                         modifier = Modifier.weight(1f),
                         readOnly = true,
-                        shape = RoundedCornerShape(15.dp),
+                        shape = RoundedCornerShape(25.dp),
                         label = { Text(stringResource(id = R.string.dataDiNascita)) },
                         trailingIcon = {
                             IconButton(
@@ -286,28 +343,42 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_calendario_evento),
                                     contentDescription = "scegli data di scadenza progetto",
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.Black
                                 )
                             }
                         },
                     )
                     Box(modifier = Modifier.weight(1f)){
                         OutlinedTextField(
-                            colors = TextFieldDefaults.colors(
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Red70,
+                                focusedTextColor = Color.Black,
+                                focusedContainerColor = White,
+                                focusedLabelColor = Red70,
+                                focusedLeadingIconColor = Color.Black,
+                                focusedTrailingIconColor = Color.Black,
+                                unfocusedBorderColor = Color.Black,
+                                unfocusedTextColor = Color.Black,
                                 unfocusedContainerColor = Grey20,
-                                focusedContainerColor = White
+                                unfocusedLabelColor = Color.Black,
+                                unfocusedLeadingIconColor = Color.Black,
+                                unfocusedTrailingIconColor = Color.Black,
+                                cursorColor = Red70
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             value = sesso.name,
                             onValueChange = {},
                             label = { Text(text = stringResource(id = R.string.sesso)) },
                             readOnly = true,
-                            shape = RoundedCornerShape(15.dp),
+                            shape = RoundedCornerShape(25.dp),
                             trailingIcon = {
                                 Icon(
                                     Icons.Default.ArrowDropDown,
                                     contentDescription = "Dropdown",
-                                    modifier = Modifier.clickable { expanded = true })
+                                    modifier = Modifier.clickable { expanded = true },
+                                    tint = Color.Black
+                                )
                             },
                             minLines = 1,
                             maxLines = 1,
@@ -319,7 +390,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         ) {
                             SessoUtente.entries.forEach { s ->
                                 DropdownMenuItem(
-                                    text = { Text(s.name) },
+                                    text = { Text(s.name, color = Color.Black)},
                                     onClick = {
                                         sesso = s
                                         expanded = false
@@ -332,9 +403,20 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                 }
 
                 OutlinedTextField(
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Red70,
+                        focusedTextColor = Color.Black,
+                        focusedContainerColor = White,
+                        focusedLabelColor = Red70,
+                        focusedLeadingIconColor = Color.Black,
+                        focusedTrailingIconColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
                         unfocusedContainerColor = Grey20,
-                        focusedContainerColor = White
+                        unfocusedLabelColor = Color.Black,
+                        unfocusedLeadingIconColor = Color.Black,
+                        unfocusedTrailingIconColor = Color.Black,
+                        cursorColor = Red70
                     ),
                     value = password,
                     onValueChange = {password = it},
@@ -369,16 +451,27 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                             )
                         }
                     },
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(25.dp),
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 1,
                     maxLines = 1
                 )
 
                 OutlinedTextField(
-                    colors = TextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Red70,
+                        focusedTextColor = Color.Black,
+                        focusedContainerColor = White,
+                        focusedLabelColor = Red70,
+                        focusedLeadingIconColor = Color.Black,
+                        focusedTrailingIconColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
                         unfocusedContainerColor = Grey20,
-                        focusedContainerColor = White
+                        unfocusedLabelColor = Color.Black,
+                        unfocusedLeadingIconColor = Color.Black,
+                        unfocusedTrailingIconColor = Color.Black,
+                        cursorColor = Red70
                     ),
                     value = confermaPassword,
                     onValueChange = {confermaPassword = it},
@@ -413,7 +506,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                             )
                         }
                     },
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(25.dp),
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 1,
                     maxLines = 1
@@ -427,10 +520,10 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         .fillMaxWidth()
                         .padding(16.dp)
                         .align(Alignment.CenterHorizontally),
-                    colors = if(isDarkTheme) ButtonDefaults.buttonColors(
-                        containerColor = Color.White, // Cambia il colore di sfondo del pulsante
-                        contentColor = Color.DarkGray // Cambia il colore del testo all'interno del pulsante
-                    ) else ButtonDefaults.buttonColors(Red70)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if(isDarkTheme) Color.White else Red70, // Cambia il colore di sfondo del pulsante
+                        contentColor = if(isDarkTheme)Color.DarkGray else White// Cambia il colore del testo all'interno del pulsante
+                    )
                 ) {  Text(text = stringResource(id = R.string.next)) }
             }
 
@@ -489,9 +582,6 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     }
 
 }
-
-
-
 
 @Preview
 @Composable

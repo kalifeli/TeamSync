@@ -59,6 +59,21 @@ class LeMieAttivitaViewModel() : ViewModel() {
     var erroreEditTask = mutableStateOf<String?>(null)
         private set
 
+    var leMieAttivitaPerUtente by mutableStateOf<List<LeMieAttivita>>(emptyList())
+
+    fun getTodoUtente(idProg: String, utenteId: String) {
+        Log.d("ViewModel", "Chiamato getTodoUtente con idProg: $idProg e utenteId: $utenteId")
+        viewModelScope.launch {
+            try {
+                val result = repositoryLeMieAttivita.getTodoByUtente(idProg, utenteId)
+                Log.d("ViewModel", "Attività recuperate: $result")
+                leMieAttivitaPerUtente = result
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("ViewModel", "Errore recupero attività: ${e.message}")
+            }
+        }
+    }
 
 
     fun setFileUri(uri: Uri?) {
@@ -208,9 +223,8 @@ class LeMieAttivitaViewModel() : ViewModel() {
                     delay(500) // Attendiamo mezzo secondo tra ogni tentativo
                     allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
                     tentativi++
-
                 }
-                leMieAttivitaCompletate = allTodo.filter { it.progetto == progetto && it.completato }
+                leMieAttivitaCompletate = allTodo.filter { it.progetto == progetto && it.completato}
                 updateProgress(progetto)
                 updateTaskCompletate(progetto)
                 updateTaskTotali(progetto)
@@ -221,6 +235,33 @@ class LeMieAttivitaViewModel() : ViewModel() {
             }
         }
     }
+
+    fun getTodoByUtente(progetto: String, userId: String) {
+        viewModelScope.launch {
+            var tentativi = 0
+            val MAX_TENTATIVI = 6
+            isLoading.value = true
+            try {
+                var allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                while (allTodo.isEmpty() && tentativi < MAX_TENTATIVI) {
+                    isLoading.value = true
+                    delay(500) // Attendiamo mezzo secondo tra ogni tentativo
+                    allTodo = repositoryLeMieAttivita.getAllTodoCompletate()
+                    tentativi++
+                }
+                leMieAttivitaCompletate = allTodo.filter { it.progetto == progetto && it.utenti.contains(userId) }
+                updateProgress(progetto)
+                updateTaskCompletate(progetto)
+                updateTaskTotali(progetto)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+
 
     fun getTodoCompletateByProject2(progetto: String, callback: (List<LeMieAttivita>) -> Unit) {
         viewModelScope.launch {

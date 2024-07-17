@@ -376,10 +376,13 @@ fun ListaColleghi(
 @Composable
 fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, partecipa : Boolean, viewModel_att: LeMieAttivitaViewModel, id_task : String, id_prog: String, view_model_notifiche: ViewModelNotifiche) {
 
+
     var amicizia = false
     if (utente.amici.contains(user_loggato?.id) && ( user_loggato!!.id != utente.id) ) {
         amicizia = true
     }
+
+
     ElevatedCard(
         onClick = {
 
@@ -470,14 +473,19 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                             .size(24.dp)
                             .clickable {
                                 viewModel_att.rimuovi_persona(id_task, utente.id)
+
+
                                 Log.d("IconClick", "Icona cliccata")
 
                                 val contenuto = (user_loggato?.nome + " " + (user_loggato?.cognome
                                     ?: "") + " " + "ti ha assegnato una task")
 
+
                                 view_model_notifiche.getNotificaIdByContent(contenuto) { id ->
                                     id?.let { view_model_notifiche.eliminaNotifica(it) }
                                 }
+
+
                                 navController.navigate("task_selezionata/${id_task}/${id_prog}")
 
 

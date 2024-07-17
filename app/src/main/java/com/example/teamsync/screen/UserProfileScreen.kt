@@ -1,6 +1,10 @@
 package com.example.teamsync.screen
 
+import android.content.ContentValues
+import android.content.Context
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -97,6 +101,11 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                 viewModel.aggiorna_foto_profilo(it)
             }
         }
+
+
+
+
+
 
     // Stato per gestire il menu
     var showMenu by remember { mutableStateOf(false) }

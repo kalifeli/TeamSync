@@ -41,6 +41,18 @@ class ToDoRepository {
         return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
     }
 
+    suspend fun getTodoByUtente(idProg: String, utenteId: String): List<LeMieAttivita> {
+        val snapshot = database.collection("Todo")
+            .whereEqualTo("progetto", idProg)
+            .whereArrayContains("utenti", utenteId)
+            .whereEqualTo("completato", false)
+            .orderBy("dataScadenza") // Ordina per data di scadenza
+            .get()
+            .await()
+        return snapshot.documents.mapNotNull { it.toObject(LeMieAttivita::class.java) }
+    }
+
+
 
     suspend fun getAllTodoCompletate(): List<LeMieAttivita> {
         val snapshot = database.collection("Todo")
@@ -146,6 +158,17 @@ class ToDoRepository {
                 }
             } else {
                 throw Exception("Todo non trovato")
+            }
+
+            val task = getTodoById(id)
+
+            if (task != null) {
+                Log.d("la elimina??? ", task.utenti.isEmpty().toString())
+                if(task.utenti.isEmpty()) {
+                    Log.d("la elimina? ", task.toString())
+                    deleteTodo(id)
+
+                }
             }
         } catch (e: Exception) {
             // Gestisci l'errore se necessario

@@ -92,7 +92,6 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
@@ -125,6 +124,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val openDialog = remember { mutableStateOf(false) }
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
+    val isClicked2 = remember { mutableStateOf(false) }
     var sezione by remember { mutableIntStateOf(1) }
     val caricanome = remember { mutableStateOf(false) }
     var carica by remember { mutableStateOf(false) }
@@ -132,6 +132,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val progetto_nome  = remember { mutableStateOf("") }
     var isLoadingNonCompletate by remember { mutableStateOf(false) }
     var isLoadingCompletate by remember { mutableStateOf(true) }
+    var isLoadingNonCompletateUtente by remember { mutableStateOf(true) }
     val partecipanti = remember { mutableStateOf<List<String>>(emptyList()) }
     val progettoCompletato = remember { mutableStateOf(false) }
     val progressione by viewModel.progressione.collectAsState()
@@ -142,6 +143,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
+
 
     val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "creazione" )) }
 
@@ -193,6 +195,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             carica = true
             isLoadingCompletate = true
             isLoadingNonCompletate = true
+            isLoadingNonCompletateUtente = true
             viewModel.getTodoCompletateByProject(id_prog)
             carica = false
             isLoadingCompletate = false
@@ -206,9 +209,25 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             carica = true
             isLoadingNonCompletate = true
             isLoadingCompletate = true
+            isLoadingNonCompletateUtente = true
             viewModel.getTodoByProject(id_prog)
             carica = false
             isLoadingNonCompletate = false
+        }
+    }
+
+    LaunchedEffect(isClicked2.value) {
+        if (isClicked2.value) {
+            carica = true
+            isLoadingNonCompletate = true
+            isLoadingCompletate = true
+            isLoadingNonCompletateUtente = true
+            utente?.let {
+                viewModel.getTodoUtente(id_prog, it.id)
+            }
+            carica = false
+            isLoadingNonCompletateUtente = false
+
         }
     }
 
@@ -434,15 +453,17 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                             isCompletedSection = true
                             isClicked1.value = true
                             isClicked.value = false
+                            isClicked2.value = false
                             sezione = 0
                         },
                         modifier = Modifier
-                            .padding(start = 16.dp),
+                            .padding(start = 8.dp)
+                            .weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             if (isClicked1.value) Red70 else Grey35
                         )
                     ) {
-                        Text(text = stringResource(id = R.string.bottoneCompletate))
+                        Text(text = stringResource(id = R.string.bottoneCompletate), fontSize = 12.sp)
                     }
                     Button(
                         onClick = {
@@ -450,16 +471,39 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                             isCompletedSection = false
                             isClicked.value = true
                             isClicked1.value = false
+                            isClicked2.value = false
                             sezione = 1
                         },
                         modifier = Modifier
-                            .padding(start = 16.dp),
+                            .padding(start = 8.dp)
+                            .weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             if (isClicked.value) Red70 else Grey35
                         ),
 
                         ) {
-                        Text(text = stringResource(id = R.string.bottoneNonCompletate))
+                        Text(text = stringResource(id = R.string.bottoneNonCompletate), fontSize = 12.sp)
+                    }
+                    Button(
+                        onClick = {
+                            utente?.let {
+                                viewModel.getTodoUtente(id_prog, it.id)
+                            }
+                            isCompletedSection = false
+                            isClicked.value = false
+                            isClicked1.value = false
+                            isClicked2.value = true
+                            sezione = 2
+                        },
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            if (isClicked2.value) Red70 else Grey35
+                        ),
+
+                        ) {
+                        Text(text = "Le Mie", fontSize = 12.sp)
                     }
                 }
                 if(carica) {
@@ -536,7 +580,77 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         }
 
                 }
+
                 }
+                if (!isLoadingNonCompletateUtente) {
+                    when (ordine) {
+                        "data_di_scadenza" -> {
+                            LazyColumn {
+                                items(viewModel.leMieAttivitaPerUtente) { attivita ->
+                                    TodoItem(
+                                        item = attivita,
+                                        onDelete = { id ->
+                                            viewModel.deleteTodo(id, sezione, id_prog)
+                                        },
+                                        onEdit = { item ->
+                                            currentTodoItem.value = item
+                                            openDialog.value = true
+                                        },
+                                        onComplete = { item ->
+                                            currentTodoItem.value = item
+                                            dialogComplete = true
+                                        },
+                                        viewModelUtente
+                                    )
+                                }
+                            }
+                        }
+                        "priorità" -> {
+                            LazyColumn {
+                                items(viewModel.leMieAttivitaPerUtente.sortedWith(comparatore)) { attivita ->
+                                    TodoItem(
+                                        item = attivita,
+                                        onDelete = { id ->
+                                            viewModel.deleteTodo(id, sezione, id_prog)
+                                        },
+                                        onEdit = { item ->
+                                            currentTodoItem.value = item
+                                            openDialog.value = true
+                                        },
+                                        onComplete = { item ->
+                                            currentTodoItem.value = item
+                                            dialogComplete = true
+                                        },
+                                        viewModelUtente
+                                    )
+                                }
+                            }
+                        }
+                        "creazione" -> {
+                            LazyColumn {
+                                items(viewModel.leMieAttivitaPerUtente.sortedByDescending { it.dataCreazione }) { attivita ->
+                                    TodoItem(
+                                        item = attivita,
+                                        onDelete = { id ->
+                                            viewModel.deleteTodo(id, sezione, id_prog)
+                                        },
+                                        onEdit = { item ->
+                                            currentTodoItem.value = item
+                                            openDialog.value = true
+                                        },
+                                        onComplete = { item ->
+                                            currentTodoItem.value = item
+                                            dialogComplete = true
+                                        },
+                                        viewModelUtente
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+
 
                 if (!isLoadingCompletate) {
 
@@ -777,12 +891,18 @@ fun TodoItem
 
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                IconButton(onClick = { dialogDelete = true }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_delete_24),
-                        contentDescription = "Delete",
-                        tint = Color.Red
-                    )
+                if (modifica.value) {
+                    IconButton(onClick = { dialogDelete = true }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
+                }
+                else
+                {
+                    Spacer(modifier = Modifier.size(25.dp))
                 }
                 if (dialogDelete) {
                     AlertDialog(

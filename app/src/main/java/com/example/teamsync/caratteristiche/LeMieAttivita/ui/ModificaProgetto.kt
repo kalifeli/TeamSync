@@ -63,9 +63,11 @@ import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.ui.theme.Grey20
+import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -119,6 +121,9 @@ fun SchermataModificaProgetto(
         calendario.get(Calendar.DAY_OF_MONTH)
     )
 
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
+
     // Caricamento iniziale dei dati del progetto
     LaunchedEffect(progettoId) {
         try {
@@ -146,25 +151,24 @@ fun SchermataModificaProgetto(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color.Black
-                    )
+                        color = if(isDarkTheme) White else Color.Black                    )
                 },
                 navigationIcon = {
                     Button(
                         onClick = { navController.popBackStack() },
-                        colors = ButtonDefaults.buttonColors(Color.Transparent)
+                        colors = ButtonDefaults.buttonColors(if(isDarkTheme) Color.DarkGray else Grey35)
                     ) {
                         Icon(
                             Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = "torna indietro",
-                            tint = Color.Black
+                            tint =if(isDarkTheme) White else Color.Black
                         )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = Color.Black,
-                    actionIconContentColor = Color.Black,
+                    containerColor =if(isDarkTheme) Color.DarkGray else Grey35,
+                    titleContentColor = if(isDarkTheme)White else Color.Black,
+                    actionIconContentColor = if(isDarkTheme) White else Color.Black,
                 )
             )
         }
@@ -183,296 +187,366 @@ fun SchermataModificaProgetto(
                     trackColor = Red70,
                     strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
             }
-        }else{
+        }else {
             erroreModificaProgetto?.let {
                 Toast.makeText(contesto, erroreModificaProgetto, Toast.LENGTH_LONG).show()
             }
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top,
-            ) {
-                item {
-                    OutlinedTextField(
-                        value = nomeProgetto,
-                        onValueChange = { nomeProgetto = it },
-                        label = { Text(stringResource(id = R.string.nome), color = Color.Black) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Red70
-                        ),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
-                }
-
-                item {
-                    OutlinedTextField(
-                        value = descrizioneProgetto,
-                        onValueChange = { descrizioneProgetto = it },
-                        label = {
-                            Text(
-                                stringResource(id = R.string.descrizioneEdit),
-                                color = Color.Black,
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Red70
-                        ),
-                        shape = RoundedCornerShape(16.dp),
-                        maxLines = 5,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .height(200.dp)
-                    )
-                }
-                item {
-                    OutlinedTextField(
-                        value = dataScadenzaSdf,
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text("Data di scadenza", color = Color.Black) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Red70
-                        ),
-                        shape = RoundedCornerShape(16.dp),
-                        trailingIcon = {
-                            IconButton(
-                                onClick = { datePickerDialogScadenza.show() },
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_calendario_evento),
-                                    contentDescription = "scegli data di scadenza progetto",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
-                }
-                item {
-                    var expanded by remember { mutableStateOf(false) }
-                    Box {
+            Box(modifier = Modifier.background(if (isDarkTheme) Color.Black else Color.White)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top,
+                ) {
+                    item {
                         OutlinedTextField(
-                            value = priorita.name,
-                            onValueChange = {},
-                            readOnly = true,
+                            value = nomeProgetto,
+                            onValueChange = { nomeProgetto = it },
                             label = {
                                 Text(
-                                    "Priorità",
-                                    color = Color.Black
+                                    stringResource(id = R.string.nome),
+                                    color = if (isDarkTheme)White else Color.Black
                                 )
                             },
-                            shape = RoundedCornerShape(16.dp),
-                            trailingIcon = {
-                                Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown",
-                                    modifier = Modifier.clickable { expanded = true })
-                            },
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Red70
+                                focusedBorderColor = Red70,
+                                unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                                focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                                unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                             ),
+                            shape = RoundedCornerShape(16.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
                         )
-
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier.background(Grey20)
-                        ) {
-                            Priorità.entries.forEach { p ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(10.dp)
-                                                    .clip(CircleShape)
-                                                    .border(0.5.dp, Color.Black, CircleShape)
-                                                    .background(p.colore)
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(p.name)
-
-                                        }
-                                    },
-                                    onClick = {
-                                        priorita = p
-                                        expanded = false
-                                    },
-                                    modifier = Modifier.background(Grey20)
-                                )
-                            }
-                        }
                     }
-                }
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Hai terminato il progetto e sei pronto alla consegna? Contrassegnalo come completato!",
-                            modifier = Modifier.weight(1f),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                        Switch(
-                            checked = completato,
-                            onCheckedChange = {
-                                completato = it
-                                viewModelProgetto.aggiornaStatoProgetto(progettoId,it)
-                            },
-                            thumbContent = {
-                                if (completato) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = "progetto completato",
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                }
-                            },
-                            colors = SwitchDefaults.colors(
-                                uncheckedTrackColor = White,
-                                checkedTrackColor = Red70,
-                                checkedBorderColor = Red70
-                            )
-                        )
-                    }
-                }
 
-                item { Spacer(modifier = Modifier.height(16.dp))}
-
-                if (completato) {
                     item {
                         OutlinedTextField(
-                            value = dataConsegnaSfd,
+                            value = descrizioneProgetto,
+                            onValueChange = { descrizioneProgetto = it },
+                            label = {
+                                Text(
+                                    stringResource(id = R.string.descrizioneEdit),
+                                    color = if (isDarkTheme)White else Color.Black
+                                )
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Red70,
+                                unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                                focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                                unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            ),
+                            shape = RoundedCornerShape(16.dp),
+                            maxLines = 5,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .height(200.dp)
+                        )
+                    }
+                    item {
+                        OutlinedTextField(
+                            value = dataScadenzaSdf,
                             onValueChange = { },
                             readOnly = true,
-                            label = { Text("Data di consegna", color = Color.Black) },
+                            label = { Text("Data di scadenza",
+                                color = if (isDarkTheme)White else Color.Black
+                            ) },
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Red70
+                                focusedBorderColor = Red70,
+                                unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                                focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                                unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                             ),
                             shape = RoundedCornerShape(16.dp),
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { datePickerDialogConsegna.show() },
+                                    onClick = { datePickerDialogScadenza.show() },
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.ic_progettoconsegnato),
-                                        contentDescription = "scegli data di consegna progetto",
+                                        painter = painterResource(id = R.drawable.ic_calendario_evento),
+                                        contentDescription = "scegli data di scadenza progetto",
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(8.dp)
                         )
                     }
                     item {
+                        var expanded by remember { mutableStateOf(false) }
                         Box {
                             OutlinedTextField(
-                                value = voto,
+                                value = priorita.name,
                                 onValueChange = {},
                                 readOnly = true,
                                 label = {
                                     Text(
-                                        "Voto",
-                                        color = Color.Black
+                                        "Priorità",
+                                        color = if (isDarkTheme)White else Color.Black
                                     )
                                 },
                                 shape = RoundedCornerShape(16.dp),
                                 trailingIcon = {
                                     Icon(Icons.Default.ArrowDropDown,
                                         contentDescription = "Dropdown",
-                                        modifier = Modifier.clickable { mostraVoto = true })
+                                        modifier = Modifier.clickable { expanded = true })
                                 },
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Red70
+                                    focusedBorderColor = Red70,
+                                    unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                                    focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                                    unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                    focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                    focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                    unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                    unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                    unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                    focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                                 ),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
                             )
 
                             DropdownMenu(
-                                expanded = mostraVoto,
-                                onDismissRequest = { mostraVoto = false },
-                                modifier = Modifier
-                                    .background(Grey20)
-                                    .height(200.dp)
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                                modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Grey35)
                             ) {
-                                val voti = listOf(
-                                    "Non valutato",
-                                    "18",
-                                    "19",
-                                    "20",
-                                    "21",
-                                    "22",
-                                    "23",
-                                    "24",
-                                    "25",
-                                    "26",
-                                    "27",
-                                    "28",
-                                    "29",
-                                    "30"
-                                )
-
-                                voti.forEach { v ->
+                                Priorità.entries.forEach { p ->
                                     DropdownMenuItem(
                                         text = {
-                                            Text(v)
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(10.dp)
+                                                        .clip(CircleShape)
+                                                        .border(
+                                                            0.5.dp,
+                                                            if (isDarkTheme) White else Color.Black,
+                                                            CircleShape
+                                                        )
+                                                        .background(p.colore)
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(p.name, color = if (isDarkTheme)White else Color.Black)
+
+                                            }
                                         },
                                         onClick = {
-                                            voto = v
-                                            mostraVoto = false
+                                            priorita = p
+                                            expanded = false
                                         },
-                                        modifier = Modifier.background(Grey20)
+                                        modifier = Modifier.background(if (isDarkTheme)Color.DarkGray else Grey35)
                                     )
                                 }
                             }
                         }
                     }
-                }
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Hai terminato il progetto e sei pronto alla consegna? Contrassegnalo come completato!",
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = if (isDarkTheme)White else Color.Black
 
-                item { Spacer(modifier = Modifier.height(16.dp))}
-
-                item {
-                    Button(
-                        onClick = {
-                            viewModelProgetto.aggiornaProgetto(
-                                progettoId,
-                                nomeProgetto,
-                                descrizioneProgetto,
-                                dataScadenzaProgetto,
-                                priorita,
-                                voto,
-                                dataConsegnaProgetto
                             )
-                            navController.popBackStack()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .padding(16.dp),
-                        border = BorderStroke(1.dp, Color.DarkGray),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Red70,
-                            contentColor = White
-                        )
-                    ) {
-                        Text(stringResource(id = R.string.salvaEdit))
+                            Switch(
+                                checked = completato,
+                                onCheckedChange = {
+                                    completato = it
+                                    viewModelProgetto.aggiornaStatoProgetto(progettoId, it)
+                                },
+                                thumbContent = {
+                                    if (completato) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Check,
+                                            contentDescription = "progetto completato",
+                                            modifier = Modifier.size(SwitchDefaults.IconSize)
+                                        )
+                                    }
+                                },
+                                colors = SwitchDefaults.colors(
+                                    uncheckedTrackColor = White,
+                                    checkedTrackColor = Red70,
+                                    checkedBorderColor = Red70
+                                )
+                            )
+                        }
+                    }
+
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
+
+                    if (completato) {
+                        item {
+                            OutlinedTextField(
+                                value = dataConsegnaSfd,
+                                onValueChange = { },
+                                readOnly = true,
+                                label = { Text("Data di consegna",
+                                    color = if (isDarkTheme)White else Color.Black
+                                ) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Red70,
+                                    unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                                    focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                                    unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                    focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                    focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                    unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                    unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                    unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                    focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,                                ),
+                                shape = RoundedCornerShape(16.dp),
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = { datePickerDialogConsegna.show() },
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_progettoconsegnato),
+                                            contentDescription = "scegli data di consegna progetto",
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
+                        }
+                        item {
+                            Box {
+                                OutlinedTextField(
+                                    value = voto,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = {
+                                        Text(
+                                            "Voto",
+                                            color = if (isDarkTheme)White else Color.Black
+                                        )
+                                    },
+                                    shape = RoundedCornerShape(16.dp),
+                                    trailingIcon = {
+                                        Icon(Icons.Default.ArrowDropDown,
+                                            contentDescription = "Dropdown",
+                                            modifier = Modifier.clickable { mostraVoto = true })
+                                    },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Red70,
+                                        unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                                        focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                                        unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                        focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                        focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                        unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                        unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                        unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                        focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                DropdownMenu(
+                                    expanded = mostraVoto,
+                                    onDismissRequest = { mostraVoto = false },
+                                    modifier = Modifier
+                                        .background(if (isDarkTheme)Color.DarkGray else Grey35)
+                                        .height(200.dp)
+                                ) {
+                                    val voti = listOf(
+                                        "Non valutato",
+                                        "18",
+                                        "19",
+                                        "20",
+                                        "21",
+                                        "22",
+                                        "23",
+                                        "24",
+                                        "25",
+                                        "26",
+                                        "27",
+                                        "28",
+                                        "29",
+                                        "30"
+                                    )
+
+                                    voti.forEach { v ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(v, color = if (isDarkTheme)White else Color.Black)
+
+                                            },
+                                            onClick = {
+                                                voto = v
+                                                mostraVoto = false
+                                            },
+                                            modifier = Modifier.background(if (isDarkTheme)Color.DarkGray else Grey35)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
+
+                    item {
+                        Button(
+                            onClick = {
+                                viewModelProgetto.aggiornaProgetto(
+                                    progettoId,
+                                    nomeProgetto,
+                                    descrizioneProgetto,
+                                    dataScadenzaProgetto,
+                                    priorita,
+                                    voto,
+                                    dataConsegnaProgetto
+                                )
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.5f)
+                                .padding(16.dp),
+                            border = BorderStroke(1.dp, Color.DarkGray),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Red70,
+                                contentColor = White
+                            )
+                        ) {
+                            Text(stringResource(id = R.string.salvaEdit))
+                        }
                     }
                 }
             }

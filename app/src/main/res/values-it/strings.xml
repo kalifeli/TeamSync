@@ -22,6 +22,37 @@
     <string name="noncompletaTodo">Sei sicuro di non aver completato questa task?</string>
     <string name="eliminaTodoTitle">Elimina ToDo</string>
     <string name="eliminaTodoDescrizione">Sei sicuro di voler eliminare questo To Do?</string>
+    <string name="Condividi">Condividi</string>
+    <string name="Info">Info Progetto</string>
+    <string name="modificaProgetto">Modifica Progetto</string>
+    <string name="Abbandona">Abbandona</string>
+    <string name="fileAllegato">File allegato clicca per visualizzare</string>
+    <string name="modificaAttività">Modifica Attività</string>
+    <string name="selFile">Seleziona File</string>
+    <string name="delega">Delega Task</string>
+    <string name="DettagliAttività">Dettagli Attività</string>
+    <string name="Titoloduepunti">Titolo:</string>
+    <string name="Descrizioneduepunti">Descrizione:</string>
+    <string name="dataDiCreazioneduepunti">Data di Creazione:</string>
+    <string name="dataDiScadenzaduepunti">Data di Scadenza:</string>
+    <string name="Prioritaduepunti">Priorità:</string>
+    <string name="listaPartecipantiDuePunti">Lista Partecipanti:</string>
+    <string name="fileAllegatoDuePunti">File Allegato:</string>
+    <string name="bottoneFile">Clicca qui per visualizzare il file</string>
+    <string name="nessunFile">Nessun File allegato....</string>
+    <string name="capito">Capito</string>
+    <string name="codiceProgetto">Codice Progetto </string>
+    <string name="condividiCodice">Condividi il codice del progetto</string>
+
+
+    <string name="completed_tasks_count">Hai completato %1$d/%2$d Attività</string>
+    <string name="abbandonaProg">Sei sicuro di abbandonare il progetto? Una volta confermato non potrai tornare più indietro!</string>
+    <string name="nomeDelega">Nome: %s</string>
+
+
+
+
+
 
     <!--Impostazioni Screen-->
     <string name="impostazioni">Impostazioni</string>
@@ -124,7 +155,26 @@
     <string name="scuro">Scuro </string>
 
 
+    <!--Modifica Progetto Screen-->
+    <string name="titolo"> Modifica Progetto </string>
 
+    <string name="fineProgetto"> Hai terminato il progetto e sei pronto alla consegna? Contrassegnalo come completato! </string>
+    <string name="dataConsegna"> Data di consegna </string>
+    <string name="voto"> Voto </string>
+    <string name="nv">Non valutato</string>
+
+
+    <!--ITuoiProgetti Screen-->
+    <string name="sincronizza"> Sincronizza </string>
+    <string name="Esci"> Esci </string>
+    <string name="ProgettoAggiunto"> Progetto aggiunto con successo </string>
+    <string name="creaNuovoProgetto"> Crea un nuovo progetto </string>
+    <string name="uniscitiAUnProgetto"> Oppure unisciti a un progetto con </string>
+    <string name="conUnCodice"> un codice</string>
+    <string name="crea"> Crea</string>
+    <string name="AggiungiUnProgetto"> Aggiungi un Progetto</string>
+    <string name="perUnirti"> Per unirti a un progetto esistente, inserisci il codice univoco fornito dal creatore del progetto.</string>
+    <string name="unisciti"> Unisciti</string>
 
 
 

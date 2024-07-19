@@ -15,12 +15,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
+import com.example.teamsync.R
+
+
 
 @Composable
 fun CondividiProgettoDialog(
@@ -40,7 +44,7 @@ fun CondividiProgettoDialog(
     AlertDialog(
         title = {
             Text(
-                text = "Condividi il codice del progetto",
+                text = stringResource(id = R.string.condividiCodice),
                 textAlign = TextAlign.Center,
                 color = if(isDarkTheme)Color.White else Color.Black
             )
@@ -53,7 +57,7 @@ fun CondividiProgettoDialog(
                     readOnly = true,
                     label = {
                         Text(
-                            "Codice Progetto",
+                            stringResource(id = R.string.codiceProgetto),
                             color = if(isDarkTheme)Color.White else Color.Black
                         )
                             },
@@ -87,7 +91,7 @@ fun CondividiProgettoDialog(
                 // il pulsante viene abilitato solo se il codice è stato caricato
                 enabled = codiceProgetto.value != null
             ) {
-                Text(text = "Condividi")
+                Text(text = stringResource(id = R.string.Condividi))
             }
         },
         dismissButton ={
@@ -95,7 +99,7 @@ fun CondividiProgettoDialog(
                 onClick = onDismissRequest
             ){
                 Text(
-                    text = "Annulla",
+                    text = stringResource(id = R.string.annullaEdit),
                     color = if(isDarkTheme)Color.White else Color.Black
                 )
             }

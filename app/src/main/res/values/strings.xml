@@ -169,6 +169,23 @@
     <string name="unisciti"> Join </string>
 
 
+    <string name="iTuoiProgetti"> Your Projects </string>
+    <string name="senzaProgetti">Oops! It looks like there are no projects. Start now by creating one.</string>
+    <string name="ciao">Hello, </string>
+    <string name="progressi">Progress </string>
+    <string name="continua">Keep it up! </string>
+    <string name="taskCompletate">Completed Tasks </string>
+    <string name="progettiCompletati">Completed Projects </string>
+    <string name="ricercaColleghi">Search Colleagues/Add Colleagues </string>
+
+    <!--ProfiloProgetto Screen-->
+    <string name="Informazioni"> Information </string>
+    <string name="Partecipanti"> Participants </string>
+    <string name="entraNelProcetto"> Join the project </string>
+
+
+    <!--Terms Screen-->
+    <string name="tiroloTerm"> Termini &amp; Condizioni </string>
 
 
 

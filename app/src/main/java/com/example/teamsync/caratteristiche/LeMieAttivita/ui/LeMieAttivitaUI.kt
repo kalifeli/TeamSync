@@ -7,7 +7,6 @@ import android.net.Uri
 import android.Manifest
 import android.content.Context
 import android.os.Build
-import com.google.accompanist.permissions.*
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -47,7 +46,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -109,10 +107,7 @@ import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

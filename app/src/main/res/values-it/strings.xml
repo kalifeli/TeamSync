@@ -175,6 +175,23 @@
     <string name="AggiungiUnProgetto"> Aggiungi un Progetto</string>
     <string name="perUnirti"> Per unirti a un progetto esistente, inserisci il codice univoco fornito dal creatore del progetto.</string>
     <string name="unisciti"> Unisciti</string>
+    <string name="iTuoiProgetti"> I Tuoi Progetti </string>
+    <string name="senzaProgetti">Oops! Sembra che non ci siano progetti. Inizia ora creandone uno. </string>
+    <string name="ciao">Ciao, </string>
+    <string name="progressi">Progressi </string>
+    <string name="continua">Continua così! </string>
+    <string name="taskCompletate">Task Completate </string>
+    <string name="progettiCompletati">Progetti Completati </string>
+    <string name="ricercaColleghi">Ricerca Colleghi/Aggiungi Colleghi </string>
+
+
+    <!--ProfiloProgetto Screen-->
+    <string name="Informazioni"> Informazioni </string>
+    <string name="Partecipanti"> Partecipanti </string>
+    <string name="entraNelProcetto"> Entra nel progetto </string>
+
+    <!--Terms Screen-->
+    <string name="tiroloTerm"> Termini &amp; Condizioni </string>
 
 
 

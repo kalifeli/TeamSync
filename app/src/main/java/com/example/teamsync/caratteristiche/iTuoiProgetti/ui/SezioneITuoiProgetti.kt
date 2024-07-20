@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -90,7 +91,7 @@ fun SezioneITUoiProgetti(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "I Tuoi Progetti",
+            text = stringResource(id = R.string.iTuoiProgetti),
             style = MaterialTheme.typography.titleLarge,
             color = if(isDarkTheme) White else Color.Black,
         )
@@ -105,7 +106,7 @@ fun SezioneITUoiProgetti(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(140.dp)
-                .border(1.dp, White,shape = RoundedCornerShape(16.dp)),
+                .border(1.dp, White, shape = RoundedCornerShape(16.dp)),
             colors = CardDefaults.outlinedCardColors(
                 containerColor = if(isDarkTheme) Color.Black else White
             ),
@@ -124,7 +125,7 @@ fun SezioneITUoiProgetti(
                     modifier = Modifier.size(150.dp)
                 )
                 Text(
-                    text = "Oops! Sembra che non ci siano progetti. Inizia ora creandone uno.",
+                    text = stringResource(id = R.string.senzaProgetti),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium,
                     color = if(isDarkTheme) White else Color.Black,

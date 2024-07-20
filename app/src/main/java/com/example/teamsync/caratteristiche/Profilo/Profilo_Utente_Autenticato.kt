@@ -51,6 +51,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -225,7 +226,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.elevatedCardColors(
             containerColor =  if(isDarkTheme) Color.Black else Red70
         ),
@@ -291,7 +292,10 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
                 if (load.value) {
                     Column(
                         modifier = Modifier
-                            .background(if(isDarkTheme) Color.DarkGray else Color.White, RoundedCornerShape(8.dp))
+                            .background(
+                                if (isDarkTheme) Color.DarkGray else Color.White,
+                                RoundedCornerShape(8.dp)
+                            )
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -299,8 +303,8 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
                         CircularProgressIndicator(color = if(isDarkTheme) Color.White else Color.Black)
                     }
                 } else {
-                    StatBox(number = numeroTaskCompletati, label = "Task Completate")
-                    StatBox(number = numeroProgettiCompletati, label = "Progetti Completati")
+                    StatBox(number = numeroTaskCompletati, label = stringResource(id = R.string.taskCompletate))
+                    StatBox(number = numeroProgettiCompletati, label = stringResource(id = R.string.progettiCompletati))
 
                 }
 
@@ -316,8 +320,10 @@ fun StatBox(number: String, label: String) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     Column(
         modifier = Modifier
-            .background( if(isDarkTheme) Color.DarkGray else Color.White,
-                RoundedCornerShape(8.dp))
+            .background(
+                if (isDarkTheme) Color.DarkGray else Color.White,
+                RoundedCornerShape(8.dp)
+            )
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -340,8 +346,9 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
             .height(56.dp)
             .padding(horizontal = 16.dp)
             .background(
-                color =  if(isDarkTheme) Color.Black else  Color.White,
-                shape = RoundedCornerShape(50.dp)),
+                color = if (isDarkTheme) Color.Black else Color.White,
+                shape = RoundedCornerShape(50.dp)
+            ),
         contentAlignment = Alignment.CenterStart
     ) {
         OutlinedTextField(
@@ -349,7 +356,7 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
             onValueChange = { newValue ->
                 searchQuery = newValue
             },
-            placeholder = { Text("Ricerca Colleghi/Aggiungi Colleghi", color = if(isDarkTheme) Color.White else Color.Black ) },
+            placeholder = { Text(stringResource(id = R.string.ricercaColleghi), color = if(isDarkTheme) Color.White else Color.Black ) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             maxLines = 1,
@@ -511,7 +518,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(if(isDarkTheme) Color.Black else Color.White, RoundedCornerShape(8.dp))
+            .background(if (isDarkTheme) Color.Black else Color.White, RoundedCornerShape(8.dp))
             .padding(16.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -530,8 +537,9 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
             modifier = Modifier
                 .size(32.dp)
                 .background(
-                    if(isDarkTheme) Color.White else color.copy(alpha = 0.2f),
-                    CircleShape)
+                    if (isDarkTheme) Color.White else color.copy(alpha = 0.2f),
+                    CircleShape
+                )
                 .padding(8.dp)
         )
 

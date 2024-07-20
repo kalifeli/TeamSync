@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +49,8 @@ import com.example.teamsync.ui.theme.TeamSyncTheme
 import com.example.teamsync.util.ThemePreferences
 import kotlinx.coroutines.launch
 import java.util.Date
+import com.example.teamsync.R
+
 
 
 @Composable
@@ -186,7 +189,7 @@ fun TermsOfServiceScreenWhite(nav: NavController) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Termini & Condizioni",
+                    text = stringResource(id = R.string.tiroloTerm),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -311,7 +314,7 @@ fun TermsOfServiceScreenBlack(nav: NavController) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Termini & Condizioni",
+                    text = stringResource(id = R.string.tiroloTerm),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White

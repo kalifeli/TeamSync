@@ -190,9 +190,29 @@
     <string name="Partecipanti"> Partecipanti </string>
     <string name="entraNelProcetto"> Entra nel progetto </string>
 
-    <!--Terms Screen-->
+    <!--Seleziona Singola Faq Screen-->
     <string name="tiroloTerm"> Termini &amp; Condizioni </string>
+    <string name="ultimaMod"> Ultima Modifica : </string>
+    <string name="tornaSu">  Torna Su </string>
 
+    <!--Notifiche Screen-->
+    <string name="nonLette"> Non lette </string>
+    <string name="lette">  Tutte </string>
+    <string name="notifiche">  Notifiche </string>
+
+    <!--Profilo altri utenti Screen-->
+    <string name="richiestaAmicizia"> ti ha inviato una richiesta di amicizia </string>
+    <string name="ProfiloUtenti">  Profilo Utenti </string>
+    <string name="TaskCompletate">  Task Completate </string>
+    <string name="richiediAmicizia">  Richiedi Amicizia </string>
+    <string name="accettaAmicizia">  Accetta amicizia </string>
+    <string name="rimuoviAmicizia">  Rimuovi Amicizia </string>
+    <string name="AggiungiAdUnProgetto"> Aggiungi ad un Progetto</string>
+    <string name="selezionaUnProgetto"> Seleziona un progetto</string>
+    <string name="chiudi"> Chiudi</string>
+
+    <!--BottomNav Screen-->
+    <string name="profilo"> Profilo</string>
 
 
 </resources>

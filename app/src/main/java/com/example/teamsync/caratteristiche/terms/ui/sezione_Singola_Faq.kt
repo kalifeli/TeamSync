@@ -222,7 +222,7 @@ fun TermsOfServiceScreenWhite(nav: NavController) {
                     } else {
                         Column(modifier = Modifier.fillMaxSize()) {
                             Text(
-                                text = "Ultima modifica: " + ultima_modifica.toString(),
+                                text = stringResource(id = R.string.ultimaMod) + ultima_modifica.toString(),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                             )
@@ -247,7 +247,7 @@ fun TermsOfServiceScreenWhite(nav: NavController) {
                                 .padding(bottom = 16.dp),
                             colors = ButtonDefaults.buttonColors( ColorePrioritaAlta)
                         ) {
-                            Text("Torna su")
+                            Text(stringResource(id = R.string.tornaSu))
 
                         }
                     }
@@ -348,7 +348,7 @@ fun TermsOfServiceScreenBlack(nav: NavController) {
                     } else {
                         Column(modifier = Modifier.fillMaxSize()) {
                             Text(
-                                text = "Ultima modifica: " + ultima_modifica.toString(),
+                                text = stringResource(id = R.string.ultimaMod) + ultima_modifica.toString(),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                             )
@@ -373,7 +373,7 @@ fun TermsOfServiceScreenBlack(nav: NavController) {
                                 .padding(bottom = 16.dp),
                             colors = ButtonDefaults.buttonColors( ColorePrioritaAlta)
                         ) {
-                            Text(color = Color.White, text = "Torna su")
+                            Text(color = Color.White, text = stringResource(id = R.string.tornaSu))
 
                         }
                     }

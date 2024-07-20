@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,7 @@ fun NotificationScreen(
     notificheModel: ViewModelNotifiche = viewModel()
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Non lette", "Tutte")
+    val tabs = listOf(stringResource(id = R.string.nonLette), stringResource(id = R.string.lette))
     val userProfile = viewModel.userProfile
     val notificheList by remember { notificheModel.notificheList }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
@@ -97,7 +98,7 @@ fun NotificationScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Notifiche",
+                        text = stringResource(id = R.string.notifiche),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -152,7 +153,7 @@ fun NotificationScreen(
                         onClick = {
                             selectedTab = index
                         },
-                        text = { Text(text = title) },
+                        text = { Text(text = title.toString()) },
                         selectedContentColor = Red70,
                         unselectedContentColor = if(isDarkTheme) Color.White else Color.Black
                     )

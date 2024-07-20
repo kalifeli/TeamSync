@@ -4,11 +4,15 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
+import android.Manifest
 import android.content.Context
+import android.os.Build
+import com.google.accompanist.permissions.*
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -105,6 +109,8 @@ import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import okhttp3.internal.wait
 import java.text.SimpleDateFormat
@@ -112,6 +118,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SuppressLint("StateFlowValueCalledInComposition")
 @ExperimentalMaterial3Api
 @Composable
@@ -183,7 +190,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         val priorita1 = attivita1.priorita
         val priorita2 = attivita2.priorita
 
-        // Confronto basato sull'ordine dell'enumerazione Priorità
+
         when {
             priorita1 == Priorità.ALTA && priorita2 != Priorità.ALTA -> -1 // ALTA prima di qualsiasi altra
             priorita1 != Priorità.ALTA && priorita2 == Priorità.ALTA -> 1  // ALTA prima di qualsiasi altra
@@ -476,7 +483,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         textAlign = TextAlign.Center,
                         text = stringResource(id = R.string.project_tasks_description),
                         style = MaterialTheme.typography.labelLarge,
-                        color = if (isDarkTheme)Color.White else Grey50,
+                        color = if (isDarkTheme)Color.White else Grey70,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -539,7 +546,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                             ) {
                             Text(
                                 text = stringResource(id = R.string.bottoneNonCompletate),
-                                fontSize = 12.sp
+                                fontSize = 12.sp,
+                                color = if(isDarkTheme) White else Color.Black
                             )
                         }
                         Button(
@@ -1032,6 +1040,7 @@ fun TodoItem
 
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
@@ -1051,12 +1060,19 @@ fun EditTodoDialog(
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     val uploadResult by viewModel.uploadResult.observeAsState()
     val coroutineScope = rememberCoroutineScope()
+    var fileContent by remember { mutableStateOf<String?>(null) }
+
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             selectedFileUri = it
             viewModel.setFileUri(it)
+            coroutineScope.launch {
+                fileContent = viewModel.readFileContent(context, it)
+            }
         }
     }
+
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -1081,6 +1097,13 @@ fun EditTodoDialog(
 
     LaunchedEffect(uploadResult) {
 
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            launcher.launch("*/*")
+        } else {
+            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
     }
 
     AlertDialog(
@@ -1229,7 +1252,7 @@ fun EditTodoDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Button(onClick = { launcher.launch("*/*") }, colors = ButtonDefaults.buttonColors(
+                Button(onClick = { permissionLauncher.launch(Manifest.permission.READ_MEDIA_VIDEO) }, colors = ButtonDefaults.buttonColors(
                     containerColor = if (isDarkTheme) Grey70 else Grey50
                 )) {
                     Text(stringResource(id = R.string.selFile), color = if (isDarkTheme) White else Color.Black)
@@ -1237,10 +1260,11 @@ fun EditTodoDialog(
 
 
 
+
                 if (selectedFileUri != null) {
                     Text("File Selezionato: ${selectedFileUri!!.lastPathSegment}", color = if (isDarkTheme) White else Color.Black)
                 }
-
+                
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {
@@ -1614,15 +1638,17 @@ fun ExpandedDialog(
 
     LaunchedEffect(item.utenti) {
         lista_utenti = ""
-        var size = item.utenti.size
+        val size = item.utenti.size
         var contatore = 0
         for (u in item.utenti) {
             viewModelUtente.ottieni_utente(u) { userProfile ->
                 contatore++
                 if (userProfile != null) {
-                    if (contatore == size){
+                    if (contatore == size) {
                         lista_utenti += "${userProfile.nome} ${userProfile.cognome}"
-                    }else{lista_utenti+= "${userProfile.nome} ${userProfile.cognome}\n"}
+                    } else {
+                        lista_utenti += "${userProfile.nome} ${userProfile.cognome}\n"
+                    }
                 }
             }
         }
@@ -1630,142 +1656,156 @@ fun ExpandedDialog(
 
     val context = LocalContext.current
 
-
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = if(isDarkTheme) Color.Black else Grey35,
-        textContentColor = if (isDarkTheme)White else Color.Black,
-        title = { Text(text = stringResource(id = R.string.DettagliAttività), color = if (isDarkTheme) White else Color.Black) },
+        containerColor = if (isDarkTheme) Color.Black else Grey35,
+        textContentColor = if (isDarkTheme) White else Color.Black,
+        title = {
+            Text(
+                text = stringResource(id = R.string.DettagliAttività),
+                color = if (isDarkTheme) White else Color.Black
+            )
+        },
         text = {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(if (isDarkTheme) Color.Black else Grey35)
                     .padding(16.dp)
             ) {
-                Text(
-                    text = stringResource(id = R.string.Titoloduepunti),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = item.titolo,
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                item {
+                    Text(
+                        text = stringResource(id = R.string.Titoloduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.titolo,
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.Descrizioneduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.descrizione,
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.dataDiCreazioneduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataCreazione),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.dataDiScadenzaduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.Prioritaduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.priorita.toString(),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.listaPartecipantiDuePunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = lista_utenti,
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.fileAllegatoDuePunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
 
-                Text(
-                    text = stringResource(id = R.string.Descrizioneduepunti),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = item.descrizione,
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Text(
-                    text = stringResource(id = R.string.dataDiCreazioneduepunti),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataCreazione),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Text(
-                    text = stringResource(id = R.string.dataDiScadenzaduepunti),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Text(
-                    text = stringResource(id = R.string.Prioritaduepunti),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = item.priorita.toString(),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Text(
-                    text = stringResource(id = R.string.listaPartecipantiDuePunti),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-
-                Text(
-                    text = lista_utenti,
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Text(
-                    text = stringResource(id = R.string.fileAllegatoDuePunti),
-                    color = if (isDarkTheme) White else Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-
-                if (item.fileUri != null) {
-                    Button(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                data = Uri.parse(item.fileUri)
-                            }
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "File Icon",
-                            tint = Color.White,
-                        )
+                    if (item.fileUri != null) {
+                        Button(
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    data = Uri.parse(item.fileUri)
+                                }
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "File Icon",
+                                tint = Color.White,
+                            )
+                            Text(
+                                text = stringResource(id = R.string.bottoneFile),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    } else {
                         Text(
-                            text = stringResource(id = R.string.bottoneFile),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(start = 8.dp)
+                            text = stringResource(id = R.string.nessunFile),
+                            color = if (isDarkTheme) White else Color.Black
                         )
                     }
-                }else Text(text = stringResource(id = R.string.nessunFile), color = if (isDarkTheme) White else Color.Black)
-
-
+                }
             }
         },
-
         confirmButton = {
-            Box(modifier = Modifier.fillMaxWidth())
-            {
+            Box(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(Grey70),
@@ -1778,6 +1818,7 @@ fun ExpandedDialog(
         }
     )
 }
+
 
 @Composable
 fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {

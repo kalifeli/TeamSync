@@ -4,7 +4,7 @@
 
     <!--To Do Screen-->
     <string name="project_tasks_description">Qui troverai le Task che sono assegnate per questo progetto.</string>
-    <string name="bottoneNonCompletate">Non Completate</string>
+    <string name="bottoneNonCompletate">Incomplete</string>
     <string name="bottoneCompletate">Completate</string>
     <string name="titoloEdit">Titolo</string>
     <string name="descrizioneEdit">Descrizione</string>

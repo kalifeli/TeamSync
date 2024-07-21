@@ -151,7 +151,7 @@ fun ITuoiProgetti(
                            modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                        ) {
                            DropdownMenuItem(
-                               text = { Text(text = "Sincronizza", color = if(isDarkTheme) White else Color.Black)},
+                               text = { Text(text = stringResource(id = R.string.sincronizza), color = if(isDarkTheme) White else Color.Black)},
                                onClick = {
                                    expended = false
                                    utenteCorrenteId?.let {
@@ -166,7 +166,7 @@ fun ITuoiProgetti(
                            )
 
                            DropdownMenuItem(
-                               text = { Text(text = "Impostazioni", color = if(isDarkTheme) White else Color.Black) },
+                               text = { Text(text = stringResource(id = R.string.impostazioni), color = if(isDarkTheme) White else Color.Black) },
                                onClick = {
                                    expended = false
                                    navController.navigate(Schermate.Impostazioni.route)
@@ -177,7 +177,7 @@ fun ITuoiProgetti(
                                modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                            )
                            DropdownMenuItem(
-                               text = { Text(text = "Esci", color = if(isDarkTheme) White else Color.Black)},
+                               text = { Text(text = stringResource(id = R.string.Esci), color = if(isDarkTheme) White else Color.Black)},
                                onClick = {
                                    expended = false
                                    viewModelProgetto.logout()
@@ -284,10 +284,11 @@ fun ITuoiProgetti(
             viewModelProgetto.resetErroreAggiungiProgetto()
         }
     }
+    val progettoAggiuntoString = context.getString(R.string.ProgettoAggiunto)
 
     LaunchedEffect(aggiungiProgettoRiuscito) {
         if(aggiungiProgettoRiuscito){
-            Toast.makeText(context, "Progetto aggiunto con successo", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, progettoAggiuntoString, Toast.LENGTH_LONG).show()
             utenteCorrenteId?.let {
                 viewModelProgetto.caricaProgettiUtente(it, true)
                 viewModelProgetto.caricaProgettiCompletatiUtente(it)
@@ -340,7 +341,7 @@ fun CreaProgettoDialog(
         onDismissRequest = onDismissRequest,
         title = {
             Text(
-                "Crea un nuovo progetto",
+                stringResource(id = R.string.creaNuovoProgetto),
                 color = if(isDarkTheme) White else Color.Black
             )
                 },
@@ -400,7 +401,7 @@ fun CreaProgettoDialog(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(
-                        "Data di Scadenza",
+                        stringResource(id = R.string.datadiscadenza),
                     ) },
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
@@ -441,7 +442,7 @@ fun CreaProgettoDialog(
                         readOnly = true,
                         label = {
                             Text(
-                                "Priorità",
+                                stringResource(id = R.string.priorità),
                             ) },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
@@ -521,12 +522,12 @@ fun CreaProgettoDialog(
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Oppure unisciti a un progetto con ",
+                        text = stringResource(id = R.string.uniscitiAUnProgetto),
                         textAlign = TextAlign.Center,
                         color = if(isDarkTheme) Color.White else Color.Black
                     )
                     Text(
-                        text = "un codice",
+                        text = stringResource(id = R.string.conUnCodice),
                         textDecoration = TextDecoration.Underline,
                         textAlign = TextAlign.Center,
                         color = Red70,
@@ -550,7 +551,7 @@ fun CreaProgettoDialog(
                 },
                 colors = ButtonDefaults.buttonColors(Red70)
             ) {
-                Text("Crea", color = White)
+                Text(stringResource(id = R.string.crea), color = White)
             }
         },
         dismissButton = {
@@ -558,7 +559,7 @@ fun CreaProgettoDialog(
                 onClick = onDismissRequest,
             ) {
                 Text(
-                    "Annulla",
+                    stringResource(id = R.string.annullaEdit),
                     color = if(isDarkTheme) White else Color.Black)
 
             }
@@ -591,7 +592,7 @@ fun AggiungiProgettoDialog(
     AlertDialog(
         title = {
             Text(
-                text = "Aggiungi un progetto",
+                text = stringResource(id = R.string.AggiungiUnProgetto),
                 color = if(isDarkTheme) White else Color.Black
             )
         },
@@ -602,7 +603,7 @@ fun AggiungiProgettoDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    text = "Per unirti a un progetto esistente, inserisci il codice univoco fornito dal creatore del progetto.",
+                    text = stringResource(id = R.string.perUnirti),
                     textAlign = TextAlign.Center,
                     color = if(isDarkTheme) White else Color.Black
                 )
@@ -611,7 +612,7 @@ fun AggiungiProgettoDialog(
                     onValueChange = {codiceProgetto = it},
                     label = {
                         Text(
-                            "Codice progetto",
+                            stringResource(id = R.string.codiceProgetto),
                             color = if(isDarkTheme) White else Color.Black
                         ) },
                     shape = RoundedCornerShape(16.dp),
@@ -648,7 +649,7 @@ fun AggiungiProgettoDialog(
                 ),
                 enabled = codiceProgetto.length >= 8
             ) {
-                Text(text = "Unisciti")
+                Text(text = stringResource(id = R.string.unisciti))
             }
         },
         dismissButton = {
@@ -656,7 +657,7 @@ fun AggiungiProgettoDialog(
                 onClick = onDismissRequest
             ){
                 Text(
-                    text = "Annulla",
+                    text = stringResource(id = R.string.annullaEdit),
                     color = if(isDarkTheme) White else Color.Black
                 )
             }

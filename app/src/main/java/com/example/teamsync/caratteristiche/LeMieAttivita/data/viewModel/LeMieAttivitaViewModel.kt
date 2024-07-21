@@ -24,6 +24,12 @@ import java.util.Date
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+
+
 
 
 class LeMieAttivitaViewModel() : ViewModel() {
@@ -61,6 +67,14 @@ class LeMieAttivitaViewModel() : ViewModel() {
 
     var leMieAttivitaPerUtente by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
+    private val _isPermissionGranted = MutableLiveData<Boolean>()
+
+    val isPermissionGranted: LiveData<Boolean> get() = _isPermissionGranted
+
+    fun onPermissionResult(granted: Boolean) {
+        _isPermissionGranted.value = granted
+    }
+
     fun getTodoUtente(idProg: String, utenteId: String) {
         Log.d("ViewModel", "Chiamato getTodoUtente con idProg: $idProg e utenteId: $utenteId")
         viewModelScope.launch {
@@ -78,6 +92,15 @@ class LeMieAttivitaViewModel() : ViewModel() {
 
     fun setFileUri(uri: Uri?) {
         _fileUri.value = uri
+    }
+
+
+    suspend fun readFileContent(context: Context, uri: Uri): String? {
+        return withContext(Dispatchers.IO) {
+            context.contentResolver.openInputStream(uri)?.bufferedReader().use { reader ->
+                reader?.readText()
+            }
+        }
     }
 
     fun uploadFileAndSaveTodo(

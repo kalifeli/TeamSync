@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -128,7 +129,7 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if(isDarkTheme) Color.DarkGray else White)
+                .background(if (isDarkTheme) Color.DarkGray else White)
                 .padding(padding)
                 .padding(16.dp)
         ) {
@@ -184,7 +185,7 @@ fun ProfiloProgetto(viewModel: ViewModelUtente, viewModelProgetto: ViewModelProg
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp
         ),
@@ -193,7 +194,7 @@ fun ProfiloProgetto(viewModel: ViewModelUtente, viewModelProgetto: ViewModelProg
 
     ) {
         Text(
-            text = "Informazioni",
+            text = stringResource(id = R.string.Informazioni),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
@@ -292,11 +293,11 @@ fun ListaColleghi(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth()
-                .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+                .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
             colors = if(isDarkTheme)CardDefaults.cardColors(containerColor = Color.Black) else  CardDefaults.cardColors(containerColor = White)
         ) {
             Text(
-                text = "Partecipanti",
+                text = stringResource(id = R.string.Partecipanti),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = if(isDarkTheme) Color.White else Color.Black,
@@ -387,7 +388,7 @@ fun ListaColleghi(
                 )
                 {
                     Text(
-                        text = "Entra nel progetto",
+                        text = stringResource(id = R.string.entraNelProcetto),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 12.dp)
@@ -440,7 +441,10 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                 contentDescription = null,
                 modifier = Modifier
                     .size(32.dp)
-                    .background(if(isDarkTheme) Color.White else color.copy(alpha = 0.2f), CircleShape)
+                    .background(
+                        if (isDarkTheme) Color.White else color.copy(alpha = 0.2f),
+                        CircleShape
+                    )
                     .padding(8.dp),
                 painter = painterResource(id = R.drawable.logo_white),
             )

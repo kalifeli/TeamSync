@@ -2,13 +2,16 @@ package com.example.teamsync.caratteristiche.LeMieAttivita.ui
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.Manifest
+import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -103,12 +106,14 @@ import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Grey70
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SuppressLint("StateFlowValueCalledInComposition")
 @ExperimentalMaterial3Api
 @Composable
@@ -143,6 +148,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     var mostraDialogCodiceProgetto by remember { mutableStateOf(false) }
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_task", Context.MODE_PRIVATE)
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
 
     val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "creazione")) }
@@ -179,7 +185,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         val priorita1 = attivita1.priorita
         val priorita2 = attivita2.priorita
 
-        // Confronto basato sull'ordine dell'enumerazione Priorità
+
         when {
             priorita1 == Priorità.ALTA && priorita2 != Priorità.ALTA -> -1 // ALTA prima di qualsiasi altra
             priorita1 != Priorità.ALTA && priorita2 == Priorità.ALTA -> 1  // ALTA prima di qualsiasi altra
@@ -349,7 +355,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color.Black
+                        color = if(isDarkTheme)Color.White else Color.Black
                     )
                 },
                 navigationIcon = {
@@ -358,7 +364,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                             Icon(
                                 Icons.AutoMirrored.Default.ArrowBack,
                                 contentDescription = "torna indietro",
-                                tint = Color.Black
+                                tint = if(isDarkTheme)Color.White else Color.Black
                             )
                         }
                     }
@@ -370,16 +376,16 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 Icon(
                                     Icons.Default.MoreVert,
                                     contentDescription = "menu a tendina",
-                                    tint = Color.Black
+                                    tint = if(isDarkTheme)Color.White else Color.Black
                                 )
                             }
                             DropdownMenu(
                                 expanded = expended,
                                 onDismissRequest = { expended = false },
-                                modifier = Modifier.background(Grey20)
+                                modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text(text = "Condividi") },
+                                    text = { Text(text = stringResource(id = R.string.Condividi),  color = if(isDarkTheme)Color.White else Color.Black) },
                                     onClick = {
                                         expended = false
                                         mostraDialogCodiceProgetto = true
@@ -387,13 +393,14 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                     leadingIcon = {
                                         Icon(
                                             Icons.Default.Share,
-                                            contentDescription = "condividi progetto"
+                                            contentDescription = "condividi progetto",
+                                            tint = if (isDarkTheme) White else Color.Black
                                         )
                                     },
-                                    modifier = Modifier.background(Grey20)
+                                    modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                                 )
                                 DropdownMenuItem(
-                                    text = { Text(text = "Info Progetto") },
+                                    text = { Text(text = stringResource(id = R.string.Info), color = if(isDarkTheme)Color.White else Color.Black) },
                                     onClick = {
                                         expended = false
                                         navController.navigate("progetto_da_accettare/${id_prog}/progetto/progetto")
@@ -401,13 +408,14 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                     leadingIcon = {
                                         Icon(
                                             Icons.Default.Info,
-                                            contentDescription = "informazioni progetto"
+                                            contentDescription = "informazioni progetto",
+                                            tint = if (isDarkTheme) White else Color.Black
                                         )
                                     },
-                                    modifier = Modifier.background(Grey20)
+                                    modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                                 )
                                 DropdownMenuItem(
-                                    text = { Text(text = "Modifica Progetto") },
+                                    text = { Text(text = stringResource(id = R.string.modificaProgetto), color = if(isDarkTheme)Color.White else Color.Black) },
                                     onClick = {
                                         expended = false
                                         navController.navigate("modificaProgetto/${id_prog}")
@@ -415,13 +423,14 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                     leadingIcon = {
                                         Icon(
                                             Icons.Default.Create,
-                                            contentDescription = "modifica informazioni progetto"
+                                            contentDescription = "modifica informazioni progetto",
+                                            tint = if (isDarkTheme) White else Color.Black
                                         )
                                     },
-                                    modifier = Modifier.background(Grey20)
+                                    modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                                 )
                                 DropdownMenuItem(
-                                    text = { Text(text = "Abbandona", color = Red70) },
+                                    text = { Text(text = stringResource(id = R.string.Abbandona), color = Red70) },
                                     onClick = {
                                         expended = false
                                         mostraDialogAbbandono = true
@@ -434,16 +443,16 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             tint = Red70
                                         )
                                     },
-                                    modifier = Modifier.background(Grey20)
+                                    modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
                                 )
                             }
                         }
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = Color.Black,
-                    actionIconContentColor = Color.Black,
+                    containerColor = if (isDarkTheme) Color.DarkGray else Color.White,
+                    titleContentColor = if (isDarkTheme) Color.DarkGray else Color.White,
+                    actionIconContentColor = if (isDarkTheme) Color.DarkGray else Color.White,
                 )
             )
         }
@@ -451,14 +460,15 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         if (!(caricanome.value)) {
             Box(
                 modifier = Modifier
-                    .background(White)
+                    .background(if (isDarkTheme) Color.DarkGray else Color.White)
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(padding),
+                        .padding(padding)
+                        .background(if (isDarkTheme) Color.DarkGray else Color.White),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -468,7 +478,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         textAlign = TextAlign.Center,
                         text = stringResource(id = R.string.project_tasks_description),
                         style = MaterialTheme.typography.labelLarge,
-                        color = Grey70,
+                        color = if (isDarkTheme)Color.White else Grey70,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -503,12 +513,13 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 .padding(start = 8.dp)
                                 .weight(1f),
                             colors = ButtonDefaults.buttonColors(
-                                if (isClicked1.value) Red70 else Grey35
+                                if (isClicked1.value) Red70 else if(isDarkTheme) Color.Black else Grey35
                             )
                         ) {
                             Text(
                                 text = stringResource(id = R.string.bottoneCompletate),
-                                fontSize = 12.sp
+                                fontSize = 12.sp,
+                                color = if (isDarkTheme)Color.White else Color.Black
                             )
                         }
                         Button(
@@ -524,13 +535,14 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 .padding(start = 8.dp)
                                 .weight(1f),
                             colors = ButtonDefaults.buttonColors(
-                                if (isClicked.value) Red70 else Grey35
+                                if (isClicked.value) Red70 else if(isDarkTheme) Color.Black else Grey35
                             ),
 
                             ) {
                             Text(
                                 text = stringResource(id = R.string.bottoneNonCompletate),
-                                fontSize = 12.sp
+                                fontSize = 12.sp,
+                                color = if(isDarkTheme) White else Color.Black
                             )
                         }
                         Button(
@@ -548,15 +560,19 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 .padding(start = 8.dp)
                                 .weight(1f),
                             colors = ButtonDefaults.buttonColors(
-                                if (isClicked2.value) Red70 else Grey35
+                                if (isClicked2.value) Red70 else if(isDarkTheme) Color.Black else Grey35
                             ),
 
                             ) {
-                            Text(text = "Le Mie", fontSize = 12.sp)
+                            Text(
+                                text = "Le Mie",
+                                fontSize = 12.sp,
+                                color = if (isDarkTheme)Color.White else Color.Black
+                                )
                         }
                     }
                     if (carica) {
-                        CircularProgressIndicator(color = Color.Black)
+                        CircularProgressIndicator(color =  if(isDarkTheme)Color.White else Color.Black)
                     }
 
                     if (!isLoadingNonCompletate) {
@@ -840,6 +856,7 @@ fun TodoItem
         var lista_utenti by remember { mutableStateOf("") }
         val modifica = remember {mutableStateOf(false) }
 
+        val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
 
         LaunchedEffect(item.utenti) {
@@ -868,7 +885,8 @@ fun TodoItem
         .fillMaxWidth()
         .padding(8.dp)
         .clip(RoundedCornerShape(8.dp))
-        .background(Grey35)
+        .background(if (isDarkTheme) Color.Black else Grey35)
+        .border(1.dp, color = if (isDarkTheme) White else White, shape = RoundedCornerShape(8.dp))
         .clickable {
             dialogExpanded = true
         }
@@ -910,6 +928,7 @@ fun TodoItem
                 maxLines = 1,
                 modifier = Modifier.padding(end = 10.dp),
                 text = item.titolo,
+                color = if (isDarkTheme)Color.White else Color.Black,
                 textAlign = TextAlign.Left,
                 fontSize = 16.sp
             )
@@ -918,24 +937,28 @@ fun TodoItem
                 modifier = Modifier
                     .padding(end = 10.dp),
                 text = item.descrizione,
-                color = Grey70
+                color = if (isDarkTheme) Grey35 else Grey70
             )
             Text(
                 modifier = Modifier
                     .padding(end = 10.dp),
                 text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
                 fontSize = 12.sp,
+                color = if (isDarkTheme) Grey20 else Color.Black,
                 textAlign = TextAlign.Center
             )
             Text(
                 text = lista_utenti,
-                color = Grey70,
+                color = if(isDarkTheme) Grey35 else Grey70,
                 modifier = Modifier
                     .padding(end = 10.dp)
                     .padding(bottom = 3.dp),
             )
             if (item.fileUri != null) {
-                Text(text = "File allegato clicca per visualizzare")
+                Text(
+                    text = stringResource(id = R.string.fileAllegato),
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                )
             }
 
                 Canvas(
@@ -965,6 +988,8 @@ fun TodoItem
                 }
                 if (dialogDelete) {
                     AlertDialog(
+                        containerColor = if(isDarkTheme) Color.Black else Grey35,
+                        textContentColor = if (isDarkTheme)White else Color.Black,
                         onDismissRequest = { dialogDelete = false },
                         confirmButton = {
                             Button(
@@ -985,9 +1010,8 @@ fun TodoItem
                                 Text(stringResource(id = R.string.annullaEdit))
                             }
                         },
-                        title = { Text(stringResource(id = R.string.eliminaTodoTitle)) },
-                        text = { Text(stringResource(id = R.string.eliminaTodoDescrizione)) },
-                        containerColor = Grey35,
+                        title = { Text(stringResource(id = R.string.eliminaTodoTitle), color = if (isDarkTheme) White else Color.Black) },
+                        text = { Text(stringResource(id = R.string.eliminaTodoDescrizione), color = if (isDarkTheme) Grey35 else Grey70) },
                     )
                 }
                 if(modifica.value)
@@ -1011,6 +1035,7 @@ fun TodoItem
 
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
@@ -1030,12 +1055,19 @@ fun EditTodoDialog(
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     val uploadResult by viewModel.uploadResult.observeAsState()
     val coroutineScope = rememberCoroutineScope()
+    var fileContent by remember { mutableStateOf<String?>(null) }
+
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             selectedFileUri = it
             viewModel.setFileUri(it)
+            coroutineScope.launch {
+                fileContent = viewModel.readFileContent(context, it)
+            }
         }
     }
+
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -1055,35 +1087,61 @@ fun EditTodoDialog(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
+
     LaunchedEffect(uploadResult) {
 
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            launcher.launch("*/*")
+        } else {
+            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
     }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Modifica Attività") },
-        containerColor = Grey35,
-        textContentColor = Grey50,
+        title = { Text(stringResource(id = R.string.modificaAttività), color = if (isDarkTheme)White else Color.Black) },
+        containerColor = if(isDarkTheme) Color.Black else Grey35,
+        textContentColor = if (isDarkTheme)White else Color.Black,
         text = {
             Column {
                 OutlinedTextField(
                     value = titolo,
                     onValueChange = { titolo = it },
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.titoloEdit), color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Grey35,
-                        unfocusedContainerColor = Grey50,
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                 )
                 OutlinedTextField(
                     value = descrizione,
                     onValueChange = { descrizione = it },
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text((stringResource(id = R.string.descrizioneEdit)), color = Color.Black,modifier = Modifier.background(Color.Transparent) ) },
+                    label = { Text((stringResource(id = R.string.descrizioneEdit)),color = if(isDarkTheme)White else Color.Black,modifier = Modifier.background(Color.Transparent) ) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Grey35,
-                        unfocusedContainerColor = Grey50,
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                 )
                 OutlinedTextField(
@@ -1091,10 +1149,18 @@ fun EditTodoDialog(
                     onValueChange = {dataScadenzaStr = it},
                     shape = RoundedCornerShape(16.dp),
                     readOnly = true,
-                    label = { Text(stringResource(id = R.string.inserisciData), color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.inserisciData), color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Grey35,
-                        unfocusedContainerColor = Grey50,
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                     trailingIcon = {
                         IconButton(
@@ -1103,11 +1169,11 @@ fun EditTodoDialog(
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_calendario_evento),
                                 contentDescription = "scegli data di scadenza progetto",
-                                modifier = Modifier.size(20.dp)
-                            )
+                                modifier = Modifier.size(20.dp),
+                                tint = if (isDarkTheme)White else Color.Black)
                         }
                     },
-                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    textStyle = TextStyle(fontSize = 18.sp, color = if(isDarkTheme) White else Color.Black),
                     placeholder = { Text("dd/MM/yyyy") }
                 )
 
@@ -1118,8 +1184,8 @@ fun EditTodoDialog(
                         readOnly = true,
                         label = {
                             Text(
-                                "Priorità",
-                                color = Color.Black
+                                stringResource(id = R.string.priorità),
+                                color = if (isDarkTheme) White else Color.Black
                             )
                         },
                         shape = RoundedCornerShape(16.dp),
@@ -1128,17 +1194,24 @@ fun EditTodoDialog(
                                 modifier = Modifier.clickable { expanded = true })
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Grey35,
-                            unfocusedContainerColor = Grey50,
+                            focusedBorderColor = Red70,
+                            unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                            unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                            focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                            focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
                     )
-
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
-                        modifier = Modifier.background(Grey35)
+                        modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Grey35)
                     ) {
                         Priorità.entries.forEach { p ->
                             DropdownMenuItem(
@@ -1150,11 +1223,15 @@ fun EditTodoDialog(
                                             modifier = Modifier
                                                 .size(10.dp)
                                                 .clip(CircleShape)
-                                                .border(0.5.dp, Color.Black, CircleShape)
+                                                .border(
+                                                    0.5.dp,
+                                                    if (isDarkTheme) White else Color.Black,
+                                                    CircleShape
+                                                )
                                                 .background(p.colore)
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text(p.name)
+                                        Text(p.name , color = if (isDarkTheme)White else Color.Black)
 
                                     }
                                 },
@@ -1162,29 +1239,35 @@ fun EditTodoDialog(
                                     priorita = p
                                     expanded = false
                                 },
-                                modifier = Modifier.background(Grey35)
+                                modifier = Modifier.background(if (isDarkTheme)Color.DarkGray else Grey35)
                             )
                         }
                     }
                 }
-                Button(onClick = { launcher.launch("*/*") }) {
-                    Text("Seleziona File")
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(onClick = { permissionLauncher.launch(Manifest.permission.READ_MEDIA_VIDEO) }, colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isDarkTheme) Grey70 else Grey50
+                )) {
+                    Text(stringResource(id = R.string.selFile), color = if (isDarkTheme) White else Color.Black)
                 }
+
 
 
 
                 if (selectedFileUri != null) {
-                    Text("File Selezionato: ${selectedFileUri!!.lastPathSegment}")
+                    Text("File Selezionato: ${selectedFileUri!!.lastPathSegment}", color = if (isDarkTheme) White else Color.Black)
                 }
-
+                
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {
                         navController.navigate("task_selezionata/${todoItem.id.toString()}/${todoItem.progetto}")
                     },
-                    colors = ButtonDefaults.buttonColors(Grey70)
+                    colors = ButtonDefaults.buttonColors(if (isDarkTheme) Grey70 else Grey50)
                 ) {
-                    Text("Delega Task")
+                    Text(stringResource(id = R.string.delega), color = if (isDarkTheme) White else Color.Black)
                 }
             }
         },
@@ -1196,7 +1279,7 @@ fun EditTodoDialog(
                         titolo = titolo,
                         descrizione = descrizione,
                         dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse(dataScadenzaStr),
-                        priorita = priorita
+                        priorita = priorita,
                     )
                     coroutineScope.launch {
                         viewModel.uploadFileAndSaveTodo(
@@ -1223,11 +1306,11 @@ fun EditTodoDialog(
             }
         },
         dismissButton = {
-            Button(
+            TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(Grey70)
             ) {
-                Text(stringResource(id = R.string.annullaEdit))
+                Text(stringResource(id = R.string.annullaEdit), color = if(isDarkTheme) White else Color.Black)
             }
         }
     )
@@ -1258,6 +1341,8 @@ fun AddTodoDialog(
 
     var expanded by remember { mutableStateOf(false) }
 
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
     val datePickerDialog = DatePickerDialog(
         context,
         R.style.CustomDatePickerDialog,
@@ -1272,9 +1357,9 @@ fun AddTodoDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Grey35,
-        textContentColor = Grey50,
-        title = { Text(stringResource(id = R.string.aggiungiTodo)) },
+        containerColor = if(isDarkTheme) Color.Black else Grey35,
+        textContentColor = if (isDarkTheme)White else Color.Black,
+        title = { Text(stringResource(id = R.string.aggiungiTodo), color = if (isDarkTheme)White else Color.Black) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1286,24 +1371,40 @@ fun AddTodoDialog(
                     value = titolo,
                     onValueChange = { titolo = it },
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text(stringResource(id = R.string.titoloEdit), color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.titoloEdit), color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Grey35,
-                        unfocusedContainerColor = Grey50,
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
-                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    textStyle = TextStyle(fontSize = 18.sp, color = if(isDarkTheme)White else Color.Black),
                     placeholder = { Text(stringResource(id = R.string.titoloEdit)) }
                 )
                 OutlinedTextField(
                     value = descrizione,
                     onValueChange = { descrizione = it },
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text(stringResource(id = R.string.descrizioneEdit), color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.descrizioneEdit), color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Grey35,
-                        unfocusedContainerColor = Grey50,
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
-                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    textStyle = TextStyle(fontSize = 18.sp,  color = if(isDarkTheme)White else Color.Black),
                     placeholder = { Text(stringResource(id = R.string.inserisciDescrizione)) }
                 )
                 OutlinedTextField(
@@ -1311,10 +1412,18 @@ fun AddTodoDialog(
                     onValueChange = {},
                     shape = RoundedCornerShape(16.dp),
                     readOnly = true,
-                    label = { Text(stringResource(id = R.string.inserisciData), color = Color.Black) },
+                    label = { Text(stringResource(id = R.string.inserisciData),  color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Grey35,
-                        unfocusedContainerColor = Grey50,
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                     trailingIcon = {
                         IconButton(
@@ -1323,11 +1432,12 @@ fun AddTodoDialog(
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_calendario_evento),
                                 contentDescription = "scegli data di scadenza progetto",
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
+                                tint = if (isDarkTheme)White else Color.Black
                             )
                         }
                     },
-                    textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+                    textStyle = TextStyle(fontSize = 18.sp,  color = if(isDarkTheme)White else Color.Black),
                     placeholder = { Text("dd/MM/yyyy") }
                 )
 
@@ -1338,8 +1448,8 @@ fun AddTodoDialog(
                         readOnly = true,
                         label = {
                             Text(
-                                "Priorità",
-                                color = Color.Black
+                                stringResource(id = R.string.priorità),
+                                color = if(isDarkTheme)White else Color.Black
                             )
                         },
                         shape = RoundedCornerShape(16.dp),
@@ -1348,8 +1458,16 @@ fun AddTodoDialog(
                                 modifier = Modifier.clickable { expanded = true })
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Grey35,
-                            unfocusedContainerColor = Grey50,
+                            focusedBorderColor = Red70,
+                            unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                            focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                            unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                            focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                            focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1370,11 +1488,15 @@ fun AddTodoDialog(
                                             modifier = Modifier
                                                 .size(10.dp)
                                                 .clip(CircleShape)
-                                                .border(0.5.dp, Color.Black, CircleShape)
+                                                .border(
+                                                    0.5.dp,
+                                                    if (isDarkTheme) White else Color.Black,
+                                                    CircleShape
+                                                )
                                                 .background(p.colore)
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text(p.name)
+                                        Text(p.name, color = if (isDarkTheme)White else Color.Black)
 
                                     }
                                 },
@@ -1382,7 +1504,7 @@ fun AddTodoDialog(
                                     priorita = p
                                     expanded = false
                                 },
-                                modifier = Modifier.background(Grey35)
+                                modifier = Modifier.background(if (isDarkTheme) Grey70 else Grey35)
                             )
                         }
                     }
@@ -1421,9 +1543,8 @@ fun AddTodoDialog(
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(Grey70)) {
-                Text(stringResource(id = R.string.annullaEdit))
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = R.string.annullaEdit), color = if (isDarkTheme) White else Color.Black)
             }
         }
     )
@@ -1437,16 +1558,19 @@ fun CompleteDialog(
     onSave: (LeMieAttivita) -> Unit,
     item: LeMieAttivita
 ) {
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
     if (sezione == 1) {
         AlertDialog(
-            containerColor = Grey35,
+            containerColor = if(isDarkTheme) Color.Black else Grey35,
+            textContentColor = if (isDarkTheme)White else Color.Black,
             onDismissRequest = onDismiss,
             title = {
-                Text(text = stringResource(id = R.string.conferma))
+                Text(text = stringResource(id = R.string.conferma),color = if (isDarkTheme) White else Color.Black)
             },
 
             text = {
-                Text(text = stringResource(id = R.string.completaTodo))
+                Text(text = stringResource(id = R.string.completaTodo),color = if (isDarkTheme) Grey35 else Grey70)
             },
             confirmButton = {
                 Button(
@@ -1462,28 +1586,22 @@ fun CompleteDialog(
                 }
             },
             dismissButton = {
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(Grey70)
-                    // Colore di sfondo del pulsante di annullamento
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.annullaEdit),
-                        color = Color.White
-                    )
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(id = R.string.annullaEdit), color = if (isDarkTheme) White else Color.Black)
                 }
             }
         )
     }else{
         AlertDialog(
-            containerColor = Grey35,
+            containerColor = if(isDarkTheme) Color.Black else Grey35,
+            textContentColor = if (isDarkTheme)White else Color.Black,
             onDismissRequest = onDismiss,
             title = {
-                Text(text = stringResource(id = R.string.conferma))
+                Text(text = stringResource(id = R.string.conferma),color = if (isDarkTheme) White else Color.Black)
             },
 
             text = {
-                Text(text =  stringResource(id = R.string.noncompletaTodo))
+                Text(text =  stringResource(id = R.string.noncompletaTodo),color = if (isDarkTheme) Grey35 else Grey70)
             },
             confirmButton = {
                 Button(
@@ -1495,16 +1613,9 @@ fun CompleteDialog(
                     Text(text =  stringResource(id = R.string.conferma), color = Color.White)
                 }
             },
-
             dismissButton = {
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(Grey70)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.annullaEdit),
-                        color = Color.White
-                    )
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(id = R.string.annullaEdit), color = if (isDarkTheme) White else Color.Black)
                 }
             }
         )
@@ -1518,18 +1629,21 @@ fun ExpandedDialog(
     viewModelUtente: ViewModelUtente
 ) {
     var lista_utenti by remember { mutableStateOf("") }
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     LaunchedEffect(item.utenti) {
         lista_utenti = ""
-        var size = item.utenti.size
+        val size = item.utenti.size
         var contatore = 0
         for (u in item.utenti) {
             viewModelUtente.ottieni_utente(u) { userProfile ->
                 contatore++
                 if (userProfile != null) {
-                    if (contatore == size){
+                    if (contatore == size) {
                         lista_utenti += "${userProfile.nome} ${userProfile.cognome}"
-                    }else{lista_utenti+= "${userProfile.nome} ${userProfile.cognome}\n"}
+                    } else {
+                        lista_utenti += "${userProfile.nome} ${userProfile.cognome}\n"
+                    }
                 }
             }
         }
@@ -1537,162 +1651,181 @@ fun ExpandedDialog(
 
     val context = LocalContext.current
 
-
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Grey35,
-        title = { Text(text = "Dettagli Attività", color = Color.Black) },
+        containerColor = if (isDarkTheme) Color.Black else Grey35,
+        textContentColor = if (isDarkTheme) White else Color.Black,
+        title = {
+            Text(
+                text = stringResource(id = R.string.DettagliAttività),
+                color = if (isDarkTheme) White else Color.Black
+            )
+        },
         text = {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Grey35)
+                    .background(if (isDarkTheme) Color.Black else Grey35)
                     .padding(16.dp)
             ) {
-                Text(
-                    text = "Titolo:",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = item.titolo,
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                item {
+                    Text(
+                        text = stringResource(id = R.string.Titoloduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.titolo,
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.Descrizioneduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.descrizione,
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.dataDiCreazioneduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataCreazione),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.dataDiScadenzaduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.Prioritaduepunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.priorita.toString(),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.listaPartecipantiDuePunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = lista_utenti,
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.fileAllegatoDuePunti),
+                        color = if (isDarkTheme) White else Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
 
-                Text(
-                    text = "Descrizione:",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = item.descrizione,
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Text(
-                    text = "Data di Creazione:",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataCreazione),
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Text(
-                    text = "Data di Scadenza:",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Text(
-                    text = "Priorità:",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = item.priorita.toString(),
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Text(
-                    text = "Lista Partecipanti:",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-
-                Text(
-                    text = lista_utenti,
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Text(
-                    text = "File Allegato:",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-
-                if (item.fileUri != null) {
-                    Button(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                data = Uri.parse(item.fileUri)
-                            }
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "File Icon",
-                            tint = Color.White,
-                        )
+                    if (item.fileUri != null) {
+                        Button(
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    data = Uri.parse(item.fileUri)
+                                }
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "File Icon",
+                                tint = Color.White,
+                            )
+                            Text(
+                                text = stringResource(id = R.string.bottoneFile),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    } else {
                         Text(
-                            text = "Clicca qui per visualizzare il file",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(start = 8.dp)
+                            text = stringResource(id = R.string.nessunFile),
+                            color = if (isDarkTheme) White else Color.Black
                         )
                     }
-                }else Text(text = "Nessun File allegato....")
-
-
+                }
             }
         },
-
         confirmButton = {
-            Box(modifier = Modifier.fillMaxWidth())
-            {
+            Box(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(Grey70),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.align(Alignment.Center)
                 ) {
-                    Text(text = "Capito", color = Color.White)
+                    Text(text = stringResource(id = R.string.capito), color = Color.White)
                 }
             }
         }
     )
 }
 
+
 @Composable
 fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+    val context = LocalContext.current
+
     OutlinedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = Grey20
+            containerColor = if(isDarkTheme) Color.Black else Grey35,
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -1733,10 +1866,10 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Hai Completato $todoCompletate/$todoNonCompletate Attività",
+                    text = context.getString(R.string.completed_tasks_count, todoCompletate,todoNonCompletate),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelLarge,
-                    color = Color.Black
+                    color = if (isDarkTheme) White else Color.Black
                 )
             }
 
@@ -1760,7 +1893,7 @@ fun Card(progress: Float, todoCompletate: Int, todoNonCompletate: Int) {
                         text = "${(progress * 100).toInt()}%",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = if (isDarkTheme) White else Color.Black,
                     )
                 }
 
@@ -1776,18 +1909,23 @@ fun AbbandonaProgettoDialog(
     navController: NavController,
     progettoId: String
 ){
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
     val userId = viewModelProgetto.utenteCorrenteId.value
     AlertDialog(
+
         text = {
             Text(
-                text = "Sei sicuro di abbandonare il progetto? Una volta confermato non potrai tornare più indietro!",
+                text = stringResource(id = R.string.abbandonaProg),
+                color = if (isDarkTheme) White else Color.Black,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
                 textAlign = TextAlign.Center,
             )
         },
-        containerColor = White,
+        containerColor = if(isDarkTheme) Color.Black else Grey35,
+        textContentColor = if (isDarkTheme)White else Color.Black,
         onDismissRequest = onDismissRequest,
         confirmButton = {
             Button(
@@ -1799,7 +1937,7 @@ fun AbbandonaProgettoDialog(
                 colors = ButtonDefaults.buttonColors(Red70),
             ) {
                 Text(
-                    text = "Abbandona"
+                    text = stringResource(id = R.string.Abbandona)
                 )
             }
         },
@@ -1808,8 +1946,8 @@ fun AbbandonaProgettoDialog(
                 onClick = onDismissRequest
             ){
                 Text(
-                    text = "Annulla",
-                    color = Color.Black
+                    text = stringResource(id = R.string.annullaEdit),
+                    color = if (isDarkTheme) White else Color.Black,
                 )
             }
         }

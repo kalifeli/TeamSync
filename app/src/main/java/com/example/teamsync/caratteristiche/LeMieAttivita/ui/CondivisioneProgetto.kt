@@ -14,10 +14,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.ui.theme.Grey35
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.ThemePreferences
+import com.example.teamsync.R
+
+
 
 @Composable
 fun CondividiProgettoDialog(
@@ -26,6 +33,8 @@ fun CondividiProgettoDialog(
     contesto: Context,
     progettoId: String
 ){
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+
     LaunchedEffect(progettoId) {
         viewModelProgetto.recuperaCodiceProgetto(progettoId)
     }
@@ -35,8 +44,9 @@ fun CondividiProgettoDialog(
     AlertDialog(
         title = {
             Text(
-                text = "Condividi il codice del progetto",
+                text = stringResource(id = R.string.condividiCodice),
                 textAlign = TextAlign.Center,
+                color = if(isDarkTheme)Color.White else Color.Black
             )
         },
         text = {
@@ -47,18 +57,28 @@ fun CondividiProgettoDialog(
                     readOnly = true,
                     label = {
                         Text(
-                            "Codice Progetto",
-                            color = Color.Black
+                            stringResource(id = R.string.codiceProgetto),
+                            color = if(isDarkTheme)Color.White else Color.Black
                         )
                             },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Red70
-                    )
+                        focusedBorderColor = Red70,
+                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
+                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
+                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+
+                        )
                 )
             }
         },
-        containerColor = White,
+        containerColor = if (isDarkTheme) Color.Black else Grey35,
         onDismissRequest = onDismissRequest,
         confirmButton = {
             Button(
@@ -71,7 +91,7 @@ fun CondividiProgettoDialog(
                 // il pulsante viene abilitato solo se il codice è stato caricato
                 enabled = codiceProgetto.value != null
             ) {
-                Text(text = "Condividi")
+                Text(text = stringResource(id = R.string.Condividi))
             }
         },
         dismissButton ={
@@ -79,8 +99,8 @@ fun CondividiProgettoDialog(
                 onClick = onDismissRequest
             ){
                 Text(
-                    text = "Annulla",
-                    color = Color.Black
+                    text = stringResource(id = R.string.annullaEdit),
+                    color = if(isDarkTheme)Color.White else Color.Black
                 )
             }
         }

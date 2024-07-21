@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -212,7 +213,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Profilo Utenti",
+                        text = stringResource(id = R.string.ProfiloUtenti),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -233,18 +234,20 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                         "task" -> {
                                             navController.navigate("task_selezionata/${task}/${progetto}")
                                         }
+
                                         "progetto" -> {
                                             navController.navigate("progetto_da_accettare/${progetto}/progetto/${sottoprovenienza}")
                                         }
+
                                         "notifiche" -> {
                                             if (sottoprovenienza == "progetto") {
                                                 navController.navigate("progetto_da_accettare/${progetto}/${provenienza}/${sottoprovenienza}")
                                             }
-                                            if( sottoprovenienza == "Richiesta_Amicizia")
-                                            {
+                                            if (sottoprovenienza == "Richiesta_Amicizia") {
                                                 navController.navigate(Schermate.Notifiche.route)
                                             }
                                         }
+
                                         else -> {
                                             navController.navigate(Schermate.Profilo.route)
                                         }
@@ -303,7 +306,11 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp))
+                        .border(
+                            1.dp,
+                            if (isDarkTheme) White else White,
+                            shape = RoundedCornerShape(16.dp)
+                        )
                         .background(
                             if (isDarkTheme) Color.Black else (Red70),
 
@@ -393,10 +400,10 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                 CircularProgressIndicator(color = Color.Black)
                             }
                         } else {
-                            StatBox(number = numeroTaskCompletati, label = "Task Completate")
+                            StatBox(number = numeroTaskCompletati, label = stringResource(id = R.string.taskCompletate))
                             StatBox(
                                 number = numeroProgettiCompletati,
-                                label = "Progetti Completati"
+                                label = stringResource(id = R.string.progettiCompletati)
                             )
 
                         }
@@ -430,7 +437,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                 )
                                 {
                                     Text(
-                                        text = "Richiedi Amicizia",
+                                        text = stringResource(id = R.string.richiestaAmicizia),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -458,7 +465,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                 )
                                 {
                                     Text(
-                                        text = "Richiedi Amicizia",
+                                        text = stringResource(id = R.string.richiestaAmicizia),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -495,7 +502,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                         )
                                         {
                                             Text(
-                                                text = "Accetta amicizia",
+                                                text = stringResource(id = R.string.accettaAmicizia),
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(vertical = 12.dp)
@@ -524,7 +531,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                         )
                                         {
                                             Text(
-                                                text = "Richiedi Amicizia",
+                                                text = stringResource(id = R.string.richiestaAmicizia),
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(vertical = 12.dp)
@@ -555,7 +562,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                 )
                                 {
                                     Text(
-                                        text = "Richiedi Amicizia",
+                                        text = stringResource(id = R.string.richiestaAmicizia),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -609,7 +616,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                         )
                         {
                             Text(
-                                text = "Rimuovi Amicizia",
+                                text = stringResource(id = R.string.rimuoviAmicizia),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(vertical = 12.dp)
@@ -639,7 +646,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                 )
                                 {
                                     Text(
-                                        text = "Aggiungi ad un progetto",
+                                        text = stringResource(id = R.string.AggiungiAdUnProgetto),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -680,7 +687,7 @@ fun AddTodoDialog(
         modifier = Modifier.border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         onDismissRequest = { onDismiss() },
-        title = { Text(text = "Seleziona un progetto", color =  if(isDarkTheme) Color.White else Color.Black) },
+        title = { Text(text = stringResource(id = R.string.selezionaUnProgetto), color =  if(isDarkTheme) Color.White else Color.Black) },
         text = {
             Column {
                 if (isLoading) {
@@ -704,13 +711,13 @@ fun AddTodoDialog(
                                         if (viewModel.userProfile != null) {
                                             (
                                                     viewModelNotifiche.creaNotificaViewModel(
-                                                viewModel.userProfile!!.id,
-                                                profile?.id ?: "",
-                                                "Richiesta_Progetto",
-                                                contenuto,
-                                                progetto.id.toString()
+                                                        viewModel.userProfile!!.id,
+                                                        profile?.id ?: "",
+                                                        "Richiesta_Progetto",
+                                                        contenuto,
+                                                        progetto.id.toString()
                                                     )
-                                            )
+                                                    )
                                         }
                                     }
                                     onDismiss()
@@ -724,7 +731,7 @@ fun AddTodoDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Chiudi", color = if(isDarkTheme) Color.White else Color.Black)
+                Text(stringResource(id = R.string.chiudi), color = if(isDarkTheme) Color.White else Color.Black)
             }
         }
     )

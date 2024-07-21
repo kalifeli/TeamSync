@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -151,7 +152,10 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
     var amici by remember { mutableStateOf(userProfile?.amici ?: "") }
     var id_task by remember { mutableStateOf(task.id) }
     var id_prog by remember { mutableStateOf(task.progetto ) }
-
+    val context = LocalContext.current
+    val titolo = task.titolo
+    val priorita = task.priorita
+    val descrizione = task.descrizione
     userProfile?.let {
         nome = it.nome
         amici = it.amici
@@ -166,7 +170,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.elevatedCardColors(
             containerColor = if(isDarkTheme) Color.Black else Red70
         ),
@@ -199,7 +203,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Dettagli Task",
+                        text = stringResource(id = R.string.DettagliAttività),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color =Color.White,
@@ -217,7 +221,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Nome: ${task.titolo}",
+                text = context.getString(R.string.nomeDelega, titolo),
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
@@ -302,7 +306,7 @@ fun ListaColleghi(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = if (isDarkTheme) Color.Black else WhiteFacebook

@@ -21,6 +21,35 @@
     <string name="noncompletaTodo">Are you sure you did not complete this task?</string>
     <string name="eliminaTodoTitle">Delete ToDo</string>
     <string name="eliminaTodoDescrizione">Are you sure you would like to delete this To Do?</string>
+    <string name="Condividi">Share</string>
+    <string name="Info">Project Info</string>
+    <string name="modificaProgetto">Edit Project</string>
+    <string name="Abbandona">Leave</string>
+    <string name="fileAllegato">Attached file, click to view.</string>
+    <string name="modificaAttività">Edit Task</string>
+    <string name="selFile">Select File</string>
+    <string name="delega">Delegate Task</string>
+    <string name="DettagliAttività">Task Details</string>
+    <string name="Titoloduepunti">Title:</string>
+    <string name="Descrizioneduepunti">Description:</string>
+    <string name="dataDiCreazioneduepunti">Creation Date:</string>
+    <string name="dataDiScadenzaduepunti">Expiration Date:</string>
+    <string name="Prioritaduepunti">Priority:</string>
+    <string name="listaPartecipantiDuePunti">Lista Partecipanti:</string>
+    <string name="fileAllegatoDuePunti">Attached File:</string>
+    <string name="bottoneFile">Click here to view the file</string>
+    <string name="nessunFile">No file attached....</string>
+    <string name="capito">Copy</string>
+    <string name="codiceProgetto">Project Code</string>
+    <string name="condividiCodice">Share the project code</string>
+
+    <string name="completed_tasks_count">You have completed %1$d/%2$d tasks</string>
+    <string name="abbandonaProg">Are you sure you want to abandon the project? Once confirmed, you won\'t be able to go back!</string>
+    <string name="nomeDelega">Name: %s</string>
+
+
+
+
 
     <!--Schermata Impostazioni -->
     <string name="impostazioni">Settings</string>
@@ -120,12 +149,63 @@
     <string name="chiaro">Bright </string>
     <string name="scuro">Dark </string>
 
+    <!--Modifica Progetto Screen-->
+    <string name="titolo">Edit Project</string>
+    <string name="fineProgetto"> Have you finished the project and are you ready for delivery? Mark it as completed! </string>
+    <string name="dataConsegna"> Delivery Date </string>
+    <string name="voto"> Grade </string>
+    <string name="nv">Not graded</string>
+
+    <!--ITuoiProgetti Screen-->
+    <string name="sincronizza"> Synchronize </string>
+    <string name="Esci"> Logout </string>
+    <string name="ProgettoAggiunto"> Project added successfully </string>
+    <string name="creaNuovoProgetto"> Create a new project </string>
+    <string name="uniscitiAUnProgetto"> Or join a project with </string>
+    <string name="conUnCodice"> a code</string>
+    <string name="crea"> Create</string>
+    <string name="AggiungiUnProgetto"> Add a Project</string>
+    <string name="perUnirti"> To join an existing project, enter the unique code provided by the project creator.</string>
+    <string name="unisciti"> Join </string>
 
 
+    <string name="iTuoiProgetti"> Your Projects </string>
+    <string name="senzaProgetti">Oops! It looks like there are no projects. Start now by creating one.</string>
+    <string name="ciao">Hello, </string>
+    <string name="progressi">Progress </string>
+    <string name="continua">Keep it up! </string>
+    <string name="taskCompletate">Completed Tasks </string>
+    <string name="progettiCompletati">Completed Projects </string>
+    <string name="ricercaColleghi">Search Colleagues/Add Colleagues </string>
+
+    <!--ProfiloProgetto Screen-->
+    <string name="Informazioni"> Information </string>
+    <string name="Partecipanti"> Participants </string>
+    <string name="entraNelProcetto"> Join the project </string>
 
 
+    <!--Terms Screen-->
+    <string name="tiroloTerm"> Termini &amp; Condizioni </string>
+    <string name="ultimaMod"> Last Modify : </string>
+    <string name="tornaSu"> Scroll Up </string>
 
+    <!--Notifiche Screen-->
+    <string name="nonLette"> Unread </string>
+    <string name="lette">  All </string>
+    <string name="notifiche">  Notification </string>
 
+    <!--Profilo altri utenti Screen-->
+    <string name="richiestaAmicizia"> sent you a friend request </string>
+    <string name="ProfiloUtenti">  User Profile </string>
+    <string name="TaskCompletate">  Task Complete </string>
+    <string name="richiediAmicizia">  Send Friend Request </string>
+    <string name="accettaAmicizia">  Accept Friend Request </string>
+    <string name="rimuoviAmicizia">  Remove Friend </string>
+    <string name="AggiungiAdUnProgetto"> Add to a Project</string>
+    <string name="selezionaUnProgetto"> Select a Project</string>
+    <string name="chiudi"> Close</string>
 
+    <!--BottomNav Screen-->
+    <string name="profilo"> Profile</string>
 
 </resources>

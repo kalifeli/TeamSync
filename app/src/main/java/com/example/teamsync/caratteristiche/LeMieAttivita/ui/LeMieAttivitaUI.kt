@@ -565,7 +565,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 
                             ) {
                             Text(
-                                text = "Le Mie",
+                                text = stringResource(id = R.string.leMie),
                                 fontSize = 12.sp,
                                 color = if (isDarkTheme)Color.White else Color.Black
                                 )
@@ -1003,11 +1003,8 @@ fun TodoItem
                             }
                         },
                         dismissButton = {
-                            Button(
-                                onClick = { dialogDelete = false },
-                                colors = ButtonDefaults.buttonColors(Grey50),
-                            ) {
-                                Text(stringResource(id = R.string.annullaEdit))
+                            TextButton(onClick = {dialogDelete = false}) {
+                                Text(stringResource(id = R.string.annullaEdit), color = if (isDarkTheme) White else Color.Black)
                             }
                         },
                         title = { Text(stringResource(id = R.string.eliminaTodoTitle), color = if (isDarkTheme) White else Color.Black) },
@@ -1056,6 +1053,8 @@ fun EditTodoDialog(
     val uploadResult by viewModel.uploadResult.observeAsState()
     val coroutineScope = rememberCoroutineScope()
     var fileContent by remember { mutableStateOf<String?>(null) }
+    val maxCharsTitolo = 50
+    val maxCharsDescrizione = 1000
 
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -1110,7 +1109,11 @@ fun EditTodoDialog(
             Column {
                 OutlinedTextField(
                     value = titolo,
-                    onValueChange = { titolo = it },
+                    maxLines = 2,
+                    onValueChange = {
+                        if (it.length <= maxCharsTitolo) {
+                        titolo = it
+                    } },
                     shape = RoundedCornerShape(16.dp),
                     label = { Text(stringResource(id = R.string.titoloEdit), color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
@@ -1128,7 +1131,11 @@ fun EditTodoDialog(
                 )
                 OutlinedTextField(
                     value = descrizione,
-                    onValueChange = { descrizione = it },
+                    maxLines = 10,
+                    onValueChange = {
+                        if (it.length <= maxCharsDescrizione) {
+                        descrizione = it
+                    } },
                     shape = RoundedCornerShape(16.dp),
                     label = { Text((stringResource(id = R.string.descrizioneEdit)),color = if(isDarkTheme)White else Color.Black,modifier = Modifier.background(Color.Transparent) ) },
                     colors = OutlinedTextFieldDefaults.colors(
@@ -1306,11 +1313,8 @@ fun EditTodoDialog(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(Grey70)
-            ) {
-                Text(stringResource(id = R.string.annullaEdit), color = if(isDarkTheme) White else Color.Black)
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = R.string.annullaEdit), color = if (isDarkTheme) White else Color.Black)
             }
         }
     )
@@ -1355,6 +1359,9 @@ fun AddTodoDialog(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
+    val maxCharsTitolo = 50
+    val maxCharsDescrizione = 1000
+
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = if(isDarkTheme) Color.Black else Grey35,
@@ -1369,7 +1376,11 @@ fun AddTodoDialog(
             ) {
                 OutlinedTextField(
                     value = titolo,
-                    onValueChange = { titolo = it },
+                    maxLines = 2,
+                    onValueChange = {
+                        if (it.length <= maxCharsTitolo) {
+                            titolo = it
+                        } },
                     shape = RoundedCornerShape(16.dp),
                     label = { Text(stringResource(id = R.string.titoloEdit), color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
@@ -1389,7 +1400,11 @@ fun AddTodoDialog(
                 )
                 OutlinedTextField(
                     value = descrizione,
-                    onValueChange = { descrizione = it },
+                    maxLines = 10,
+                    onValueChange = {
+                        if (it.length <= maxCharsDescrizione) {
+                            descrizione = it
+                        } },
                     shape = RoundedCornerShape(16.dp),
                     label = { Text(stringResource(id = R.string.descrizioneEdit), color = if(isDarkTheme)White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
@@ -1580,7 +1595,7 @@ fun CompleteDialog(
 
                         onDismiss()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red) // Colore di sfondo del pulsante di conferma
+                    colors = ButtonDefaults.buttonColors(containerColor = Red70) // Colore di sfondo del pulsante di conferma
                 ) {
                     Text(text = stringResource(id = R.string.conferma), color = Color.White) // Testo bianco sul pulsante rosso
                 }

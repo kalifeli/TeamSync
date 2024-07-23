@@ -1129,6 +1129,13 @@ fun EditTodoDialog(
                         focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                 )
+                Text(
+                    text = "${titolo.length} / $maxCharsTitolo",
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.End)
+                        .padding(end = 8.dp)
+                )
                 OutlinedTextField(
                     value = descrizione,
                     maxLines = 10,
@@ -1150,6 +1157,13 @@ fun EditTodoDialog(
                         unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
                         focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
+                )
+                Text(
+                    text = "${descrizione.length} / $maxCharsDescrizione",
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.End)
+                        .padding(end = 8.dp)
                 )
                 OutlinedTextField(
                     value = dataScadenzaStr,
@@ -1366,7 +1380,7 @@ fun AddTodoDialog(
         onDismissRequest = onDismiss,
         containerColor = if(isDarkTheme) Color.Black else Grey35,
         textContentColor = if (isDarkTheme)White else Color.Black,
-        title = { Text(stringResource(id = R.string.aggiungiTodo), color = if (isDarkTheme)White else Color.Black) },
+        title = { Text(stringResource(id = R.string.aggiungiTodo), color = if (isDarkTheme)White else Color.Black, modifier = Modifier.padding(start = 16.dp)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1398,6 +1412,13 @@ fun AddTodoDialog(
                     textStyle = TextStyle(fontSize = 18.sp, color = if(isDarkTheme)White else Color.Black),
                     placeholder = { Text(stringResource(id = R.string.titoloEdit)) }
                 )
+                Text(
+                    text = "${titolo.length} / $maxCharsTitolo",
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.End)
+                        .padding(end = 8.dp)
+                )
                 OutlinedTextField(
                     value = descrizione,
                     maxLines = 10,
@@ -1421,6 +1442,13 @@ fun AddTodoDialog(
                     ),
                     textStyle = TextStyle(fontSize = 18.sp,  color = if(isDarkTheme)White else Color.Black),
                     placeholder = { Text(stringResource(id = R.string.inserisciDescrizione)) }
+                )
+                Text(
+                    text = "${descrizione.length} / $maxCharsDescrizione",
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.End)
+                        .padding(end = 8.dp)
                 )
                 OutlinedTextField(
                     value = dataScadenzaStr,

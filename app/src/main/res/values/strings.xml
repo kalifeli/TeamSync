@@ -46,6 +46,11 @@
     <string name="completed_tasks_count">You have completed %1$d/%2$d tasks</string>
     <string name="abbandonaProg">Are you sure you want to abandon the project? Once confirmed, you won\'t be able to go back!</string>
     <string name="nomeDelega">Name: %s</string>
+    <string name="prioritaDelega">Priority: %s</string>
+    <string name="dataDiScadenzaDelega">Expiry Date: %s</string>
+    <string name="DescrizioneDelega">Description: %s</string>
+    <string name="listaPartecipanti">Participants List -></string>
+
     <string name="AggiungiPersone">Add People</string>
 
     <string name="leMie">Mine</string>

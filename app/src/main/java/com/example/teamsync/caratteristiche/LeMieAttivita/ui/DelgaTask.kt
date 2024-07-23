@@ -109,7 +109,7 @@ fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHost
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Aggiungi Persone",
+                        text = stringResource(id = R.string.AggiungiPersone),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (isDarkTheme) Color.White else Color.Black,
@@ -154,6 +154,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
     var id_prog by remember { mutableStateOf(task.progetto ) }
     val context = LocalContext.current
     val titolo = task.titolo
+    val dataScadenza = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(task.dataScadenza)
     val priorita = task.priorita
     val descrizione = task.descrizione
     userProfile?.let {
@@ -228,23 +229,24 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Priorità: ${task.priorita}",
+                text = context.getString(R.string.prioritaDelega, priorita),
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Data scadenza: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(task.dataScadenza)}",
+                text = context.getString(R.string.dataDiScadenzaDelega, dataScadenza),
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Descrizione: ${task.descrizione}",
+                text = context.getString(R.string.DescrizioneDelega, descrizione),
                 fontSize = 16.sp,
                 color = Color.White,
+                maxLines = 3,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
             )
         }
@@ -318,7 +320,7 @@ fun ListaColleghi(
             modifier = Modifier.padding(start = 10.dp, top = 15.dp, bottom = 25.dp)
         ) {
             Text(
-                text = "Lista Partecipanti->",
+                text = stringResource(id = R.string.listaPartecipanti),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (isDarkTheme) Color.White else Color.Black
@@ -420,7 +422,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
     ElevatedCard(
         onClick = {
 
-                navController.navigate("utente/${utente.id}/${amicizia}/task/${id_task}/${id_prog}/progetto")
+            navController.navigate("utente/${utente.id}/${amicizia}/task/${id_task}/${id_prog}/progetto")
         },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -538,11 +540,3 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
 
     }
 }
-
-
-
-
-
-
-
-

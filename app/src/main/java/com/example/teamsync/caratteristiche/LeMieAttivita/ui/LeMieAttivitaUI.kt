@@ -1380,13 +1380,12 @@ fun AddTodoDialog(
         onDismissRequest = onDismiss,
         containerColor = if(isDarkTheme) Color.Black else Grey35,
         textContentColor = if (isDarkTheme)White else Color.Black,
-        title = { Text(stringResource(id = R.string.aggiungiTodo), color = if (isDarkTheme)White else Color.Black, modifier = Modifier.padding(start = 16.dp)) },
+        title = { Text(stringResource(id = R.string.aggiungiTodo), color = if (isDarkTheme)White else Color.Black) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
             ) {
                 OutlinedTextField(
                     value = titolo,

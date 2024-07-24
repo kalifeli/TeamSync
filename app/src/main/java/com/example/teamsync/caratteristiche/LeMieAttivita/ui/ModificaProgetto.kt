@@ -122,7 +122,8 @@ fun SchermataModificaProgetto(
     )
 
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
-
+    val maxCharsDescrizione = 200
+    val maxCharsNome = 20
 
     // Caricamento iniziale dei dati del progetto
     LaunchedEffect(progettoId) {
@@ -203,7 +204,9 @@ fun SchermataModificaProgetto(
                     item {
                         OutlinedTextField(
                             value = nomeProgetto,
-                            onValueChange = { nomeProgetto = it },
+                            onValueChange = { if (it.length <= maxCharsNome) {
+                                nomeProgetto = it
+                            } },
                             label = {
                                 Text(
                                     stringResource(id = R.string.nome),
@@ -227,12 +230,26 @@ fun SchermataModificaProgetto(
                                 .fillMaxWidth()
                                 .padding(8.dp)
                         )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 10.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text(
+                                text = "${nomeProgetto.length} / $maxCharsNome",
+                                color = if (isDarkTheme) Color.White else Color.Black,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
 
                     item {
                         OutlinedTextField(
                             value = descrizioneProgetto,
-                            onValueChange = { descrizioneProgetto = it },
+                            onValueChange = { if (it.length <= maxCharsDescrizione) {
+                                descrizioneProgetto = it
+                            } },
                             label = {
                                 Text(
                                     stringResource(id = R.string.descrizioneEdit),
@@ -256,8 +273,19 @@ fun SchermataModificaProgetto(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
-                                .height(200.dp)
                         )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 10.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text(
+                                text = "${descrizioneProgetto.length} / $maxCharsDescrizione",
+                                color = if (isDarkTheme) Color.White else Color.Black,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
                     item {
                         OutlinedTextField(

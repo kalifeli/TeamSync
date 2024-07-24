@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel
 
+import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -59,8 +60,6 @@ class LeMieAttivitaViewModel() : ViewModel() {
     var leMieAttivitaNonCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
     var leMieAttivitaCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
-    var erroreAggiungiTask = mutableStateOf<String?>(null)
-        private set
 
     var erroreEditTask = mutableStateOf<String?>(null)
         private set
@@ -69,11 +68,6 @@ class LeMieAttivitaViewModel() : ViewModel() {
 
     private val _isPermissionGranted = MutableLiveData<Boolean>()
 
-    val isPermissionGranted: LiveData<Boolean> get() = _isPermissionGranted
-
-    fun onPermissionResult(granted: Boolean) {
-        _isPermissionGranted.value = granted
-    }
 
     fun getTodoUtente(idProg: String, utenteId: String) {
         Log.d("ViewModel", "Chiamato getTodoUtente con idProg: $idProg e utenteId: $utenteId")
@@ -162,7 +156,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
-    fun resetErroreAggiungiTask() {
+    fun resetErroreEditTask() {
         erroreEditTask.value = null
     }
 
@@ -332,6 +326,17 @@ class LeMieAttivitaViewModel() : ViewModel() {
         return dateToCompare.before(today.time)
     }
 
+    private val _erroreAggiungiTask = MutableLiveData<String?>()
+    val erroreAggiungiTask: LiveData<String?> = _erroreAggiungiTask
+
+    fun setErroreAggiungiTask(message: String) {
+        _erroreAggiungiTask.value = message
+    }
+
+    fun resetErroreAggiungiTask() {
+        _erroreAggiungiTask.value = null
+    }
+
     fun addTodo(
         titolo: String,
         descrizione: String,
@@ -341,10 +346,16 @@ class LeMieAttivitaViewModel() : ViewModel() {
         proprietario: String,
         progetto : String
     ) {
-        if (isDateBeforeToday(dataScad)) {
-            erroreAggiungiTask.value = "AGGIUNGI RIFIUTATO: La data di scadenza non può essere precedente alla data di creazione della Task."
+        if (titolo.isBlank()) {
+            setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: Il titolo non può essere omesso.")
+            Log.e(TAG, "Errore Aggiungi Task: " + "${erroreAggiungiTask.value}");
             return
         }
+        if (isDateBeforeToday(dataScad)) {
+            setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
+            return
+        }
+
         viewModelScope.launch {
             repositoryLeMieAttivita.addTodo(
                 titolo,

@@ -89,6 +89,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.teamsync.R
@@ -235,8 +236,16 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         }
     }
 
+    LaunchedEffect(viewModel.erroreEditTask.value) {
+        if (viewModel.erroreEditTask.value != null) {
+            Toast.makeText(contesto, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
+            viewModel.resetErroreAggiungiTask()
+        }
+    }
+
     if (addTodoDialog) {
         AddTodoDialog(
+            viewModel = LeMieAttivitaViewModel(),
             onDismiss = { addTodoDialog = false },
             onSave = { newTodo ->
                 coroutineScope.launch {
@@ -322,20 +331,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         )
     }
 
-    LaunchedEffect(viewModel.erroreAggiungiTask.value) {
-        if (viewModel.erroreAggiungiTask.value != null) {
-            Toast.makeText(contesto, viewModel.erroreAggiungiTask.value, Toast.LENGTH_LONG).show()
-            viewModel.erroreAggiungiTask.value
-        }
-    }
 
-    LaunchedEffect(viewModel.erroreEditTask.value) {
-        if (viewModel.erroreEditTask.value != null) {
-            Toast.makeText(contesto, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
-            viewModel.resetErroreAggiungiTask()
-        }
-
-    }
 
     Scaffold(
         topBar = {
@@ -944,7 +940,7 @@ fun TodoItem
                     .padding(end = 10.dp),
                 text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(item.dataScadenza),
                 fontSize = 12.sp,
-                color = if (isDarkTheme) Grey20 else Color.Black,
+                color = if (item.dataScadenza <= Date()) Red70 else if (isDarkTheme) Grey20 else Color.Black,
                 textAlign = TextAlign.Center
             )
             Text(
@@ -1133,7 +1129,8 @@ fun EditTodoDialog(
                     text = "${titolo.length} / $maxCharsTitolo",
                     color = if (isDarkTheme) Color.White else Color.Black,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.End)
                         .padding(end = 8.dp)
                 )
                 OutlinedTextField(
@@ -1162,7 +1159,8 @@ fun EditTodoDialog(
                     text = "${descrizione.length} / $maxCharsDescrizione",
                     color = if (isDarkTheme) Color.White else Color.Black,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.End)
                         .padding(end = 8.dp)
                 )
                 OutlinedTextField(
@@ -1345,7 +1343,8 @@ fun EditTodoDialog(
 @Composable
 fun AddTodoDialog(
     onDismiss: () -> Unit,
-    onSave: (LeMieAttivita) -> Unit
+    onSave: (LeMieAttivita) -> Unit,
+    viewModel: LeMieAttivitaViewModel
 ) {
     var titolo by remember { mutableStateOf("") }
     var descrizione by remember { mutableStateOf("") }
@@ -1356,7 +1355,6 @@ fun AddTodoDialog(
     val calendar = Calendar.getInstance()
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val dataScadenzaStr = sdf.format(dataScadenza)
-
     var expanded by remember { mutableStateOf(false) }
 
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
@@ -1378,9 +1376,9 @@ fun AddTodoDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = if(isDarkTheme) Color.Black else Grey35,
-        textContentColor = if (isDarkTheme)White else Color.Black,
-        title = { Text(stringResource(id = R.string.aggiungiTodo), color = if (isDarkTheme)White else Color.Black) },
+        containerColor = if (isDarkTheme) Color.Black else Grey35,
+        textContentColor = if (isDarkTheme) White else Color.Black,
+        title = { Text(stringResource(id = R.string.aggiungiTodo), color = if (isDarkTheme) White else Color.Black) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1393,29 +1391,31 @@ fun AddTodoDialog(
                     onValueChange = {
                         if (it.length <= maxCharsTitolo) {
                             titolo = it
-                        } },
+                        }
+                    },
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text(stringResource(id = R.string.titoloEdit), color = if(isDarkTheme)White else Color.Black) },
+                    label = { Text(stringResource(id = R.string.titoloEdit), color = if (isDarkTheme) White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Red70,
-                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                        unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                        focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                     ),
-                    textStyle = TextStyle(fontSize = 18.sp, color = if(isDarkTheme)White else Color.Black),
+                    textStyle = TextStyle(fontSize = 18.sp, color = if (isDarkTheme) White else Color.Black),
                     placeholder = { Text(stringResource(id = R.string.titoloEdit)) }
                 )
                 Text(
                     text = "${titolo.length} / $maxCharsTitolo",
                     color = if (isDarkTheme) Color.White else Color.Black,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.End)
                         .padding(end = 8.dp)
                 )
                 OutlinedTextField(
@@ -1424,29 +1424,31 @@ fun AddTodoDialog(
                     onValueChange = {
                         if (it.length <= maxCharsDescrizione) {
                             descrizione = it
-                        } },
+                        }
+                    },
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text(stringResource(id = R.string.descrizioneEdit), color = if(isDarkTheme)White else Color.Black) },
+                    label = { Text(stringResource(id = R.string.descrizioneEdit), color = if (isDarkTheme) White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Red70,
-                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                        unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                        focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                     ),
-                    textStyle = TextStyle(fontSize = 18.sp,  color = if(isDarkTheme)White else Color.Black),
+                    textStyle = TextStyle(fontSize = 18.sp, color = if (isDarkTheme) White else Color.Black),
                     placeholder = { Text(stringResource(id = R.string.inserisciDescrizione)) }
                 )
                 Text(
                     text = "${descrizione.length} / $maxCharsDescrizione",
                     color = if (isDarkTheme) Color.White else Color.Black,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.End)
                         .padding(end = 8.dp)
                 )
                 OutlinedTextField(
@@ -1454,18 +1456,18 @@ fun AddTodoDialog(
                     onValueChange = {},
                     shape = RoundedCornerShape(16.dp),
                     readOnly = true,
-                    label = { Text(stringResource(id = R.string.inserisciData),  color = if(isDarkTheme)White else Color.Black) },
+                    label = { Text(stringResource(id = R.string.inserisciData), color = if (isDarkTheme) White else Color.Black) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Red70,
-                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                        unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                        focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                        unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                        focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                        focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                     ),
                     trailingIcon = {
                         IconButton(
@@ -1475,11 +1477,11 @@ fun AddTodoDialog(
                                 painter = painterResource(id = R.drawable.ic_calendario_evento),
                                 contentDescription = "scegli data di scadenza progetto",
                                 modifier = Modifier.size(20.dp),
-                                tint = if (isDarkTheme)White else Color.Black
+                                tint = if (isDarkTheme) White else Color.Black
                             )
                         }
                     },
-                    textStyle = TextStyle(fontSize = 18.sp,  color = if(isDarkTheme)White else Color.Black),
+                    textStyle = TextStyle(fontSize = 18.sp, color = if (isDarkTheme) White else Color.Black),
                     placeholder = { Text("dd/MM/yyyy") }
                 )
 
@@ -1491,7 +1493,7 @@ fun AddTodoDialog(
                         label = {
                             Text(
                                 stringResource(id = R.string.priorità),
-                                color = if(isDarkTheme)White else Color.Black
+                                color = if (isDarkTheme) White else Color.Black
                             )
                         },
                         shape = RoundedCornerShape(16.dp),
@@ -1501,15 +1503,15 @@ fun AddTodoDialog(
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Red70,
-                            unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                            focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                            unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                            focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                            focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                            unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                            unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                            unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                            focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                            focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                            unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1591,7 +1593,16 @@ fun AddTodoDialog(
         }
     )
 
+    val erroreAggiungiTask by viewModel.erroreAggiungiTask.observeAsState()
+
+    LaunchedEffect(erroreAggiungiTask) {
+        erroreAggiungiTask?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            viewModel.resetErroreAggiungiTask()
+        }
+    }
 }
+
 
 @Composable
 fun CompleteDialog(
@@ -1700,7 +1711,7 @@ fun ExpandedDialog(
         title = {
             Text(
                 text = stringResource(id = R.string.DettagliAttività),
-                color = if (isDarkTheme) White else Color.Black
+                color = if (isDarkTheme) White else Color.Black,
             )
         },
         text = {

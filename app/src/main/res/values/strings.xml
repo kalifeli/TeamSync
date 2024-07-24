@@ -185,6 +185,7 @@
     <string name="taskCompletate">Completed Tasks </string>
     <string name="progettiCompletati">Completed Projects </string>
     <string name="ricercaColleghi">Search Colleagues/Add Colleagues </string>
+    <string name="Calendario">Calendar </string>
 
     <!--ProfiloProgetto Screen-->
     <string name="Informazioni"> Information </string>

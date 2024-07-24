@@ -334,7 +334,8 @@ fun CreaProgettoDialog(
 
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val dataScadenzaStr = sdf.format(dataScadenza)
-
+    val maxCharsNome = 20
+    val maxCharsDescrizione = 200
 
 
     AlertDialog(
@@ -350,7 +351,11 @@ fun CreaProgettoDialog(
             Column {
                 OutlinedTextField(
                     value = nome,
-                    onValueChange = { nome = it },
+                    onValueChange = {
+                        if (it.length <= maxCharsNome) {
+                            nome = it
+                        }
+                    },
                     label = {
                         Text(
                             stringResource(id = R.string.nome),
@@ -370,10 +375,20 @@ fun CreaProgettoDialog(
                         focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                 )
+                Text(
+                    text = "${nome.length} / $maxCharsNome",
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(end = 8.dp)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = descrizione,
-                    onValueChange = { descrizione = it },
+                    onValueChange = { if (it.length <= maxCharsDescrizione) {
+                        descrizione = it
+                    } },
                     label = {
                         Text(
                             stringResource(id = R.string.descrizioneEdit)
@@ -393,6 +408,14 @@ fun CreaProgettoDialog(
                         focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
                     maxLines = 15
+                )
+                Text(
+                    text = "${descrizione.length} / $maxCharsDescrizione",
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(end = 8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 

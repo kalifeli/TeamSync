@@ -61,8 +61,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
     var leMieAttivitaCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
 
-    var erroreEditTask = mutableStateOf<String?>(null)
-        private set
+
 
     var leMieAttivitaPerUtente by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
@@ -105,8 +104,13 @@ class LeMieAttivitaViewModel() : ViewModel() {
         priorita: Priorità,
         sezione: Int
     ) {
+        if (titolo.isBlank()) {
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: Il titolo non può essere omesso.")
+            Log.e(TAG, "Errore Aggiungi Task: " + "${erroreAggiungiTask.value}");
+            return
+        }
         if (isDateBeforeToday(dataScad)) {
-            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task."
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
             return
         }
         viewModelScope.launch {
@@ -141,8 +145,12 @@ class LeMieAttivitaViewModel() : ViewModel() {
         utenti: List<String>,
         fileUri: String?
     ) {
+        if (titolo.isBlank()) {
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: Il titolo non può essere omesso.")
+            return
+        }
         if (isDateBeforeToday(dataScad)) {
-            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task..."
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
             return
         }
         viewModelScope.launch {
@@ -156,9 +164,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
-    fun resetErroreEditTask() {
-        erroreEditTask.value = null
-    }
+
 
     fun updateTaskTotali(id: String) {
         viewModelScope.launch {
@@ -329,12 +335,21 @@ class LeMieAttivitaViewModel() : ViewModel() {
     private val _erroreAggiungiTask = MutableLiveData<String?>()
     val erroreAggiungiTask: LiveData<String?> = _erroreAggiungiTask
 
+    private val _erroreEditTask = MutableLiveData<String?>()
+    val erroreEditTask: LiveData<String?> = _erroreAggiungiTask
+
     fun setErroreAggiungiTask(message: String) {
         _erroreAggiungiTask.value = message
+    }
+    fun setErroreEditTask(message: String) {
+        _erroreEditTask.value = message
     }
 
     fun resetErroreAggiungiTask() {
         _erroreAggiungiTask.value = null
+    }
+    fun resetErroreEditTask() {
+        _erroreEditTask.value = null
     }
 
     fun addTodo(

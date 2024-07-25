@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.Manifest
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -125,9 +126,9 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val utente = viewModelUtente.userProfile
     val coroutineScope = rememberCoroutineScope()
     var addTodoDialog by remember { mutableStateOf(false) }
+    var openDialog by remember { mutableStateOf(false) }
     val currentTodoItem = remember { mutableStateOf<LeMieAttivita?>(null) }
     var dialogComplete by remember { mutableStateOf(false) }
-    val openDialog = remember { mutableStateOf(false) }
     val isClicked = remember { mutableStateOf(true) }
     val isClicked1 = remember { mutableStateOf(false) }
     val isClicked2 = remember { mutableStateOf(false) }
@@ -236,10 +237,23 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         }
     }
 
-    LaunchedEffect(viewModel.erroreEditTask.value) {
-        if (viewModel.erroreEditTask.value != null) {
-            Toast.makeText(contesto, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
+    val erroreAggiungiTask by viewModel.erroreAggiungiTask.observeAsState()
+
+    LaunchedEffect(erroreAggiungiTask) {
+        erroreAggiungiTask?.let { message ->
+            Log.d("TAG", "Showing Toast with message: $message")
+            Toast.makeText(contesto, message, Toast.LENGTH_LONG).show()
             viewModel.resetErroreAggiungiTask()
+        }
+    }
+
+    val erroreEditTask by viewModel.erroreAggiungiTask.observeAsState()
+
+    LaunchedEffect(erroreEditTask) {
+        erroreEditTask?.let { message ->
+            Log.d("TAG", "Showing Toast with message: $message")
+            Toast.makeText(contesto, message, Toast.LENGTH_LONG).show()
+            viewModel.resetErroreEditTask()
         }
     }
 
@@ -260,18 +274,24 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                             id_prog
                         )
                     }
-                    addTodoDialog = false
+                    addTodoDialog = if (viewModel.erroreAggiungiTask.value == null) {
+                        // Se il salvataggio è riuscito, chiudi la dialog
+                        false
+                    } else {
+                        // Mostra un messaggio di errore
+                        true
+                    }
+
                 }
             }
         )
     }
 
 
-    if (openDialog.value && currentTodoItem.value != null) {
-
+    if (openDialog) {
         EditTodoDialog(
             todoItem = currentTodoItem.value!!,
-            onDismiss = { openDialog.value = false },
+            onDismiss = { openDialog = false },
             onSave = { updatedItem ->
                 val fileUri = viewModel.uploadResult.value
 
@@ -286,12 +306,17 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     updatedItem.utenti,
                     fileUri = fileUri
                 )
-                openDialog.value = false
+                openDialog = if (viewModel.erroreEditTask.value == null) {
+                    false
+                } else {
+                    // Mostra un messaggio di errore
+                    true
+                }
             },
             navController,
             progettoNome = progetto_nome.value,
-            viewModelNotifiche = viewModelNotifiche
-
+            viewModelNotifiche = viewModelNotifiche,
+            viewModel = LeMieAttivitaViewModel()
 
         )
     }
@@ -302,8 +327,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             onDismiss = { dialogComplete = false },
             onSave = { completeTodo ->
                 coroutineScope.launch {
-                    // Chiama la funzione completa nel viewModel
-
                     viewModel.completeTodo(
                         id = completeTodo.id ?: "",
                         completeTodo.completato,
@@ -583,7 +606,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -611,7 +634,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -633,7 +656,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -660,7 +683,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -682,7 +705,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -704,7 +727,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -733,7 +756,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -757,7 +780,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -779,7 +802,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                             },
                                             onEdit = { item ->
                                                 currentTodoItem.value = item
-                                                openDialog.value = true
+                                                openDialog = true
                                             },
                                             onComplete = { item ->
                                                 currentTodoItem.value = item
@@ -835,6 +858,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         }
 
     }
+
 }
 
 @Composable
@@ -1035,7 +1059,7 @@ fun EditTodoDialog(
     onDismiss: () -> Unit,
     onSave: (LeMieAttivita) -> Unit,
     navController: NavHostController,
-    viewModel: LeMieAttivitaViewModel = LeMieAttivitaViewModel(),
+    viewModel: LeMieAttivitaViewModel,
     viewModelUtente: ViewModelUtente = ViewModelUtente(),
     viewModelNotifiche: ViewModelNotifiche,
     progettoNome: String
@@ -1318,7 +1342,6 @@ fun EditTodoDialog(
                         }
                     }
                     onSave(updatedTodo)
-                    onDismiss()
                 },
             ) {
                 Text(stringResource(id = R.string.salvaEdit))
@@ -1330,14 +1353,17 @@ fun EditTodoDialog(
             }
         }
     )
-    LaunchedEffect(viewModel.erroreEditTask.value) {
-        if(viewModel.erroreEditTask.value != null){
-            Toast.makeText(context, viewModel.erroreEditTask.value, Toast.LENGTH_LONG).show()
+    val erroreEditTask by viewModel.erroreEditTask.observeAsState()
+
+    LaunchedEffect(erroreEditTask) {
+        erroreEditTask?.let { message ->
+            Log.d("TAG", "Showing Toast with message: $message")
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             viewModel.resetErroreAggiungiTask()
         }
-
     }
 }
+
 
 
 @Composable
@@ -1576,7 +1602,6 @@ fun AddTodoDialog(
                                     priorita = priorita
                                 )
                             )
-                            onDismiss()
                         }
                     } else {
                         Toast.makeText( context, context.getString(R.string.datiErrati), Toast.LENGTH_SHORT).show()
@@ -1593,10 +1618,13 @@ fun AddTodoDialog(
         }
     )
 
+
     val erroreAggiungiTask by viewModel.erroreAggiungiTask.observeAsState()
+    Log.d("Tag", "Current error message: $erroreAggiungiTask")
 
     LaunchedEffect(erroreAggiungiTask) {
         erroreAggiungiTask?.let { message ->
+            Log.d("TAG", "Showing Toast with message: $message")
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             viewModel.resetErroreAggiungiTask()
         }

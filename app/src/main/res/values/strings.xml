@@ -43,7 +43,7 @@
     <string name="codiceProgetto">Project Code</string>
     <string name="condividiCodice">Share the project code</string>
 
-    <string name="completed_tasks_count">You have completed %1$d/%2$d tasks</string>
+    <string name="completed_tasks_count">Completed %1$d/%2$d Activities</string>
     <string name="abbandonaProg">Are you sure you want to abandon the project? Once confirmed, you won\'t be able to go back!</string>
     <string name="nomeDelega">Name: %s</string>
     <string name="prioritaDelega">Priority: %s</string>

@@ -45,7 +45,7 @@
     <string name="condividiCodice">Condividi il codice del progetto</string>
 
 
-    <string name="completed_tasks_count">Hai completato %1$d/%2$d Attività</string>
+    <string name="completed_tasks_count">Sono state completate %1$d/%2$d Attività</string>
     <string name="abbandonaProg">Sei sicuro di abbandonare il progetto? Una volta confermato non potrai tornare più indietro!</string>
     <string name="nomeDelega">Nome: %s</string>
     <string name="prioritaDelega">Priorità: %s</string>

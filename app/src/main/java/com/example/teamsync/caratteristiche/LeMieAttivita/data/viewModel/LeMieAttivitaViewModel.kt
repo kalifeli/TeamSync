@@ -26,6 +26,7 @@ import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import android.content.Context
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -61,12 +62,34 @@ class LeMieAttivitaViewModel() : ViewModel() {
     var leMieAttivitaCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
 
-
+    val repositoryUtente = RepositoryUtente()
 
     var leMieAttivitaPerUtente by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
     private val _isPermissionGranted = MutableLiveData<Boolean>()
 
+    var utenteCorrenteId = mutableStateOf<String?>(null)
+
+
+    private val _erroreAggiungiTask = MutableLiveData<String?>()
+    val erroreAggiungiTask: LiveData<String?> = _erroreAggiungiTask
+
+    private val _erroreEditTask = MutableLiveData<String?>()
+    val erroreEditTask: LiveData<String?> = _erroreEditTask
+
+    fun setErroreAggiungiTask(message: String) {
+        _erroreAggiungiTask.value = message
+    }
+    fun setErroreEditTask(message: String) {
+        _erroreEditTask.value = message
+    }
+
+    fun resetErroreAggiungiTask() {
+        _erroreAggiungiTask.value = null
+    }
+    fun resetErroreEditTask() {
+        _erroreEditTask.value = null
+    }
 
     fun getTodoUtente(idProg: String, utenteId: String) {
         Log.d("ViewModel", "Chiamato getTodoUtente con idProg: $idProg e utenteId: $utenteId")
@@ -106,7 +129,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
     ) {
         if (titolo.isBlank()) {
             setErroreEditTask("MODIFICA RIFIUTATA!!!: Il titolo non può essere omesso.")
-            Log.e(TAG, "Errore Aggiungi Task: " + "${erroreAggiungiTask.value}");
+            Log.d("Errore Edit", "Errore Edit Task: " + "${erroreEditTask.value}");
             return
         }
         if (isDateBeforeToday(dataScad)) {
@@ -133,7 +156,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
-
+    val utenteId = repositoryUtente.getUtenteAttualeID()
     fun updateTodo(
         id: String,
         titolo: String,
@@ -147,6 +170,8 @@ class LeMieAttivitaViewModel() : ViewModel() {
     ) {
         if (titolo.isBlank()) {
             setErroreEditTask("MODIFICA RIFIUTATA!!!: Il titolo non può essere omesso.")
+            Log.d("Errore Edit", "Errore Edit Task: " + "${erroreEditTask.value}");
+
             return
         }
         if (isDateBeforeToday(dataScad)) {
@@ -156,7 +181,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         viewModelScope.launch {
             try {
                 repositoryLeMieAttivita.updateTodo(id, titolo, descrizione, dataScad, priorita,progetto,utenti,fileUri)
-                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+                if (sezione == 1) getTodoByProject(progetto)  else if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoUtente(progetto, utenteId.toString())
 
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
@@ -332,25 +357,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         return dateToCompare.before(today.time)
     }
 
-    private val _erroreAggiungiTask = MutableLiveData<String?>()
-    val erroreAggiungiTask: LiveData<String?> = _erroreAggiungiTask
 
-    private val _erroreEditTask = MutableLiveData<String?>()
-    val erroreEditTask: LiveData<String?> = _erroreAggiungiTask
-
-    fun setErroreAggiungiTask(message: String) {
-        _erroreAggiungiTask.value = message
-    }
-    fun setErroreEditTask(message: String) {
-        _erroreEditTask.value = message
-    }
-
-    fun resetErroreAggiungiTask() {
-        _erroreAggiungiTask.value = null
-    }
-    fun resetErroreEditTask() {
-        _erroreEditTask.value = null
-    }
 
     fun addTodo(
         titolo: String,

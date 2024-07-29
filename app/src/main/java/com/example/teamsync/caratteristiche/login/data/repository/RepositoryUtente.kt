@@ -89,6 +89,11 @@ class RepositoryUtente {
         return utenteCorrente
     }
 
+    fun getUtenteAttualeID(): String? {
+        val utenteCorrente: FirebaseUser? = auth.currentUser
+        return utenteCorrente?.uid
+    }
+
 
     fun sendEmailVerification(){
         auth.useAppLanguage()

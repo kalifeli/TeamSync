@@ -306,7 +306,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     updatedItem.utenti,
                     fileUri = fileUri
                 )
-                openDialog = if (viewModel.erroreEditTask.value == null) {
+                openDialog = if (erroreEditTask == null) {
+                    // Se il salvataggio è riuscito, chiudi la dialog
                     false
                 } else {
                     // Mostra un messaggio di errore
@@ -322,11 +323,14 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     }
 
     if (dialogComplete && currentTodoItem.value != null) {
+        Log.d("Controllo Sessione per il completeDialog", "Il valore della variabile 'sezione' è: $sezione")
         CompleteDialog(
             sezione,
             onDismiss = { dialogComplete = false },
             onSave = { completeTodo ->
                 coroutineScope.launch {
+                    // Chiama la funzione completa nel viewModel
+
                     viewModel.completeTodo(
                         id = completeTodo.id ?: "",
                         completeTodo.completato,
@@ -820,7 +824,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     }
 
                 }
-                if (sezione == 1) {
+                if (sezione == 1 || sezione == 2) {
                     FloatingActionButton(
                         containerColor = Red70,
                         shape = FloatingActionButtonDefaults.shape,
@@ -1357,7 +1361,7 @@ fun EditTodoDialog(
 
     LaunchedEffect(erroreEditTask) {
         erroreEditTask?.let { message ->
-            Log.d("TAG", "Showing Toast with message: $message")
+            Log.d("messaggio di errore", "Showing Toast with message: $message")
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             viewModel.resetErroreAggiungiTask()
         }
@@ -1641,7 +1645,7 @@ fun CompleteDialog(
 ) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
-    if (sezione == 1) {
+    if (sezione == 1 || sezione == 2) {
         AlertDialog(
             containerColor = if(isDarkTheme) Color.Black else Grey35,
             textContentColor = if (isDarkTheme)White else Color.Black,
@@ -1689,7 +1693,7 @@ fun CompleteDialog(
                     onClick = {
                         onSave(item)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    colors = ButtonDefaults.buttonColors(containerColor = Red70)
                 ) {
                     Text(text =  stringResource(id = R.string.conferma), color = Color.White)
                 }

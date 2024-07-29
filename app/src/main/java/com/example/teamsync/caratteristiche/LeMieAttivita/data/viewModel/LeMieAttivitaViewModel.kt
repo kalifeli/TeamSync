@@ -366,7 +366,8 @@ class LeMieAttivitaViewModel() : ViewModel() {
         priorita: Priorità,
         completato: Boolean,
         proprietario: String,
-        progetto : String
+        progetto : String,
+        sezione : Int
     ) {
         if (titolo.isBlank()) {
             setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: Il titolo non può essere omesso.")
@@ -388,7 +389,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
                 proprietario,
                 progetto
             )
-            getTodoByProject(progetto)
+           if(sezione == 1) getTodoByProject(progetto) else if (sezione == 2) getTodoUtente(progetto, utenteId.toString())
         }
     }
 
@@ -397,7 +398,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
             try {
 
                 repositoryLeMieAttivita.deleteTodo(id)
-                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+                if (sezione == 0) getTodoCompletateByProject(progetto) else if ( sezione == 1)getTodoByProject(progetto) else getTodoUtente(progetto, utenteId.toString())
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
@@ -409,7 +410,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         viewModelScope.launch {
             try {
                 repositoryLeMieAttivita.completeTodo(id, completato)
-                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+                if (sezione == 0) getTodoCompletateByProject(progetto) else if (sezione==1) getTodoByProject(progetto) else getTodoUtente(progetto, utenteId.toString())
             } catch (e: Exception) {
                 //gestire errore
             }

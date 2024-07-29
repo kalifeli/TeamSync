@@ -271,7 +271,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                             newTodo.priorita,
                             newTodo.completato,
                             it.id,
-                            id_prog
+                            id_prog,
+                            sezione
                         )
                     }
                     addTodoDialog = if (viewModel.erroreAggiungiTask.value == null) {

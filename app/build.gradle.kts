@@ -75,6 +75,8 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -106,7 +108,19 @@ dependencies {
     // Lottie Animation
     implementation (libs.lottie.compose)
 
-    testImplementation ("org.mockito:mockito-core:3.8.0") // Aggiorna la versione se necessario
-    testImplementation ("org.mockito.kotlin:mockito-kotlin:3.2.0" ) // Dipendenza per Kotlin
+    // Dependencies per il ViewModel
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+    // Dependencies per il test
+    testImplementation (libs.junit)
+    testImplementation (libs.mockito.core.v3112)
+    testImplementation (libs.mockito.kotlin)
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation (libs.androidx.core.testing)
+    testImplementation (libs.mockk)
+
+    // Espresso per Android Instrumentation tests (androidTest)
+    androidTestImplementation (libs.androidx.espresso.core.v340)
+    androidTestImplementation (libs.androidx.junit.v121)
 
 }

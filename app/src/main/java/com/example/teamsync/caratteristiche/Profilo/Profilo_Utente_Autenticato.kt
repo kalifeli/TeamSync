@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -40,12 +41,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -56,14 +59,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.caratteristiche.iTuoiProgetti.ui.ImmagineProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
@@ -71,7 +74,12 @@ import com.example.teamsync.util.ThemePreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostController, viewModelProgetto: ViewModelProgetto, viewmodelTodo : LeMieAttivitaViewModel) {
+fun ProfiloSchermata(
+    viewModel: ViewModelUtente,
+    navController: NavHostController,
+    viewModelProgetto: ViewModelProgetto,
+    viewmodelTodo : LeMieAttivitaViewModel
+) {
     var searchQuery by remember { mutableStateOf("") }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     Scaffold(
@@ -86,10 +94,8 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
                             color = if(isDarkTheme) Color.White else Color.Black
                         )
                     },
-                    actions = {
-                    },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = if(isDarkTheme) Color.DarkGray else Color.Transparent,
+                        containerColor = if(isDarkTheme) Color.DarkGray else White,
                         titleContentColor =  if(isDarkTheme) Color.White else  Color.Black,
                         actionIconContentColor =  if(isDarkTheme) Color.White else Color.Black,
                     )
@@ -100,120 +106,96 @@ fun ProfiloSchermata(viewModel: ViewModelUtente, navController: NavHostControlle
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = if (isDarkTheme) Color.DarkGray else Color.Transparent)
+                .background(color = if (isDarkTheme) Color.DarkGray else White)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .padding(horizontal = 16.dp)
-
-
             ) {
-
                 ProfiloHeader(viewModel, navController, viewModelProgetto, viewmodelTodo)
                 Spacer(modifier = Modifier.height(16.dp))
                 RicercaAggiungiColleghi { query ->
                     searchQuery = query
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                ListaColleghi(viewModel, navController, searchQuery)
+                ListaColleghi(viewModel, navController, searchQuery, isDarkTheme)
             }
         }
     }
-
-
-
 }
 
 
 
 @Composable
-fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, viewModelProgetto: ViewModelProgetto, viewModelTodo: LeMieAttivitaViewModel) {
-
-    var userProfile by remember { mutableStateOf<ProfiloUtente?>(null) }
+fun ProfiloHeader(
+    viewModel: ViewModelUtente,
+    navController: NavHostController,
+    viewModelProgetto: ViewModelProgetto,
+    viewModelTodo: LeMieAttivitaViewModel
+) {
+    val isLoading by viewModelProgetto.isLoading.observeAsState()
+    val userProfile by viewModel.userProfilo.observeAsState()
+    val progetti by viewModelProgetto.progetti1.observeAsState()
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var numeroTaskCompletati by remember { mutableStateOf("") }
     var numeroProgettiCompletati by remember { mutableStateOf("") }
-    var load = remember { mutableStateOf(true) }
+    val load = remember { mutableStateOf(true) }
 
+    //Carica il profilo utente all'avvio
     LaunchedEffect(Unit) {
         viewModel.getUserProfile()
     }
 
-
-    LaunchedEffect(viewModel.userProfile) {
-        userProfile = viewModel.userProfile
-    }
-
+    // Carica i progetti utente quando cambia l'ID dell'utente
     LaunchedEffect(userProfile?.id) {
         userProfile?.id?.let { userId ->
-            viewModelProgetto.caricaProgettiUtente(userId, true)
+            viewModelProgetto.caricaProgettiUtente(userId, false)
         }
     }
 
 
-
-
-    LaunchedEffect(viewModelProgetto.isLoading.value) {
-        load.value = true
-        if (!viewModelProgetto.isLoading.value) {
+    LaunchedEffect(isLoading) {
+        if (isLoading == false && load.value) {
             userProfile?.id?.let { userId ->
-                val progettiCompletati = viewModelProgetto.progetti.value.count { it.completato }
-                numeroProgettiCompletati = progettiCompletati.toString()
+                progetti?.let { listaProgetti ->
+                    val progettiCompletati = listaProgetti.count { it.completato }
+                    numeroProgettiCompletati = progettiCompletati.toString()
 
+                    var taskCompletati = 0
+                    var completatiCounter = 0 // Contatore per le callback completate
+                    val totaleProgetti = listaProgetti.size
 
-                var taskCompletati = 0
-                var completatiCounter = 0 // Contatore per le callback completate
-                val totaleProgetti = viewModelProgetto.progetti.value.size
-
-                viewModelProgetto.progetti.value.forEach { progetto ->
-                    viewModelTodo.getTodoCompletateByProject2(progetto.id.toString()) { attivitàCompletate ->
-                        if (attivitàCompletate.isNotEmpty()) {
-
-                            for (att in attivitàCompletate) {
-                                if (att.utenti.contains(userId)) {
-
-                                    taskCompletati += 1
-
+                    if(totaleProgetti == 0){
+                        numeroTaskCompletati = "0"
+                        load.value = false
+                    }else{
+                        listaProgetti.forEach { progetto ->
+                            viewModelTodo.getTodoCompletateByProject2(progetto.id.toString()) { attivitàCompletate ->
+                                if (attivitàCompletate.isNotEmpty()) {
+                                    for (att in attivitàCompletate) {
+                                        if (att.utenti.contains(userId)) {
+                                            taskCompletati += 1
+                                        }
+                                    }
                                 }
 
+                                completatiCounter++
+                                if (completatiCounter == totaleProgetti) {
+                                    numeroTaskCompletati = taskCompletati.toString()
+                                    load.value = false
+                                }
                             }
                         }
-
-                        completatiCounter++
-                        if (completatiCounter == totaleProgetti) {
-                            numeroTaskCompletati = taskCompletati.toString()
-                            load.value = false
-                        }
                     }
-
                 }
-
-
             }
-
         }
     }
 
-
-
-
-
-
-    userProfile = viewModel.userProfile
-
-    var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
-    var amici by remember { mutableStateOf(userProfile?.amici ?: "") }
-
-
-
-    userProfile?.let {
-        nome = it.nome
-        amici = it.amici
-    }
-
-
+    val nome by remember { mutableStateOf(userProfile?.nome ?: "") }
+    val cognome by remember { mutableStateOf(userProfile?.cognome ?: "") }
 
     ElevatedCard(
         onClick = {
@@ -225,7 +207,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.elevatedCardColors(
             containerColor =  if(isDarkTheme) Color.Black else Red70
         ),
@@ -237,46 +219,17 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            if (userProfile?.immagine != null) {
+            ImmagineProfiloUtente(
+                imageUrl = userProfile?.immagine,
+                defaultImage = R.drawable.logo_rotondo,
+                modifier = Modifier
+                    .size(90.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, Color.White, CircleShape)
+            )
 
-                Image(
-                    painter = // Gestisci l'indicatore di caricamento qui
-                    rememberAsyncImagePainter(
-                        ImageRequest.Builder // Placeholder di caricamento
-                        // Effetto crossfade durante il caricamento
-                            (LocalContext.current).data(userProfile!!.immagine)
-                            .apply(block = fun ImageRequest.Builder.() {
-                                // Gestisci l'indicatore di caricamento qui
-                                placeholder(R.drawable.white) // Placeholder di caricamento
-                                crossfade(true) // Effetto crossfade durante il caricamento
-                            }).build()
-                    ),
-
-                    contentDescription = "Immagine Profilo",
-                    modifier = Modifier
-
-                        .size(64.dp)
-                        .background(Color.White, CircleShape)
-                        .padding(10.dp),
-
-                    contentScale = ContentScale.Crop,
-
-
-                    )
-
-            } else {
-
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "Icona Applicazione",
-                    modifier = Modifier
-                        .size(64.dp)
-                        .background(Color.White, CircleShape)
-                        .padding(10.dp),
-                )
-            }
             Text(
-                text = nome,
+                text = "$nome $cognome ",
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 color = Color.White,
@@ -291,7 +244,10 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
                 if (load.value) {
                     Column(
                         modifier = Modifier
-                            .background(if(isDarkTheme) Color.DarkGray else Color.White, RoundedCornerShape(8.dp))
+                            .background(
+                                if (isDarkTheme) Color.DarkGray else Color.White,
+                                RoundedCornerShape(8.dp)
+                            )
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -303,22 +259,21 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
                     StatBox(number = numeroProgettiCompletati, label = "Progetti Completati")
 
                 }
-
             }
         }
     }
 }
-
-
 
 @Composable
 fun StatBox(number: String, label: String) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     Column(
         modifier = Modifier
-            .background( if(isDarkTheme) Color.DarkGray else Color.White,
-                RoundedCornerShape(8.dp))
-            .padding(16.dp),
+            .background(
+                if (isDarkTheme) Color.DarkGray else Color.White,
+                RoundedCornerShape(8.dp)
+            )
+            .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -328,7 +283,6 @@ fun StatBox(number: String, label: String) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
 fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
@@ -340,8 +294,9 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
             .height(56.dp)
             .padding(horizontal = 16.dp)
             .background(
-                color =  if(isDarkTheme) Color.Black else  Color.White,
-                shape = RoundedCornerShape(50.dp)),
+                color = if (isDarkTheme) Color.Black else Color.White,
+                shape = RoundedCornerShape(50.dp)
+            ),
         contentAlignment = Alignment.CenterStart
     ) {
         OutlinedTextField(
@@ -349,7 +304,7 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
             onValueChange = { newValue ->
                 searchQuery = newValue
             },
-            placeholder = { Text("Ricerca Colleghi/Aggiungi Colleghi", color = if(isDarkTheme) Color.White else Color.Black ) },
+            placeholder = { Text("Trova colleghi", color = if(isDarkTheme) Color.White else Color.Black ) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             maxLines = 1,
@@ -358,7 +313,7 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
                 IconButton(onClick = {
                     onSearch(searchQuery)  // Passaggio della query di ricerca corrente
                 }) {
-                    Icon(Icons.Default.Search, contentDescription = null)
+                    Icon(Icons.Default.Search, contentDescription = null, tint = if(isDarkTheme) White else Color.Black)
                 }
 
             },
@@ -376,22 +331,23 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
 fun ListaColleghi(
     viewModel: ViewModelUtente,
     navController: NavHostController,
-    searchQuery: String
+    searchQuery: String,
+    isDarkTheme: Boolean
 ) {
-    val userProfile = viewModel.userProfile
+    val userProfile by viewModel.userProfilo.observeAsState()
+
     var amici by remember { mutableStateOf(userProfile?.amici ?: emptyList()) }
 
     val cache = remember { mutableStateMapOf<String, ProfiloUtente?>() } // Utilizzo di mutableStateMapOf per la cache
 
     var lista_ricerca by remember { mutableStateOf<List<String>>(emptyList()) }
-
     var mostra_ricerca by remember { mutableStateOf(false) }
-
-
     var visualizza_amici by remember { mutableStateOf(true) }
 
+    val searchIsLoading by viewModel.isLoading.observeAsState()
+
     userProfile?.let {
-        amici = it.amici ?: emptyList()
+        amici = it.amici
     }
 
     // Utilizzo di LaunchedEffect per gestire il cambio di stato di amici
@@ -399,34 +355,84 @@ fun ListaColleghi(
         amici = userProfile?.amici ?: emptyList()
     }
 
-    if(visualizza_amici)
-    {
+    if(searchIsLoading == true){
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.CenterHorizontally),
+                color = Grey50,
+                trackColor = Red70,
+                strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+            )
+        }
+    }
+
+    if(visualizza_amici) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+
+        ) {
+            Text(
+                text = "I Tuoi Amici (${userProfile?.amici?.size})",
+                style = MaterialTheme.typography.labelLarge,
+                color = if(isDarkTheme) White else Color.Black
+            )
+        }
+
+        if(userProfile?.amici?.size == 0){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding()
+                    .background(if(isDarkTheme) Color.Black else White),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.im_amici),
+                    contentDescription = "immagine nessun amico",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .padding(16.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = "La tua lista amici è vuota. Cerca colleghi per iniziare a connetterti.",
+                    modifier = Modifier.padding(16.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (isDarkTheme) White else Color.Black
+                )
+            }
+        }
         LazyColumn {
             items(amici) { amico ->
 
                 var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
 
-
                 if (cache.contains(amico)) {
                     user_amico = cache[amico]
                 } else {
-
                     viewModel.ottieni_utente(amico) { profile ->
                         user_amico = profile
                         cache[amico] = profile // Aggiungi il profilo alla cache
                         Log.d("Singolo Collega", "Dati: $user_amico")
                     }
-
-
                 }
 
                 user_amico?.let { collega ->
                     CollegaItem(
                         collega,
-                        color = getColore(amici.indexOf(amico) + 1),
                         navController,
-                        userProfile,
-                        amico
+                        userProfile
                     )
                 }
 
@@ -434,9 +440,6 @@ fun ListaColleghi(
             }
         }
     }
-
-
-
 
     LaunchedEffect(searchQuery) {
         if (searchQuery.isNotBlank()) {
@@ -458,9 +461,7 @@ fun ListaColleghi(
     if (mostra_ricerca) {
         LazyColumn {
             items(lista_ricerca) { amico ->
-
                 var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
-
 
                 if (cache.contains(amico)) {
                     user_amico = cache[amico]
@@ -471,17 +472,13 @@ fun ListaColleghi(
                         cache[amico] = profile // Aggiungi il profilo alla cache
                         Log.d("Singolo Collega", "Dati: $user_amico")
                     }
-
-
                 }
 
                 user_amico?.let { collega ->
                     CollegaItem(
                         collega,
-                        color = getColore(lista_ricerca.indexOf(amico) + 1),
                         navController,
-                        userProfile,
-                        amico
+                        userProfile
                     )
                 }
 
@@ -492,7 +489,11 @@ fun ListaColleghi(
 }
 
 @Composable
-fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostController, user_loggato: ProfiloUtente?, y : String) {
+fun CollegaItem(
+    utente: ProfiloUtente,
+    navController: NavHostController,
+    user_loggato: ProfiloUtente?
+) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
     LaunchedEffect(utente.id) {
@@ -501,38 +502,31 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
     }
 
     var amicizia = false
-    if(utente.amici.contains(user_loggato?.id))
-    {
+    if(utente.amici.contains(user_loggato?.id)) {
         amicizia = true
-
     }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(if(isDarkTheme) Color.Black else Color.White, RoundedCornerShape(8.dp))
+            .background(if (isDarkTheme) Color.Black else Color.White, RoundedCornerShape(8.dp))
             .padding(16.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-
                         navController.navigate("utente/${utente.id}/${amicizia}/profilo/0/0/profilo")
-
                     }
                 )
             }
     ) {
-
-        Icon(
-            painter = painterResource(id = R.drawable.logo_white ),
-            contentDescription = null,
+        ImmagineProfiloUtente(
+            imageUrl = utente.immagine,
+            defaultImage = R.drawable.logo_rotondo,
             modifier = Modifier
-                .size(32.dp)
-                .background(
-                    if(isDarkTheme) Color.White else color.copy(alpha = 0.2f),
-                    CircleShape)
-                .padding(8.dp)
+                .size(40.dp)
+                .clip(CircleShape)
+                .border(1.dp, Color.White, CircleShape),
         )
 
 
@@ -557,20 +551,6 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
     }
 }
 
-
-
-@Composable
-fun getColore(number: Int): Color {
-    return when (number) {
-        1 -> Color.Blue
-        2 -> Color.Green
-        3 -> Color.Red
-        4 -> Color.Yellow
-        5 -> Color.Magenta
-        6 -> Color.Gray
-        else -> Color.Black
-    }
-}
 
 
 

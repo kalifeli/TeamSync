@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey50
@@ -199,7 +200,7 @@ fun Bottone_IniziaOra(
 @Composable
 fun PreviewSchermataDiBenvenuto() {
     val navController = rememberNavController()
-    SchermataDiBenvenuto(navController, viewModelUtente = ViewModelUtente())
+    SchermataDiBenvenuto(navController, viewModelUtente = ViewModelUtente(RepositoryUtente()))
 }
 
 @Preview

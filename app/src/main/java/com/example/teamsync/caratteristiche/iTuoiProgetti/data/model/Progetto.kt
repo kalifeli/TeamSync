@@ -10,7 +10,7 @@ data class Progetto(
     val nome: String = "",
     val descrizione: String? = "",
     val dataCreazione: Date = Date(), // Data di creazione del progetto
-    val dataScadenza: Date = Date(), // Data di scadenza del progetto (può essere null)
+    val dataScadenza: Date = Date(), // Data di scadenza del progetto
     val dataConsegna: Date = Date(),
     val priorita: Priorità = Priorità.NESSUNA, // Priorità del progetto
     val attivita: List<LeMieAttivita> = emptyList(), // Lista di attività associate al progetto

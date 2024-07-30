@@ -1,6 +1,4 @@
 package com.example.teamsync.caratteristiche.Profilo
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,30 +31,29 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
-import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.ProfiloAmici.StatBox
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.caratteristiche.iTuoiProgetti.ui.ImmagineProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Red70
@@ -66,20 +63,32 @@ import com.example.teamsync.util.ThemePreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostController, id: String, amicizia: String, provenienza: String, notificheRepo : RepositoryNotifiche, task: String, progetto : String, viewModelprogetto: ViewModelProgetto, viewModelNotifiche: ViewModelNotifiche, sottoprovenienza : String ) {
+fun ProfiloUtenteCliccato(
+    viewModel: ViewModelUtente,
+    navController: NavHostController,
+    id: String,
+    amicizia: String,
+    provenienza: String,
+    task: String,
+    progetto: String,
+    viewModelprogetto: ViewModelProgetto,
+    viewModelNotifiche: ViewModelNotifiche,
+    sottoprovenienza: String
+) {
+    val viewModelTodo = LeMieAttivitaViewModel()
 
+    val userProfile by viewModel.userProfilo.observeAsState()
+    val profiloCollega by viewModel.profiloCollega.observeAsState()
+    val progettiCollega by viewModelprogetto.progettiCollega.observeAsState()
+    val isLoading by viewModelprogetto.isLoading.observeAsState()
 
-    var viewModelTodo = LeMieAttivitaViewModel()
-    var userProfile by remember { mutableStateOf<ProfiloUtente?>(null) }
-
-    var user_amico by remember { mutableStateOf<ProfiloUtente?>(null) }
     var nome by remember { mutableStateOf("") }
     var cognome by remember { mutableStateOf("") }
     var matricola by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var avvia_notifica by remember { mutableStateOf(false) }
     var accetta_amicizia by remember { mutableStateOf(false) }
-    var load = remember { mutableStateOf(true) }
+    val load = remember { mutableStateOf(true) }
     var numeroTaskCompletati by remember { mutableStateOf("") }
     var numeroProgettiCompletati by remember { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
@@ -87,47 +96,50 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
     var disabilitaclick by remember { mutableStateOf(true) }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
-    LaunchedEffect(Unit) {
-        viewModel.getUserProfile()
+
+    // Carica il profilo del collega
+    LaunchedEffect(id) {
+        viewModel.ottieniCollega(id)
     }
-    LaunchedEffect(viewModel.userProfile) {
-        userProfile = viewModel.userProfile
-    }
-    LaunchedEffect(userProfile?.id) {
+
+    // Aggiorna i dati del profilo del collega quando cambia
+    LaunchedEffect(profiloCollega) {
         disabilitaclick = false
-        userProfile?.id?.let { userId ->
-            viewModelprogetto.caricaProgettiUtente(id, true)
+        profiloCollega?.let { profilo ->
+            nome = profilo.nome
+            cognome = profilo.cognome
+            matricola = profilo.matricola
+            email = profilo.email
+            viewModelprogetto.caricaProgettiCollega(id, true)
         }
-        Log.d("Progetti", "${viewModelprogetto.progetti}")
     }
-    LaunchedEffect(viewModelprogetto.isLoading.value) {
+
+    // Aggiorna i progetti del collega quando cambia
+    LaunchedEffect(profiloCollega?.id) {
+        profiloCollega?.id?.let { userId ->
+            viewModelprogetto.caricaProgettiCollega(userId, true)
+        }
+    }
+
+    LaunchedEffect(isLoading) {
         load.value = true
-        if (!viewModelprogetto.isLoading.value) {
+        if (isLoading == false) {
             abilitaBottone = true
-            val progettiCompletati = viewModelprogetto.progetti.value.count { it.completato }
+            val progettiCompletati = progettiCollega?.count { it.completato } ?: 0
             numeroProgettiCompletati = progettiCompletati.toString()
 
-
             var taskCompletati = 0
-            var completatiCounter = 0 // Contatore per le callback completate
-            val totaleProgetti = viewModelprogetto.progetti.value.size
+            var completatiCounter = 0
+            val totaleProgetti = progettiCollega?.size ?: 0
 
             if (totaleProgetti == 0) {
                 numeroTaskCompletati = "0"
                 load.value = false
             } else {
-                viewModelprogetto.progetti.value.forEach { progetto ->
+                progettiCollega?.forEach { progetto ->
                     viewModelTodo.getTodoCompletateByProject2(progetto.id.toString()) { attivitàCompletate ->
                         if (attivitàCompletate.isNotEmpty()) {
-
-                            for (att in attivitàCompletate) {
-                                if (att.utenti.contains(id)) {
-
-                                    taskCompletati += 1
-
-                                }
-
-                            }
+                            taskCompletati += attivitàCompletate.count { it.utenti.contains(id) }
                         }
 
                         completatiCounter++
@@ -136,64 +148,31 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                             load.value = false
                         }
                     }
-
-
                 }
             }
-
-
-        }
-
-    }
-
-    LaunchedEffect(id) {
-        viewModel.ottieni_utente(id) { profile ->
-            user_amico = profile
-            nome = profile?.nome ?: ""
-            cognome = profile?.cognome ?: ""
-            matricola = profile?.matricola ?: ""
-            email = profile?.email ?: ""
         }
     }
+
 
     LaunchedEffect(avvia_notifica) {
         if (avvia_notifica) {
-            viewModel.ottieni_utente(id) { profile ->
-                val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome
-                    ?: "") + " " + "ti ha inviato una richiesta di amicizia"
-
-                if (userProfile != null) {
-                    viewModelNotifiche.creaNotificaViewModel(
-                        userProfile!!.id,
-                        profile?.id ?: "",
-                        "Richiesta_Amicizia",
-                        contenuto,
-                        ""
-
-
-                    )
-                }
+            profiloCollega?.let { profile ->
+                val contenuto = "${userProfile?.nome ?: ""} ${userProfile?.cognome ?: ""} ti ha inviato una richiesta di amicizia"
+                viewModelNotifiche.creaNotificaViewModel(userProfile!!.id, profile.id, "Richiesta_Amicizia", contenuto, "")
             }
+            avvia_notifica = false
         }
     }
+
+
+    // Effettua la notifica di accettazione di amicizia
     LaunchedEffect(accetta_amicizia) {
-
         if (accetta_amicizia) {
-            viewModel.ottieni_utente(id) { profile ->
-                val contenuto = (userProfile?.nome ?: "") + " " + (userProfile?.cognome
-                    ?: "") + " " + "ha accettato la tua richiesta di amicizia"
-
-                if (userProfile != null) {
-                    viewModelNotifiche.creaNotificaViewModel(
-                        userProfile!!.id,
-                        profile?.id ?: "",
-                        "Accetta_Amicizia",
-                        contenuto,
-                        "",
-
-                        )
-                }
+            profiloCollega?.let { profile ->
+                val contenuto = "${userProfile?.nome ?: ""} ${userProfile?.cognome ?: ""} ha accettato la tua richiesta di amicizia"
+                viewModelNotifiche.creaNotificaViewModel(userProfile!!.id, profile.id, "Accetta_Amicizia", contenuto, "")
             }
+            accetta_amicizia = false
         }
     }
 
@@ -202,7 +181,8 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
             AddTodoDialog(
                 onDismiss = { showMenu = false },
                 id = id,
-                id_persona_autenticata = it.id
+                id_persona_autenticata = it.id,
+                userProfile = userProfile
             )
         }
     }
@@ -232,19 +212,23 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                     when (provenienza) {
                                         "task" -> {
                                             navController.navigate("task_selezionata/${task}/${progetto}")
+                                            viewModelprogetto.resetProgettiCollega()
                                         }
+
                                         "progetto" -> {
                                             navController.navigate("progetto_da_accettare/${progetto}/progetto/${sottoprovenienza}")
+                                            viewModelprogetto.resetProgettiCollega()
                                         }
+
                                         "notifiche" -> {
                                             if (sottoprovenienza == "progetto") {
                                                 navController.navigate("progetto_da_accettare/${progetto}/${provenienza}/${sottoprovenienza}")
                                             }
-                                            if( sottoprovenienza == "Richiesta_Amicizia")
-                                            {
+                                            if (sottoprovenienza == "Richiesta_Amicizia") {
                                                 navController.navigate(Schermate.Notifiche.route)
                                             }
                                         }
+
                                         else -> {
                                             navController.navigate(Schermate.Profilo.route)
                                         }
@@ -275,8 +259,6 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
 
                     }
                 },
-                actions = {
-                },
 
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent,
@@ -303,7 +285,11 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp))
+                        .border(
+                            1.dp,
+                            if (isDarkTheme) White else White,
+                            shape = RoundedCornerShape(16.dp)
+                        )
                         .background(
                             if (isDarkTheme) Color.Black else (Red70),
 
@@ -314,47 +300,17 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                 ) {
 
 
-                    if (user_amico?.immagine != null) {
-
-                        Image(
-                            painter = // Gestisci l'indicatore di caricamento qui
-                            rememberAsyncImagePainter(
-                                ImageRequest.Builder // Placeholder di caricamento
-                                // Effetto crossfade durante il caricamento
-                                    (LocalContext.current).data(user_amico!!.immagine)
-                                    .apply(block = fun ImageRequest.Builder.() {
-                                        // Gestisci l'indicatore di caricamento qui
-                                        placeholder(R.drawable.user_icon) // Placeholder di caricamento
-                                        crossfade(true) // Effetto crossfade durante il caricamento
-                                    }).build()
-                            ),
-
-                            contentDescription = "Immagine Profilo",
-                            modifier = Modifier
-
-                                .size(64.dp)
-                                .background(Color.White, CircleShape)
-                                .padding(16.dp),
-
-                            contentScale = ContentScale.Crop,
-
-
-                            )
-
-                    } else {
-
-                        Image(
-                            painter = painterResource(id = R.drawable.user_icon),
-                            contentDescription = "Icona Applicazione",
-                            modifier = Modifier
-                                .size(64.dp)
-                                .background(Color.White, CircleShape)
-                                .padding(16.dp),
-                        )
-                    }
+                    ImmagineProfiloUtente(
+                        imageUrl = profiloCollega?.immagine,
+                        defaultImage = R.drawable.logo_rotondo,
+                        modifier = Modifier
+                            .size(90.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, Color.White, CircleShape),
+                    )
 
                     Text(
-                        text = nome + " " + cognome,
+                        text = "$nome $cognome",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color = Color.White,
@@ -549,7 +505,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                     },
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
+                                        containerColor = if (isDarkTheme) Color.Black else Red70,
                                         contentColor = Color.White
                                     )
                                 )
@@ -562,7 +518,6 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(5.dp))
-
 
                             }
 
@@ -593,11 +548,7 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
                                                 navController.navigate("progetto_da_accettare/${progetto}/${provenienza}/${sottoprovenienza}")
                                             if (sottoprovenienza == "Richiesta_Amicizia")
                                                 navController.navigate(Schermate.Notifiche.route)
-
-
                                         }
-
-
                                     }
                                 }
                             },
@@ -659,10 +610,11 @@ fun ProfiloUtenteCliccato(viewModel: ViewModelUtente, navController: NavHostCont
 fun AddTodoDialog(
     onDismiss: () -> Unit,
     id: String,
-    id_persona_autenticata: String
+    id_persona_autenticata: String,
+    userProfile: ProfiloUtente?
 ) {
     val viewModelProgetto = remember { ViewModelProgetto() }
-    val viewModel = remember { ViewModelUtente() }
+    val viewModel = remember { ViewModelUtente(RepositoryUtente()) }
     val viewModelNotifiche = remember { ViewModelNotifiche() }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var isLoading by remember { mutableStateOf(true) }
@@ -698,19 +650,19 @@ fun AddTodoDialog(
                                 .fillMaxWidth()
                                 .clickable {
                                     viewModel.ottieni_utente(id) { profile ->
-                                        val contenuto = (viewModel.userProfile?.nome
-                                            ?: "") + " " + (viewModel.userProfile?.cognome
+                                        val contenuto = (userProfile?.nome
+                                            ?: "") + " " + (userProfile?.cognome
                                             ?: "") + " ti ha invitato in un progetto"
-                                        if (viewModel.userProfile != null) {
+                                        if (userProfile != null) {
                                             (
                                                     viewModelNotifiche.creaNotificaViewModel(
-                                                viewModel.userProfile!!.id,
-                                                profile?.id ?: "",
-                                                "Richiesta_Progetto",
-                                                contenuto,
-                                                progetto.id.toString()
+                                                        userProfile.id,
+                                                        profile?.id ?: "",
+                                                        "Richiesta_Progetto",
+                                                        contenuto,
+                                                        progetto.id.toString()
                                                     )
-                                            )
+                                                    )
                                         }
                                     }
                                     onDismiss()

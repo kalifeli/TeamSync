@@ -166,7 +166,7 @@ fun SchermataModificaProgetto(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor =if(isDarkTheme) Color.DarkGray else Grey35,
+                    containerColor =if(isDarkTheme) White else Grey35,
                     titleContentColor = if(isDarkTheme)White else Color.Black,
                     actionIconContentColor = if(isDarkTheme) White else Color.Black,
                 )

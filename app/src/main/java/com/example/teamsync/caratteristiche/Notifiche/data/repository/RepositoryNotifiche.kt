@@ -74,6 +74,23 @@ class RepositoryNotifiche {
         }
     }
 
+    suspend fun deleteAllNotifiche(userId: String){
+        try {
+            val snapshot = firestore.collection("Notifiche").whereEqualTo("destinatario",userId).get().await()
+
+            val batch = firestore.batch() // permette di effettuare più operazioni di scrittura come un'unica operazione atomica
+
+            snapshot.documents.forEach{ document ->
+                batch.delete(document.reference)
+            }
+
+            batch.commit().await()
+
+        }catch (e: Exception){
+            throw e
+        }
+    }
+
     suspend fun apriNotifica(notificaId: String) {
         try {
             val docRef = firestore.collection("Notifiche").document(notificaId)

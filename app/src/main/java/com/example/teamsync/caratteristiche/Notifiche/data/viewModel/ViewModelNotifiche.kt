@@ -1,12 +1,12 @@
 package com.example.teamsync.caratteristiche.Notifiche.data.viewModel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.Notifiche.data.model.Notifiche
 import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,19 +16,27 @@ class ViewModelNotifiche : ViewModel() {
     private val repositoryNotifiche = RepositoryNotifiche()
 
 
-    private val viewModelU = ViewModelUtente()
+    private val viewModelU = ViewModelUtente(repositoryUtente = RepositoryUtente())
     var notificheList = mutableStateOf<List<Notifiche>>(emptyList())
         private set
     var isLoading = mutableStateOf(true)
         private set
 
-    // AGGIUNTA per tenere traccia delle notifiche non lette
-    val notificheNonLette = MutableLiveData<Boolean>().apply { value = false }
+    var eliminazioneNotificheStato = mutableStateOf(false)
+        private set
+    var erroreEliminazioneNotifiche = mutableStateOf<String?>(null)
+        private set
+    var letturaNotificheStato = mutableStateOf(false)
+        private set
+    var erroreLetturaNotifiche = mutableStateOf<String?>(null)
+        private set
+
 
 
     init {
         fetchNotifiche()
     }
+
 
 
     fun fetchNotifiche() {
@@ -40,10 +48,11 @@ class ViewModelNotifiche : ViewModel() {
 
             try {
                 // Attendiamo finché non abbiamo un userId valido
-                var userId = viewModelU.userProfile?.id
+                var userId = viewModelU.userProfilo.value?.id
+                //userProfile?.id
                 while (userId.isNullOrEmpty()) {
                     delay(500)
-                    userId = viewModelU.userProfile?.id
+                    userId = viewModelU.userProfilo.value?.id
                 }
 
                 // Se siamo qui, abbiamo trovato un userId valido
@@ -59,10 +68,6 @@ class ViewModelNotifiche : ViewModel() {
                     it.destinatario == userId
                 }
 
-                Log.d("ViewModelNotifiche", "Notifiche caricate: ${notificheList.value}")
-                aggiornaNotificheNonLette()
-
-                println("Notifiche caricate: ${notificheList.value}")
 
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -73,14 +78,7 @@ class ViewModelNotifiche : ViewModel() {
         }
     }
 
-    private fun aggiornaNotificheNonLette(){
-        val nonLette = notificheList.value.any { !it.aperto }
-        notificheList.value.forEach { notifica ->
-            Log.d("ViewModelNotifiche", "Notifica ID: ${notifica.id}, Aperto: ${notifica.aperto}")
-        }
-        Log.d("ViewModelNotifiche", "aggiornaNotificheNonLette: $nonLette")
-        notificheNonLette.value = nonLette
-    }
+
 
 
     fun cambiaStatoNotifica(notificaId: String) {
@@ -100,16 +98,22 @@ class ViewModelNotifiche : ViewModel() {
                     }
                 }
 
-                Log.d("ViewModelNotifiche", "Dopo cambiaStatoNotifica: ${notificheList.value}")
-                // Aggiorna lo stato delle notifiche non lette
-                aggiornaNotificheNonLette()
-
-
+                erroreLetturaNotifiche.value = null
+                letturaNotificheStato.value = true
                 println("Stato della notifica cambiato con successo")
             } catch (e: Exception) {
-                println("Errore durante il cambio di stato della notifica: $e")
+                erroreLetturaNotifiche.value = "Errore durante il cambio di stato della notifica"
+                letturaNotificheStato.value = false
             }
         }
+    }
+
+    fun resetErroreLetturaNotifiche(){
+        erroreLetturaNotifiche.value = null
+    }
+
+    fun resetLetturaNotificheStato(){
+        letturaNotificheStato.value = false
     }
 
     fun creaNotificaViewModel(mittenteId: String, destinatarioId: String, tipo: String, contenuto: String, progetto: String) {
@@ -127,7 +131,6 @@ class ViewModelNotifiche : ViewModel() {
     fun cambiaStato_Accettato_Notifica(notificaId: String) {
         viewModelScope.launch {
             try {
-                // Apri la notifica su Firebase (assicurati che questa funzione aggiorni Firebase)
                 repositoryNotifiche.apriNotifica(notificaId)
 
                 // Aggiorna la lista locale delle notifiche
@@ -165,6 +168,27 @@ class ViewModelNotifiche : ViewModel() {
                 println("Errore durante l'eliminazione della notifica: $e")
             }
         }
+    }
+
+    fun eliminaNotificheUtente(userId: String){
+        viewModelScope.launch {
+            try {
+                repositoryNotifiche.deleteAllNotifiche(userId)
+                eliminazioneNotificheStato.value = true
+                erroreEliminazioneNotifiche.value = null
+
+            } catch (e: Exception) {
+                eliminazioneNotificheStato.value = false
+                erroreEliminazioneNotifiche.value = "Errore durante l'eliminazione delle notifiche"
+            }
+        }
+    }
+
+    fun resetErroreEliminazioneNotifiche(){
+        erroreEliminazioneNotifiche.value = null
+    }
+    fun resetEliminazioneNotificheStato(){
+        eliminazioneNotificheStato.value = false
     }
 
     fun getNotificaIdByContent(contenuto: String, onResult: (String?) -> Unit) {

@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -145,7 +146,7 @@ fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHost
 @Composable
 fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, task : LeMieAttivita) {
     viewModel.getUserProfile()
-    val userProfile = viewModel.userProfile
+    val userProfile by viewModel.userProfilo.observeAsState()
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
     var amici by remember { mutableStateOf(userProfile?.amici ?: "") }
@@ -166,7 +167,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.elevatedCardColors(
             containerColor = if(isDarkTheme) Color.Black else Red70
         ),
@@ -261,37 +262,33 @@ fun ListaColleghi(
     view_model_notifiche: ViewModelNotifiche
 ) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
-    val userProfile = viewModel.userProfile
+    val userProfile by viewModel.userProfilo.observeAsState()
     var amici by remember { mutableStateOf<List<String>>(emptyList()) }
     var task by remember { mutableStateOf<LeMieAttivita?>(null) }
     val cache =
         remember { mutableStateMapOf<String, ProfiloUtente?>() } // Utilizzo di mutableStateMapOf per la cache
     var isLoading by remember { mutableStateOf(true) }
-    var visualizza_amici by remember { mutableStateOf(true) }
+    val visualizza_amici by remember { mutableStateOf(true) }
 
 
 
     LaunchedEffect(Unit) {
         task = viewModel_att.getTodoById(id_task = id_task)
         if (userProfile != null) {
-            amici = viewModel_Prog.getLista_Partecipanti(id_progetto, userProfile.id)
+            amici = viewModel_Prog.getLista_Partecipanti(id_progetto, userProfile!!.id)
         }
     }
     // Utilizzo di LaunchedEffect per gestire il cambio di stato di amici
     LaunchedEffect(userProfile) {
         viewModel_Prog.getLista_Partecipanti(id_progetto) { partecipanti -> amici = partecipanti }
         println(
-            "partecipanti" + " " + amici
+            "partecipanti $amici"
         )
     }
-
 
     LaunchedEffect(amici) {
         isLoading = false
     }
-
-
-
 
     ElevatedCard(
         onClick = {
@@ -302,7 +299,7 @@ fun ListaColleghi(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = if (isDarkTheme) Color.Black else WhiteFacebook
@@ -314,7 +311,7 @@ fun ListaColleghi(
             modifier = Modifier.padding(start = 10.dp, top = 15.dp, bottom = 25.dp)
         ) {
             Text(
-                text = "Lista Partecipanti->",
+                text = "Lista Partecipanti",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (isDarkTheme) Color.White else Color.Black
@@ -330,11 +327,11 @@ fun ListaColleghi(
                         if (!isLoading) {
 
                             if (task != null && userProfile != null && task!!.utenti.contains(
-                                    userProfile.id
+                                    userProfile!!.id
                                 )
                             ) {
                                 CollegaItem(
-                                    userProfile,
+                                    userProfile!!,
                                     color = Red70,
                                     navController = navController,
                                     userProfile,
@@ -477,11 +474,10 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
                             .clickable {
                                 viewModel_att.aggiungi_persona(id_task, utente.id)
                                 Log.d("IconClick", "Icona cliccata")
-                                val contenuto = (user_loggato?.nome + " " + (user_loggato?.cognome
-                                    ?: "") + " " + "ti ha assegnato una task")
+                                val contenuto = (user_loggato.nome + " " + (user_loggato.cognome) + " " + "ti ha assegnato una task")
                                 view_model_notifiche.creaNotificaViewModel(
                                     utente.id,
-                                    utente.id ?: "",
+                                    utente.id,
                                     "Assegnazione_Task",
                                     contenuto,
                                     id_prog

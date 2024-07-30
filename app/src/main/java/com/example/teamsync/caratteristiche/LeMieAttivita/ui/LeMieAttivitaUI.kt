@@ -43,7 +43,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -94,6 +93,7 @@ import com.example.teamsync.caratteristiche.LeMieAttivita.data.model.LeMieAttivi
 import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAttivitaViewModel
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.navigation.Schermate
@@ -106,7 +106,6 @@ import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -119,7 +118,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     viewModel.getTodoByProject(id_prog)
     viewModel.getTodoCompletateByProject(id_prog)
     viewModelUtente.getUserProfile()
-    val utente = viewModelUtente.userProfile
+    val utente by viewModelUtente.userProfilo.observeAsState()
     val coroutineScope = rememberCoroutineScope()
     var addTodoDialog by remember { mutableStateOf(false) }
     val currentTodoItem = remember { mutableStateOf<LeMieAttivita?>(null) }
@@ -279,9 +278,9 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             },
             navController,
             progettoNome = progetto_nome.value,
-            viewModelNotifiche = viewModelNotifiche
-
-
+            viewModelNotifiche = viewModelNotifiche,
+            viewModel = LeMieAttivitaViewModel(),
+            userProfile = utente
         )
     }
 
@@ -300,12 +299,12 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         id_prog
                     )
                     for (p in partecipanti.value) {
-                        if (p != viewModelUtente.userProfile?.id) {
-                            val contenuto = (viewModelUtente.userProfile?.nome
-                                ?: " ") + " " + (viewModelUtente.userProfile?.cognome
+                        if (p != utente?.id) {
+                            val contenuto = (utente?.nome
+                                ?: " ") + " " + (utente?.cognome
                                 ?: " ") + " ha completato una task del progetto: " + progetto_nome.value
                             viewModelNotifiche.creaNotificaViewModel(
-                                viewModelUtente.userProfile?.id ?: " ",
+                                utente?.id ?: " ",
                                 p,
                                 "Completamento_Task",
                                 contenuto,
@@ -476,7 +475,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         textAlign = TextAlign.Center,
                         text = stringResource(id = R.string.project_tasks_description),
                         style = MaterialTheme.typography.labelLarge,
-                        color = if (isDarkTheme)Color.White else Grey50,
+                        color = if (isDarkTheme)Color.White else Grey70,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -511,13 +510,13 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 .padding(start = 8.dp)
                                 .weight(1f),
                             colors = ButtonDefaults.buttonColors(
-                                if (isClicked1.value) Red70 else if(isDarkTheme) Color.Black else Grey35
+                                containerColor = if (isClicked1.value) Red70 else if(isDarkTheme) Color.Black else Grey35,
+                                contentColor = if (isClicked1.value) White else if(isDarkTheme) White else Color.Black
                             )
                         ) {
                             Text(
                                 text = stringResource(id = R.string.bottoneCompletate),
-                                fontSize = 12.sp,
-                                color = if (isDarkTheme)Color.White else Color.Black
+                                fontSize = 12.sp
                             )
                         }
                         Button(
@@ -533,8 +532,9 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 .padding(start = 8.dp)
                                 .weight(1f),
                             colors = ButtonDefaults.buttonColors(
-                                if (isClicked.value) Red70 else if(isDarkTheme) Color.Black else Grey35
-                            ),
+                                containerColor = if (isClicked.value) Red70 else if(isDarkTheme) Color.Black else Grey35,
+                                contentColor = if (isClicked.value) White else if(isDarkTheme) White else Color.Black
+                            )
 
                             ) {
                             Text(
@@ -557,15 +557,15 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 .padding(start = 8.dp)
                                 .weight(1f),
                             colors = ButtonDefaults.buttonColors(
-                                if (isClicked2.value) Red70 else if(isDarkTheme) Color.Black else Grey35
-                            ),
+                                containerColor = if (isClicked2.value) Red70 else if(isDarkTheme) Color.Black else Grey35,
+                                contentColor = if (isClicked2.value) White else if(isDarkTheme) White else Color.Black
+                            )
 
-                            ) {
+                        ) {
                             Text(
                                 text = "Le Mie",
-                                fontSize = 12.sp,
-                                color = if (isDarkTheme)Color.White else Color.Black
-                                )
+                                fontSize = 12.sp
+                            )
                         }
                     }
                     if (carica) {
@@ -590,14 +590,14 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
                             }
 
                             "priorità" -> {
-
 
                                 LazyColumn {
                                     items(
@@ -618,7 +618,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
@@ -640,7 +641,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
@@ -667,7 +669,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
@@ -689,7 +692,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
@@ -711,7 +715,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
@@ -740,7 +745,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
@@ -764,7 +770,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
                                 }
@@ -786,7 +793,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 currentTodoItem.value = item
                                                 dialogComplete = true
                                             },
-                                            viewModelUtente
+                                            viewModelUtente,
+                                            userProfile = utente
                                         )
                                     }
 
@@ -798,7 +806,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                     }
 
                 }
-                if (sezione == 1) {
+                if (sezione == 1 || sezione == 2) {
                     FloatingActionButton(
                         containerColor = Red70,
                         shape = FloatingActionButtonDefaults.shape,
@@ -839,43 +847,42 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 }
 
 @Composable
-fun TodoItem
-            (
-                item: LeMieAttivita,
-                onDelete: (String) -> Unit,
-                onEdit: (LeMieAttivita) -> Unit,
-                onComplete: (LeMieAttivita) -> Unit,
-                viewModelUtente: ViewModelUtente
-            )
-    {
-        var dialogDelete by remember { mutableStateOf(false) }
-        var dialogExpanded by remember { mutableStateOf(false) }
-        var lista_utenti by remember { mutableStateOf("") }
-        val modifica = remember {mutableStateOf(false) }
+fun TodoItem(
+    item: LeMieAttivita,
+    onDelete: (String) -> Unit,
+    onEdit: (LeMieAttivita) -> Unit,
+    onComplete: (LeMieAttivita) -> Unit,
+    viewModelUtente: ViewModelUtente,
+    userProfile: ProfiloUtente?
+) {
+    var dialogDelete by remember { mutableStateOf(false) }
+    var dialogExpanded by remember { mutableStateOf(false) }
+    var lista_utenti by remember { mutableStateOf("") }
+    val modifica = remember {mutableStateOf(false) }
 
-        val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
+    val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
 
-        LaunchedEffect(item.utenti) {
-            lista_utenti = ""
-            val size = item.utenti.size
-            var contatore = 0
-            for (u in item.utenti) {
-                viewModelUtente.ottieni_utente(u) { userProfile ->
-                    contatore++
-                    if (userProfile != null) {
-                        if (contatore == size){
+    LaunchedEffect(item.utenti) {
+        lista_utenti = ""
+        val size = item.utenti.size
+        var contatore = 0
+        for (u in item.utenti) {
+            viewModelUtente.ottieni_utente(u) { userProfile ->
+                contatore++
+                if (userProfile != null) {
+                    if (contatore == size){
                         lista_utenti += "${userProfile.nome} ${userProfile.cognome}"
-                        }else{lista_utenti+= "${userProfile.nome} ${userProfile.cognome}\n"}
-
-
+                        }else {
+                            lista_utenti+= "${userProfile.nome} ${userProfile.cognome}\n"
+                        }
                     }
                 }
             }
 
-            if(viewModelUtente.userProfile?.let { item.utenti.contains(it.id) } == true)
-                modifica.value = true
-        }
+        if(userProfile?.let { item.utenti.contains(it.id) } == true)
+            modifica.value = true
+    }
 
 
     Row(modifier = Modifier
@@ -1036,10 +1043,10 @@ fun EditTodoDialog(
     onDismiss: () -> Unit,
     onSave: (LeMieAttivita) -> Unit,
     navController: NavHostController,
-    viewModel: LeMieAttivitaViewModel = LeMieAttivitaViewModel(),
-    viewModelUtente: ViewModelUtente = ViewModelUtente(),
+    viewModel: LeMieAttivitaViewModel,
     viewModelNotifiche: ViewModelNotifiche,
-    progettoNome: String
+    progettoNome: String,
+    userProfile: ProfiloUtente?
 ) {
     var titolo by remember { mutableStateOf(todoItem.titolo) }
     var descrizione by remember { mutableStateOf(todoItem.descrizione) }
@@ -1227,6 +1234,7 @@ fun EditTodoDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                //SOSTITUIRE
                 Button(onClick = { launcher.launch("*/*") }, colors = ButtonDefaults.buttonColors(
                     containerColor = if (isDarkTheme) Grey70 else Grey50
                 )) {
@@ -1271,9 +1279,9 @@ fun EditTodoDialog(
                         )
 
                         for (p1 in updatedTodo.utenti) {
-                            if (p1 != viewModelUtente.userProfile?.id) {
-                                val contenuto = "${viewModelUtente.userProfile?.nome ?: " "} ${viewModelUtente.userProfile?.cognome ?: " "} ha modificato la vostra task: ${updatedTodo.titolo} del progetto: $progettoNome"
-                                viewModelNotifiche.creaNotificaViewModel(viewModelUtente.userProfile?.id ?: " ", p1, "Modifica_Task", contenuto, updatedTodo.progetto)
+                            if (p1 != userProfile?.id) {
+                                val contenuto = "${userProfile?.nome ?: " "} ${userProfile?.cognome ?: " "} ha modificato la vostra task: ${updatedTodo.titolo} del progetto: $progettoNome"
+                                viewModelNotifiche.creaNotificaViewModel(userProfile?.id ?: " ", p1, "Modifica_Task", contenuto, updatedTodo.progetto)
                             }
                         }
                     }
@@ -1467,7 +1475,11 @@ fun AddTodoDialog(
                                             modifier = Modifier
                                                 .size(10.dp)
                                                 .clip(CircleShape)
-                                                .border(0.5.dp, if(isDarkTheme)White else Color.Black, CircleShape)
+                                                .border(
+                                                    0.5.dp,
+                                                    if (isDarkTheme) White else Color.Black,
+                                                    CircleShape
+                                                )
                                                 .background(p.colore)
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
@@ -1608,7 +1620,7 @@ fun ExpandedDialog(
 
     LaunchedEffect(item.utenti) {
         lista_utenti = ""
-        var size = item.utenti.size
+        val size = item.utenti.size
         var contatore = 0
         for (u in item.utenti) {
             viewModelUtente.ottieni_utente(u) { userProfile ->
@@ -1634,7 +1646,7 @@ fun ExpandedDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(if(isDarkTheme) Color.Black else Grey35)
+                    .background(if (isDarkTheme) Color.Black else Grey35)
                     .padding(16.dp)
             ) {
                 Text(

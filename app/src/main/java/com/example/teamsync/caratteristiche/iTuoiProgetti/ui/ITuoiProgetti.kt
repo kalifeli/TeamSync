@@ -71,6 +71,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.data.models.Priorità
 import com.example.teamsync.navigation.Schermate
@@ -101,23 +102,23 @@ fun ITuoiProgetti(
         mutableStateOf(false)
     }
     val aggiungiProgettoRiuscito = viewModelProgetto.aggiungiProgettoRiuscito.value
-    val progetti by viewModelProgetto.progetti
     val progettiCompletati by viewModelProgetto.progettiCompletati
 
     val utenteCorrenteId by viewModelProgetto.utenteCorrenteId
     val context = LocalContext.current
-    val loading = viewModelProgetto.isLoading.value
+    val isLoading by viewModelProgetto.isLoading.observeAsState()
 
-    // CAMBIAMENTI
-    val progetti1 by viewModelProgetto.progetti1.observeAsState(emptyList())
+    val progetti by viewModelProgetto.progetti1.observeAsState(emptyList())
     val attivitaProgetti by viewModelProgetto.attivitaProgetti.observeAsState(emptyMap())
 
-
     LaunchedEffect(Unit) {
-        viewModelProgetto.utenteCorrenteId.value?.let {
-            //viewModelProgetto.caricaProgettiUtente(it, false)
-            viewModelProgetto.caricaProgettiUtente1(it, false)
-            viewModelProgetto.caricaProgettiCompletatiUtente(it)
+        viewModelUtente.resetProfiloCollega()
+    }
+
+    LaunchedEffect(utenteCorrenteId) {
+        if(!utenteCorrenteId.isNullOrEmpty()){
+            viewModelProgetto.caricaProgettiUtente(utenteCorrenteId!!, false)
+            viewModelProgetto.caricaProgettiCompletatiUtente(utenteCorrenteId!!)
         }
         Log.d("View", "utente corrente : ${viewModelProgetto.utenteCorrenteId.value}")
     }
@@ -233,7 +234,7 @@ fun ITuoiProgetti(
                    verticalAlignment = Alignment.Top,
                    horizontalArrangement = Arrangement.Center
                ){
-                   if (loading) {
+                   if (isLoading == true) {
                        CircularProgressIndicator(
                            modifier = Modifier
                                .padding(8.dp)
@@ -250,7 +251,7 @@ fun ITuoiProgetti(
 
                Spacer(modifier = Modifier.height(16.dp))
 
-               SezioneITUoiProgetti(navController = navController, progetti = progetti1, viewModelProgetto = viewModelProgetto, attivitaProgetti = attivitaProgetti,
+               SezioneITUoiProgetti(navController = navController, progetti = progetti, viewModelProgetto = viewModelProgetto, attivitaProgetti = attivitaProgetti,
                    isDarkTheme = isDarkTheme
                )
 
@@ -289,7 +290,7 @@ fun ITuoiProgetti(
         if(aggiungiProgettoRiuscito){
             Toast.makeText(context, "Progetto aggiunto con successo", Toast.LENGTH_LONG).show()
             utenteCorrenteId?.let {
-                viewModelProgetto.caricaProgettiUtente(it, true)
+                viewModelProgetto.caricaProgettiUtente(it, false)
                 viewModelProgetto.caricaProgettiCompletatiUtente(it)
             }
             viewModelProgetto.resetAggiugniProgettoRiuscito()
@@ -368,6 +369,7 @@ fun CreaProgettoDialog(
                         unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
                         focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
+                    maxLines = 2
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -391,7 +393,7 @@ fun CreaProgettoDialog(
                         unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
                         focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
                     ),
-                    maxLines = 15
+                    maxLines = 4
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -672,7 +674,9 @@ fun AggiungiProgettoDialog(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewITuoiProgetti(){
-    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(), ViewModelUtente())
+    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(), ViewModelUtente(
+        RepositoryUtente()
+    ))
 }
 @Preview(showSystemUi = true)
 @Composable

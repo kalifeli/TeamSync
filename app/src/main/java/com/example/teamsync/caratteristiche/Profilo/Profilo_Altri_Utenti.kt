@@ -40,6 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -192,7 +194,7 @@ fun ProfiloUtenteCliccato(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Profilo Utenti",
+                        text = stringResource(id = R.string.ProfiloUtenti),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -349,10 +351,10 @@ fun ProfiloUtenteCliccato(
                                 CircularProgressIndicator(color = Color.Black)
                             }
                         } else {
-                            StatBox(number = numeroTaskCompletati, label = "Task Completate")
+                            StatBox(number = numeroTaskCompletati, label = stringResource(id = R.string.taskCompletate))
                             StatBox(
                                 number = numeroProgettiCompletati,
-                                label = "Progetti Completati"
+                                label = stringResource(id = R.string.progettiCompletati)
                             )
 
                         }
@@ -386,7 +388,7 @@ fun ProfiloUtenteCliccato(
                                 )
                                 {
                                     Text(
-                                        text = "Richiedi Amicizia",
+                                        text = stringResource(id = R.string.richiestaAmicizia),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -414,7 +416,7 @@ fun ProfiloUtenteCliccato(
                                 )
                                 {
                                     Text(
-                                        text = "Richiedi Amicizia",
+                                        text = stringResource(id = R.string.richiestaAmicizia),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -451,7 +453,7 @@ fun ProfiloUtenteCliccato(
                                         )
                                         {
                                             Text(
-                                                text = "Accetta amicizia",
+                                                text = stringResource(id = R.string.accettaAmicizia),
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(vertical = 12.dp)
@@ -480,7 +482,7 @@ fun ProfiloUtenteCliccato(
                                         )
                                         {
                                             Text(
-                                                text = "Richiedi Amicizia",
+                                                text = stringResource(id = R.string.richiestaAmicizia),
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(vertical = 12.dp)
@@ -511,7 +513,7 @@ fun ProfiloUtenteCliccato(
                                 )
                                 {
                                     Text(
-                                        text = "Richiedi Amicizia",
+                                        text = stringResource(id = R.string.richiestaAmicizia),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -560,7 +562,7 @@ fun ProfiloUtenteCliccato(
                         )
                         {
                             Text(
-                                text = "Rimuovi Amicizia",
+                                text = stringResource(id = R.string.rimuoviAmicizia),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(vertical = 12.dp)
@@ -590,7 +592,7 @@ fun ProfiloUtenteCliccato(
                                 )
                                 {
                                     Text(
-                                        text = "Aggiungi ad un progetto",
+                                        text = stringResource(id = R.string.AggiungiAdUnProgetto),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(vertical = 12.dp)
@@ -632,7 +634,7 @@ fun AddTodoDialog(
         modifier = Modifier.border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         onDismissRequest = { onDismiss() },
-        title = { Text(text = "Seleziona un progetto", color =  if(isDarkTheme) Color.White else Color.Black) },
+        title = { Text(text = stringResource(id = R.string.selezionaUnProgetto), color =  if(isDarkTheme) Color.White else Color.Black) },
         text = {
             Column {
                 if (isLoading) {
@@ -676,7 +678,7 @@ fun AddTodoDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Chiudi", color = if(isDarkTheme) Color.White else Color.Black)
+                Text(stringResource(id = R.string.chiudi), color = if(isDarkTheme) Color.White else Color.Black)
             }
         }
     )

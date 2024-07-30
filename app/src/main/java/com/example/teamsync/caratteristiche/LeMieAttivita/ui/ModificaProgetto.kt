@@ -122,7 +122,8 @@ fun SchermataModificaProgetto(
     )
 
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
-
+    val maxCharsDescrizione = 200
+    val maxCharsNome = 20
 
     // Caricamento iniziale dei dati del progetto
     LaunchedEffect(progettoId) {
@@ -147,7 +148,7 @@ fun SchermataModificaProgetto(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Modifica Progetto",
+                        text = stringResource(id = R.string.titolo),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -203,7 +204,9 @@ fun SchermataModificaProgetto(
                     item {
                         OutlinedTextField(
                             value = nomeProgetto,
-                            onValueChange = { nomeProgetto = it },
+                            onValueChange = { if (it.length <= maxCharsNome) {
+                                nomeProgetto = it
+                            } },
                             label = {
                                 Text(
                                     stringResource(id = R.string.nome),
@@ -227,12 +230,26 @@ fun SchermataModificaProgetto(
                                 .fillMaxWidth()
                                 .padding(8.dp)
                         )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 10.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text(
+                                text = "${nomeProgetto.length} / $maxCharsNome",
+                                color = if (isDarkTheme) Color.White else Color.Black,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
 
                     item {
                         OutlinedTextField(
                             value = descrizioneProgetto,
-                            onValueChange = { descrizioneProgetto = it },
+                            onValueChange = { if (it.length <= maxCharsDescrizione) {
+                                descrizioneProgetto = it
+                            } },
                             label = {
                                 Text(
                                     stringResource(id = R.string.descrizioneEdit),
@@ -256,15 +273,27 @@ fun SchermataModificaProgetto(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
-                                .height(200.dp)
                         )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 10.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text(
+                                text = "${descrizioneProgetto.length} / $maxCharsDescrizione",
+                                color = if (isDarkTheme) Color.White else Color.Black,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
                     item {
                         OutlinedTextField(
                             value = dataScadenzaSdf,
                             onValueChange = { },
                             readOnly = true,
-                            label = { Text("Data di scadenza",
+                            label = { Text(
+                                stringResource(id = R.string.datadiscadenza),
                                 color = if (isDarkTheme)White else Color.Black
                             ) },
                             colors = OutlinedTextFieldDefaults.colors(
@@ -305,7 +334,7 @@ fun SchermataModificaProgetto(
                                 readOnly = true,
                                 label = {
                                     Text(
-                                        "Priorità",
+                                        stringResource(id = R.string.priorità),
                                         color = if (isDarkTheme)White else Color.Black
                                     )
                                 },
@@ -378,7 +407,7 @@ fun SchermataModificaProgetto(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Hai terminato il progetto e sei pronto alla consegna? Contrassegnalo come completato!",
+                                text = stringResource(id = R.string.fineProgetto),
                                 modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = if (isDarkTheme)White else Color.Black
@@ -416,7 +445,8 @@ fun SchermataModificaProgetto(
                                 value = dataConsegnaSfd,
                                 onValueChange = { },
                                 readOnly = true,
-                                label = { Text("Data di consegna",
+                                label = { Text(
+                                    stringResource(id = R.string.dataConsegna),
                                     color = if (isDarkTheme)White else Color.Black
                                 ) },
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -454,7 +484,7 @@ fun SchermataModificaProgetto(
                                     readOnly = true,
                                     label = {
                                         Text(
-                                            "Voto",
+                                            stringResource(id = R.string.voto),
                                             color = if (isDarkTheme)White else Color.Black
                                         )
                                     },
@@ -482,11 +512,11 @@ fun SchermataModificaProgetto(
                                     expanded = mostraVoto,
                                     onDismissRequest = { mostraVoto = false },
                                     modifier = Modifier
-                                        .background(if (isDarkTheme)Color.DarkGray else Grey35)
+                                        .background(if (isDarkTheme) Color.DarkGray else Grey35)
                                         .height(200.dp)
                                 ) {
                                     val voti = listOf(
-                                        "Non valutato",
+                                        stringResource(id = R.string.nv),
                                         "18",
                                         "19",
                                         "20",

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -94,7 +95,7 @@ fun BottomNav(
                 )
                    },
             label = {
-                Text(text = "Notifiche")
+                Text(text = stringResource(id = R.string.notifiche))
             },
             colors = NavigationBarItemDefaults.colors(
                 indicatorColor = Color.Transparent,
@@ -121,7 +122,7 @@ fun BottomNav(
                 )
                    },
             label = {
-                Text(text = "Profilo")
+                Text(text = stringResource(id = R.string.profilo))
             },
             colors = NavigationBarItemDefaults.colors(
                 indicatorColor = Color.Transparent,

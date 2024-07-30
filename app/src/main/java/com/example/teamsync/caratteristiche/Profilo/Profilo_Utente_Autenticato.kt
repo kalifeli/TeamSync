@@ -54,6 +54,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -255,8 +256,8 @@ fun ProfiloHeader(
                         CircularProgressIndicator(color = if(isDarkTheme) Color.White else Color.Black)
                     }
                 } else {
-                    StatBox(number = numeroTaskCompletati, label = "Task Completate")
-                    StatBox(number = numeroProgettiCompletati, label = "Progetti Completati")
+                    StatBox(number = numeroTaskCompletati, label = stringResource(id = R.string.taskCompletate))
+                    StatBox(number = numeroProgettiCompletati, label = stringResource(id = R.string.progettiCompletati))
 
                 }
             }

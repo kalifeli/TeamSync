@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -196,7 +197,7 @@ fun ProfiloProgetto(viewModel: ViewModelUtente, viewModelProgetto: ViewModelProg
 
     ) {
         Text(
-            text = "Informazioni",
+            text = stringResource(id = R.string.Informazioni),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
@@ -289,7 +290,7 @@ fun ListaColleghi(
             colors = if(isDarkTheme)CardDefaults.cardColors(containerColor = Color.Black) else  CardDefaults.cardColors(containerColor = White)
         ) {
             Text(
-                text = "Partecipanti",
+                text = stringResource(id = R.string.Partecipanti),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = if(isDarkTheme) Color.White else Color.Black,
@@ -380,7 +381,7 @@ fun ListaColleghi(
                 )
                 {
                     Text(
-                        text = "Entra nel progetto",
+                        text = stringResource(id = R.string.entraNelProcetto),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 12.dp)

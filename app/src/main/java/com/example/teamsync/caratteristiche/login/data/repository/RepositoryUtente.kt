@@ -135,6 +135,12 @@ class RepositoryUtente{
         return utenteCorrente
     }
 
+    fun getUtenteAttualeID(): String? {
+        val utenteCorrente: FirebaseUser? = auth.currentUser
+        return utenteCorrente?.uid
+    }
+
+
     /**
      * Invia un'email di verifica all'utente attualmente loggato.
      *

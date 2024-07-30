@@ -57,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.example.teamsync.R
@@ -74,8 +75,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostController) {
@@ -103,7 +109,6 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                 viewModel.aggiorna_foto_profilo(it)
             }
         }
-
 
 
 
@@ -152,6 +157,14 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
         }
     }
 
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (isGranted) {
+            launcher.launch("image/*")
+        } else {
+
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
     // LaunchedEffect per caricare il profilo utente
     LaunchedEffect(userProfile) {
         try {
@@ -515,8 +528,14 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                             text = { Text(stringResource(id = R.string.caricaImmagine)) },
                             onClick = {
                                 showMenu = false
-                                launcher.launch("image/*")
-                            },
+                                when {
+                                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED -> {
+                                        launcher.launch("image/*")
+                                    }
+                                    else -> {
+                                        permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                                    }
+                                }                            },
                             modifier = Modifier.background(Grey20)
                         )
                         DropdownMenuItem(

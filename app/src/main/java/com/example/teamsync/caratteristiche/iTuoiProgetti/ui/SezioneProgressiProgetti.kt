@@ -17,12 +17,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import androidx.compose.ui.text.font.FontWeight
 import com.example.teamsync.ui.theme.Grey35
+import com.example.teamsync.R
+
 
 @Composable
 fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int, isDarkTheme: Boolean){
@@ -33,7 +36,7 @@ fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int, isDar
         ),
         modifier = Modifier
             .size(width = 160.dp, height = 200.dp)
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if(isDarkTheme) Color.Black else White
         ),
@@ -47,7 +50,7 @@ fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int, isDar
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Progressi",
+                text = stringResource(id = R.string.progressi),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = if(isDarkTheme) White else Color.Black
@@ -74,7 +77,7 @@ fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int, isDar
             }
             Spacer(modifier = Modifier.size(8.dp))
             Text(
-                text = "Continua così!",
+                text = stringResource(id = R.string.continua),
                 style = MaterialTheme.typography.bodyMedium,
                 color = if(isDarkTheme) White else Color.Black
             )

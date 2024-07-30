@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -109,7 +110,7 @@ fun Lista_Utenti_assegna_Task(viewModel: ViewModelUtente, navController: NavHost
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Aggiungi Persone",
+                        text = stringResource(id = R.string.AggiungiPersone),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (isDarkTheme) Color.White else Color.Black,
@@ -152,7 +153,11 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
     var amici by remember { mutableStateOf(userProfile?.amici ?: "") }
     var id_task by remember { mutableStateOf(task.id) }
     var id_prog by remember { mutableStateOf(task.progetto ) }
-
+    val context = LocalContext.current
+    val titolo = task.titolo
+    val dataScadenza = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(task.dataScadenza)
+    val priorita = task.priorita
+    val descrizione = task.descrizione
     userProfile?.let {
         nome = it.nome
         amici = it.amici
@@ -167,7 +172,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, White,shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.elevatedCardColors(
             containerColor = if(isDarkTheme) Color.Black else Red70
         ),
@@ -200,7 +205,7 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Dettagli Task",
+                        text = stringResource(id = R.string.DettagliAttività),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color =Color.White,
@@ -218,30 +223,31 @@ fun ProfiloHeader(viewModel: ViewModelUtente, navController: NavHostController, 
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Nome: ${task.titolo}",
+                text = context.getString(R.string.nomeDelega, titolo),
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Priorità: ${task.priorita}",
+                text = context.getString(R.string.prioritaDelega, priorita),
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Data scadenza: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(task.dataScadenza)}",
+                text = context.getString(R.string.dataDiScadenzaDelega, dataScadenza),
                 fontSize = 16.sp,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Descrizione: ${task.descrizione}",
+                text = context.getString(R.string.DescrizioneDelega, descrizione),
                 fontSize = 16.sp,
                 color = Color.White,
+                maxLines = 3,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
             )
         }
@@ -299,7 +305,7 @@ fun ListaColleghi(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, White,shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = if (isDarkTheme) Color.Black else WhiteFacebook
@@ -311,7 +317,7 @@ fun ListaColleghi(
             modifier = Modifier.padding(start = 10.dp, top = 15.dp, bottom = 25.dp)
         ) {
             Text(
-                text = "Lista Partecipanti",
+                text = stringResource(id = R.string.listaPartecipanti),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (isDarkTheme) Color.White else Color.Black
@@ -412,8 +418,7 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
 
     ElevatedCard(
         onClick = {
-
-                navController.navigate("utente/${utente.id}/${amicizia}/task/${id_task}/${id_prog}/progetto")
+            navController.navigate("utente/${utente.id}/${amicizia}/task/${id_task}/${id_prog}/progetto")
         },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -530,11 +535,3 @@ fun CollegaItem(utente : ProfiloUtente, color: Color, navController: NavHostCont
 
     }
 }
-
-
-
-
-
-
-
-

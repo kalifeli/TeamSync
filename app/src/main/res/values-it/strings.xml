@@ -32,9 +32,9 @@
     <string name="azioni">Azioni</string>
     <string name="task">Task</string>
     <string name="progetti">Progetti</string>
-    <string name="help">Help &amp; Support</string>
-    <string name="terms">Terms and Policies</string>
-    <string name="logout">Logout</string>
+    <string name="help">Aiuto &amp; Supporto</string>
+    <string name="terms">Termini e Condizioni</string>
+    <string name="eliminaAccount">Elimina Account</string>
 
     <!-- Schermata Impostazioni Notifiche -->
     <string name="avvisamiquando">Avvisami quando</string>

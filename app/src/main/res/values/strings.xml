@@ -33,7 +33,7 @@
     <string name="progetti">Projects</string>
     <string name="help">Help &amp; Support</string>
     <string name="terms">Terms and Policies</string>
-    <string name="logout">Logout</string>
+    <string name="eliminaAccount">Delete Account</string>
 
     <!-- Schermata Impostazioni Notifiche -->
     <string name="avvisamiquando">Notify me when</string>

@@ -40,6 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -85,7 +86,7 @@ import androidx.annotation.RequiresApi
 @Composable
 fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostController) {
     viewModel.getUserProfile()
-    val userProfile = viewModel.userProfile
+    val userProfile by viewModel.userProfilo.observeAsState()
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var nome by remember { mutableStateOf(userProfile?.nome ?: "") }
     var cognome by remember { mutableStateOf(userProfile?.cognome ?: "") }
@@ -97,6 +98,8 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
     var loading1 by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+    val erroreAggiornaProfilo by viewModel.erroreAggiornaProfilo
+    val aggiornaProfiloRiuscito by viewModel.aggiornaProfiloRiuscito
     val primoaccesso by remember { mutableStateOf(userProfile?.primoAccesso ?: false) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val launcher =
@@ -129,6 +132,30 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val dataNascitaSdf = sdf.format(dataDiNascita)
 
+    // LaunchedEffect per mostrare il Toast quando erroreAggiornaProfilo cambia
+    LaunchedEffect(erroreAggiornaProfilo) {
+        if (erroreAggiornaProfilo != null) {
+            Toast.makeText(context, erroreAggiornaProfilo, Toast.LENGTH_LONG).show()
+            viewModel.resetErroreAggiornaProfilo()
+        }
+    }
+
+    // LaunchedEffect per mostrare il Toast quando aggiornaProfiloRiuscito cambia
+    LaunchedEffect(aggiornaProfiloRiuscito) {
+        if (aggiornaProfiloRiuscito) {
+            Toast.makeText(context, "Profilo aggiornato con successo", Toast.LENGTH_LONG).show()
+            viewModel.resetAggiornaProfiloRiuscito()
+            //navController.navigate(Schermate.Impostazioni.route)
+        }
+    }
+
+    // LaunchedEffect per mostrare il Toast quando error cambia
+    LaunchedEffect(error) {
+        if (error != null) {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            error = null
+        }
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
@@ -177,8 +204,6 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                         primoAccesso = primoaccesso
                     )
                 viewModel.updateUserProfile(updatedProfile)
-
-
             } catch (e: Exception) {
                 // Gestisce eventuali errori durante il caricamento dell'immagine
                 error = "Errore durante il caricamento dell'immagine: ${e.message}"
@@ -245,7 +270,7 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
 
                         Image(
                             painter = rememberImagePainter(
-                                userProfile.immagine,
+                                userProfile!!.immagine,
                                 builder = {
                                     // Gestisci l'indicatore di caricamento qui
                                     placeholder(R.drawable.white) // Placeholder di caricamento
@@ -266,18 +291,14 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                         )
                     }
                 }
+
                 Spacer(modifier = Modifier.height(10.dp))
+
                 if (loading) {
                     Text(
                         stringResource(id = R.string.caricamento),
                         style = MaterialTheme.typography.labelMedium,
                         color = if (isDarkTheme) Color.LightGray else Color.Gray
-                    )
-                } else if (error != null) {
-                    Text(
-                        "Errore: $error",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Color.Red
                     )
                 } else {
                     OutlinedTextField(
@@ -476,7 +497,6 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                                 amici = amici
                             )
                             viewModel.updateUserProfile(updatedProfile)
-                            navController.navigate(Schermate.Impostazioni.route)
                         },
                         enabled = !loading1,
                         border = BorderStroke(1.dp, if(isDarkTheme) Color.White else Color.DarkGray),

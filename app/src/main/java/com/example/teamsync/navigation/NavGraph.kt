@@ -8,7 +8,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +17,6 @@ import com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel.LeMieAt
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.LeMieAttivitaUI
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.Lista_Utenti_assegna_Task
 import com.example.teamsync.caratteristiche.LeMieAttivita.ui.SchermataModificaProgetto
-import com.example.teamsync.caratteristiche.Notifiche.data.repository.RepositoryNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.data.viewModel.ViewModelNotifiche
 import com.example.teamsync.caratteristiche.Notifiche.ui.NotificationScreen
 import com.example.teamsync.caratteristiche.Profilo.ProfiloUtenteCliccato
@@ -28,6 +26,7 @@ import com.example.teamsync.caratteristiche.faq.ui.Faq
 import com.example.teamsync.caratteristiche.faq.ui.Supporto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.ui.ITuoiProgetti
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.caratteristiche.login.ui.LoginScreen
 import com.example.teamsync.caratteristiche.login.ui.PasswordDimenticata
@@ -41,14 +40,13 @@ import com.example.teamsync.screen.Registrazione
 import com.example.teamsync.screen.SchermataDiBenvenuto
 import com.example.teamsync.screen.Tema
 import com.example.teamsync.screen.UserProfileScreen
-import com.example.teamsync.util.ThemePreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun NavGraph(){
     val navController = rememberNavController()
-    val viewModelUtente = ViewModelUtente()
+    val viewModelUtente = ViewModelUtente(RepositoryUtente())
     val viewModelProgetto = ViewModelProgetto()
     val viewModelLeMieAttivita = LeMieAttivitaViewModel()
     val viewModelNotifiche = ViewModelNotifiche()
@@ -61,7 +59,7 @@ fun NavGraph(){
         composable(route = Schermate.Login.route) { LoginScreen( navController, viewModelUtente, viewModelProgetto) }
         composable(route = Schermate.RecuperoPassword.route) { PasswordDimenticata(navController, viewModelUtente)}
         composable(route = Schermate.ModificaProfilo.route){ UserProfileScreen(viewModelUtente,navController)}
-        composable(route= Schermate.Impostazioni.route){Impostazioni(navController)}
+        composable(route= Schermate.Impostazioni.route){Impostazioni(navController, viewModelUtente)}
         composable(route = Schermate.Tema.route){ Tema(navController) }
         composable(route = Schermate.Terms.route) {Termini(navController)}
         composable(route = Schermate.Supporto.route) { Supporto(navController)}
@@ -138,7 +136,18 @@ fun NavGraph(){
                     if (task != null) {
                         if (pro != null) {
                             if (sottoprovenienza != null) {
-                                ProfiloUtenteCliccato(viewModel = viewModelUtente, navController = navController, id = id_u, amicizia = amici.toString(), provenienza = provenienza, notificheRepo = RepositoryNotifiche(), task = task, progetto = pro,viewModelProgetto, viewModelNotifiche, sottoprovenienza)
+                                ProfiloUtenteCliccato(
+                                    viewModel = viewModelUtente,
+                                    navController = navController,
+                                    id = id_u,
+                                    amicizia = amici.toString(),
+                                    provenienza = provenienza,
+                                    task = task,
+                                    progetto = pro,
+                                    viewModelProgetto,
+                                    viewModelNotifiche,
+                                    sottoprovenienza
+                                )
                             }
                         }
                     }

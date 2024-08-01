@@ -52,10 +52,10 @@ fun ITuoiProgettiItem(
     attivitaNonCompletate: Int,
     isDarkTheme: Boolean
 ){
-    val dataScadenza = remember { progetto.dataScadenza }
+    val dataScadenza = remember(progetto.dataScadenza){ progetto.dataScadenza }
     val formattatoreData = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
     val dataScadenzaSdf = formattatoreData.format(dataScadenza)
-    val dataConsegna = remember {progetto.dataConsegna}
+    val dataConsegna = remember(progetto.dataConsegna) {progetto.dataConsegna}
     val dataConsegnaSdf = formattatoreData.format(dataConsegna)
 
     ElevatedCard(

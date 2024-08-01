@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +71,7 @@ import java.util.Locale
 @Composable
 fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewModel_att: LeMieAttivitaViewModel, view_model_prog: ViewModelProgetto, id_prog : String, viewNotifiche: ViewModelNotifiche, provenienza : String, sottoprovenienza: String) {
 
+    val userProfile by viewModel.userProfilo.observeAsState()
     val searchQuery by remember { mutableStateOf("") }
     var progetto_ by remember { mutableStateOf<Progetto?>(null) }
     var listap by remember { mutableStateOf<List<String>?>(emptyList()) }
@@ -78,7 +80,7 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
 
 
     LaunchedEffect(Unit) {
-        viewModel.getUserProfile()
+        //viewModel.getUserProfile()
         progetto_ = view_model_prog.get_progetto_by_id(id_prog)
         listap = view_model_prog.getLista_Partecipanti(id_prog)
 
@@ -139,7 +141,8 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
                         viewModel,
                         view_model_prog,
                         navController,
-                        id_prog
+                        id_prog,
+                userProfile
                     )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -169,13 +172,13 @@ fun Progetto(viewModel: ViewModelUtente, navController: NavHostController, viewM
 
 
 @Composable
-fun ProfiloProgetto(viewModel: ViewModelUtente, viewModelProgetto: ViewModelProgetto, navController: NavHostController, progetto : String) {
+fun ProfiloProgetto(viewModel: ViewModelUtente, viewModelProgetto: ViewModelProgetto, navController: NavHostController, progetto : String, userProfile: ProfiloUtente?) {
     viewModel.getUserProfile()
     var progetto_ by remember { mutableStateOf<Progetto?>(null) }
     LaunchedEffect(Unit){
         progetto_ = viewModelProgetto.get_progetto_by_id(progetto)
     }
-    viewModel.userProfile
+
     val formatoData = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val dataCreazione = formatoData.format(progetto_?.dataCreazione ?: Date())
     val dataScadenza = formatoData.format(progetto_?.dataScadenza ?: Date())
@@ -236,36 +239,28 @@ fun ListaColleghi(
     sottoprovenienza : String,
     provenienza: String
 ) {
-    val userProfile = viewModel.userProfile
+    val userProfile by viewModel.userProfilo.observeAsState()
     var amici by remember { mutableStateOf<List<String>>(emptyList()) }
     val task by remember { mutableStateOf<LeMieAttivita?>(null) }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val cache = remember { mutableStateMapOf<String, ProfiloUtente?>() } // Utilizzo di mutableStateMapOf per la cache
-    var visualizza_amici by remember { mutableStateOf(true) }
-    var mostraPulsante = remember {
+    val visualizza_amici by remember { mutableStateOf(true) }
+    val mostraPulsante = remember {
         mutableStateOf(false)
     }
-    var caricamento_tasto =  remember{
+    val caricamento_tasto =  remember{
         mutableStateOf(true)
     }
 
 
-
-
-
-
-
-
-
-
     LaunchedEffect(Unit) {
         if (userProfile != null) {
-            amici = viewModel_Prog.getLista_Partecipanti(id_progetto,userProfile.id)
+            amici = viewModel_Prog.getLista_Partecipanti(id_progetto, userProfile!!.id)
         }
         userProfile?.let {
             viewModel_Prog.getProgettiUtenteByIdUtente(it.id) { progetti, id ->
                 mostraPulsante.value = !(viewModel_Prog.utentePartecipa(progetti,id_progetto))
-                Log.d("utente", "valore: ${viewModel.userProfile?.id}")
+                Log.d("utente", "valore: ${userProfile?.id}")
                 Log.d("lista", "valore: $progetti")
                 Log.d("progetto da controllare", "valore: $id_progetto")
                 Log.d("mostra pulsante1", "Dati: ${!(viewModel_Prog.utentePartecipa(progettiUtente = progetti, id_progetto))}")
@@ -273,14 +268,12 @@ fun ListaColleghi(
                 caricamento_tasto.value = false
 
             }
-
         }
 
     }
     // Utilizzo di LaunchedEffect per gestire il cambio di stato di amici
     LaunchedEffect(userProfile) {
         amici = viewModel_Prog.getLista_Partecipanti(id_progetto)
-
     }
 
     if(visualizza_amici)
@@ -358,14 +351,14 @@ fun ListaColleghi(
                     {
                         viewModel_Prog.aggiungiPartecipanteAlProgetto(
                             id_progetto,
-                            viewModel.userProfile?.id ?: ""
+                            userProfile?.id ?: ""
                         )
-                        for (p in listap!!) {
-                            if (p != viewModel.userProfile?.id) {
+                        for (p in listap) {
+                            if (p != userProfile?.id) {
                                 val contenuto =
-                                    viewModel.userProfile?.nome + " " + (viewModel.userProfile?.cognome
+                                    userProfile?.nome + " " + (userProfile?.cognome
                                         ?: "") + " " + "è entrato nel progetto " + nomeProgetto
-                                viewModel.userProfile?.id?.let {
+                                userProfile?.id?.let {
                                     viewNotifiche.creaNotificaViewModel(
                                         it,
                                         p,

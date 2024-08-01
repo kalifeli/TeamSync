@@ -43,9 +43,14 @@
     <string name="codiceProgetto">Project Code</string>
     <string name="condividiCodice">Share the project code</string>
 
-    <string name="completed_tasks_count">You have completed %1$d/%2$d tasks</string>
+    <string name="completed_tasks_count">Completed %1$d/%2$d Activities</string>
     <string name="abbandonaProg">Are you sure you want to abandon the project? Once confirmed, you won\'t be able to go back!</string>
     <string name="nomeDelega">Name: %s</string>
+    <string name="prioritaDelega">Priority: %s</string>
+    <string name="dataDiScadenzaDelega">Expiry Date: %s</string>
+    <string name="DescrizioneDelega">Description: %s</string>
+    <string name="listaPartecipanti">Participants List -></string>
+
     <string name="AggiungiPersone">Add People</string>
 
     <string name="leMie">Mine</string>
@@ -65,7 +70,7 @@
     <string name="progetti">Projects</string>
     <string name="help">Help &amp; Support</string>
     <string name="terms">Terms and Policies</string>
-    <string name="logout">Logout</string>
+    <string name="eliminaAccount">Delete Account</string>
 
     <!-- Schermata Impostazioni Notifiche -->
     <string name="avvisamiquando">Notify me when</string>
@@ -180,6 +185,7 @@
     <string name="taskCompletate">Completed Tasks </string>
     <string name="progettiCompletati">Completed Projects </string>
     <string name="ricercaColleghi">Search Colleagues/Add Colleagues </string>
+    <string name="Calendario">Calendar </string>
 
     <!--ProfiloProgetto Screen-->
     <string name="Informazioni"> Information </string>

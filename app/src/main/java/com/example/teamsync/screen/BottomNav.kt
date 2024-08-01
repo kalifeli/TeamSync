@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -42,7 +43,11 @@ fun BottomNav(
     ) {
 
         val rottaCorrente = navController.currentBackStackEntryAsState().value?.destination?.route
-        val notificheNonLette by notificheViewModel.notificheNonLette.observeAsState(false)
+        val notificheList by notificheViewModel.notificheList
+
+        LaunchedEffect(Unit) {
+            notificheViewModel.fetchNotifiche()
+        }
 
         NavigationBarItem(
             selected = rottaCorrente == Schermate.ItuoiProgetti.route,
@@ -84,7 +89,7 @@ fun BottomNav(
             icon = {
                 Icon(
                     painter = painterResource(
-                        if (notificheNonLette) R.drawable.ic_notifichenonaperte else R.drawable.ic_notifiche
+                        if (notificheList.any { !it.aperto }) R.drawable.ic_notifichenonaperte else R.drawable.ic_notifiche
                     ),
                     contentDescription = "icona notifiche"
                 )

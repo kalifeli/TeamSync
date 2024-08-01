@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.Notifiche.data.model
 
+import java.util.Date
 
 
 data class Notifiche(
@@ -11,4 +12,5 @@ data class Notifiche(
     var id : String = "",
     var progetto_id : String = "",
     var accettato : String = "",
+    val data: Date = Date()
     )

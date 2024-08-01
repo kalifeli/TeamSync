@@ -44,7 +44,6 @@ class RepositoryProgetto {
                 .get()
                 .await()
                 .toObjects(Progetto::class.java)
-
         }catch (e: Exception){
             emptyList()
         }
@@ -136,7 +135,7 @@ class RepositoryProgetto {
      *
      * @throws Exception Se si verifica un errore durante il recupero dell'utente attualmente autenticato, l'eccezione sarà rilanciata.
      */
-    fun getUtenteCorrente(): FirebaseUser? {
+    suspend fun getUtenteCorrente(): FirebaseUser? {
         return try {
             auth.currentUser
         } catch (e: Exception) {

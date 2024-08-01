@@ -8,6 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.login.data.model.ProfiloUtente
@@ -21,10 +23,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 
-class ViewModelUtente : ViewModel() {
-
-    //istanza della classe repository dell'utente
-    private val repositoryUtente = RepositoryUtente()
+class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewModel() {
 
     var utenteCorrente by mutableStateOf<FirebaseUser?>(null)
         private set
@@ -38,17 +37,33 @@ class ViewModelUtente : ViewModel() {
         private set
     var erroreLogin = mutableStateOf<String?>(null)
         private set
+    var erroreAggiornaProfilo = mutableStateOf<String?>(null)
+        private set
+    var aggiornaProfiloRiuscito = mutableStateOf(false)
+        private set
     var primoAccesso = mutableStateOf(false)
         private set
     var erroreRegistrazione = mutableStateOf<String?>(null)
         private set
     var erroreVerificaEmail = mutableStateOf<String?>(null)
         private set
+    private val _erroreEliminazioneUtente = MutableLiveData<String?>(null)
+    val erroreEliminazioneUtente: LiveData<String?> get() = _erroreEliminazioneUtente
     private var tentativiLoginFalliti = mutableIntStateOf(0)
 
     private val gestore_immagine = ImageUploader()
 
-    var userProfile: ProfiloUtente? = null
+
+    // Profilo utente autentificato
+    private val _userProfilo = MutableLiveData<ProfiloUtente?>()
+    val userProfilo: LiveData<ProfiloUtente?> get() = _userProfilo
+
+    // Profilo collega
+    private val _profiloCollega = MutableLiveData<ProfiloUtente?>()
+    val profiloCollega: LiveData<ProfiloUtente?> get() = _profiloCollega
+
+    private val _isLoading = MutableLiveData(false)
+    val isLoading : LiveData<Boolean> get() = _isLoading
 
     init {
         getUserProfile()
@@ -62,7 +77,7 @@ class ViewModelUtente : ViewModel() {
             erroreLogin.value = "Per favore, inserisci l'indirizzo email."
             return
         }
-        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+        if(!EmailValidator.isValidEmail(email)){
             erroreLogin.value = "L'indirizzo email inserito non è valido."
             return
         }
@@ -74,27 +89,42 @@ class ViewModelUtente : ViewModel() {
         viewModelScope.launch {
             try {
                 val utente = repositoryUtente.login(email, password)
-                if(utente != null && repositoryUtente.isEmailVerified()){
+                println("Login restituito utente: $utente")
+                val isEmailVerified = repositoryUtente.isEmailVerified()
+                println("Email verificata: $isEmailVerified")
+                if(utente != null && isEmailVerified){
                     utenteCorrente = utente
                     erroreLogin.value = null
                     val isFirstLogin = repositoryUtente.isFirstLogin(utente.uid)
+                    println("Primo accesso: $isFirstLogin")
                     primoAccesso.value = isFirstLogin
                     loginRiuscito.value = true
-                    Log.d("ViewModelUtente", "primoAccesso : ${primoAccesso.value}")
+                    tentativiLoginFalliti.intValue = 0 // reset del contatore in caso di login riuscito
+                    println("Login riuscito per l'utente: ${utente.uid}")
                 }else{
                     erroreLogin.value = "L'email non è stata verificata. Per favore, verifica il tuo indirizzo email."
+                    println("L'email non è stata verificata per l'utente: ${utente?.uid}")
                 }
             }catch (e: Exception){
                 tentativiLoginFalliti.intValue += 1
-                if(tentativiLoginFalliti.intValue > 3){
+                if (tentativiLoginFalliti.intValue > 3) {
                     erroreLogin.value = "Hai dimenticato la password?"
-                }else {
+                } else {
                     erroreLogin.value = "Email o password errate. Controlla le tue credenziali e riprova."
                 }
+                println("Errore durante il login: ${e.message}")
+                e.printStackTrace()
             }
         }
 
     }
+
+    object EmailValidator {
+        fun isValidEmail(email: String): Boolean {
+            return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        }
+    }
+
     fun aggiorna_foto_profilo(uri: Uri) : Task<Uri>
     {
         return gestore_immagine.uploadImageToFirebaseStorage(uri = uri)
@@ -117,8 +147,9 @@ class ViewModelUtente : ViewModel() {
         }
 
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val utente = repositoryUtente.signUp(matricola, nome, cognome, dataNascita,sesso, email, password)
+                repositoryUtente.signUp(matricola, nome, cognome, dataNascita,sesso, email, password)
                 sendEmailVerification()
                 erroreRegistrazione.value = null
                 registrazioneRiuscita.value = true
@@ -128,12 +159,32 @@ class ViewModelUtente : ViewModel() {
             }catch (e: Exception){
                 erroreRegistrazione.value = "Registrazione fallita. Riprovare."
                 registrazioneRiuscita.value = false
+            }finally {
+                _isLoading.value = false
             }
         }
 
     }
 
-    private fun validateRegistrationField(
+    /**
+     * Valida i campi di registrazione.
+     *
+     * Questa funzione controlla i campi di registrazione forniti e restituisce un messaggio di errore
+     * se uno dei campi non è valido. Se tutti i campi sono validi, restituisce null.
+     *
+     * @param matricola Il numero di matricola dell'utente. Non può essere vuoto.
+     * @param nome Il nome dell'utente. Non può essere vuoto.
+     * @param cognome Il cognome dell'utente. Non può essere vuoto.
+     * @param email L'indirizzo email dell'utente. Deve essere un indirizzo email valido.
+     * @param dataNascita La data di nascita dell'utente. Deve essere una data passata rispetto alla data attuale.
+     * @param password La password dell'utente. Non può essere vuota.
+     * @param confermaPassword La conferma della password dell'utente. Deve corrispondere alla password.
+     * @return Una stringa contenente il messaggio di errore se uno dei campi non è valido,
+     *         oppure null se tutti i campi sono validi.
+     *
+     * @exception IllegalArgumentException Se la data di nascita è nel futuro.
+     */
+    fun validateRegistrationField(
         matricola: String,
         nome: String,
         cognome: String,
@@ -141,23 +192,31 @@ class ViewModelUtente : ViewModel() {
         dataNascita: Date,
         password: String,
         confermaPassword: String
-
-    ): String?{
+    ): String? {
         return when {
+            // Controlla se il campo matricola è vuoto
             matricola.isBlank() -> "Per favore, inserisci il numero di matricola."
+            // Controlla se il campo email è vuoto
             email.isBlank() -> "Per favore, inserisci il tuo indirizzo email."
-            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "L'indirizzo email inserito non è valido."
+            // Controlla se l'email è valida
+            !EmailValidator.isValidEmail(email) -> "L'indirizzo email inserito non è valido."
+            // Controlla se il campo nome è vuoto
             nome.isBlank() -> "Per favore, inserisci il tuo nome."
+            // Controlla se il campo cognome è vuoto
             cognome.isBlank() -> "Per favore, inserisci il tuo cognome."
+            // Controlla se la data di nascita è nel futuro o uguale alla data attuale
+            dataNascita >= Date() -> "Per favore, inserisci una data di nascita valida."
+            // Controlla se il campo password è vuoto
             password.isBlank() -> "Per favore, inserisci la password."
+            // Controlla se il campo confermaPassword è vuoto
             confermaPassword.isBlank() -> "Per favore, conferma la password inserita."
+            // Controlla se la password e la conferma password coincidono
             !password.equals(confermaPassword) -> "Le password non coincidono."
-
+            // Se tutti i campi sono validi, restituisce null
             else -> null
         }
-
-
     }
+
 
     private fun sendEmailVerification() {
         viewModelScope.launch {
@@ -184,7 +243,7 @@ class ViewModelUtente : ViewModel() {
     fun resetPassword(email: String){
 
         if(email.isNotBlank()) {
-            if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            if(!EmailValidator.isValidEmail(email)){
                 resetPasswordRiuscito.value = false
                 erroreResetPassword.value = "L'indirizzo email inserito non è valido."
                 return
@@ -224,17 +283,23 @@ class ViewModelUtente : ViewModel() {
         erroreVerificaEmail.value = null
     }
 
+    fun resetAggiornaProfiloRiuscito(){
+        aggiornaProfiloRiuscito.value = false
+    }
+
 
      fun getUserProfile() {
-        viewModelScope.launch {
-            val currentUser = repositoryUtente.getUtenteAttuale()
-            currentUser?.let {
-
-                val profile = repositoryUtente.getUserProfile(it.uid)
-
-                userProfile = profile
-            }
-        }
+         viewModelScope.launch {
+             try {
+                 val currentUser = repositoryUtente.getUtenteAttuale()
+                 currentUser?.let {
+                     val profile = repositoryUtente.getUserProfile(it.uid)
+                     _userProfilo.value = profile
+                 }
+             } catch (e: Exception) {
+                 erroreAggiornaProfilo.value = "Errore durante il caricamento del profilo: ${e.message}"
+             }
+         }
     }
 
 
@@ -269,11 +334,10 @@ class ViewModelUtente : ViewModel() {
     fun sonoAmici(idUtente2: String, callback: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
-                var sonoAmici = userProfile?.amici?.contains(idUtente2)
-                while(userProfile == null) {
-                    sonoAmici = userProfile?.amici?.contains(idUtente2)
+                var sonoAmici = userProfilo.value?.amici?.contains(idUtente2)
+                while(userProfilo.value == null) {
+                    sonoAmici = userProfilo.value?.amici?.contains(idUtente2)
                 }
-
                 if (sonoAmici != null) {
                     callback(sonoAmici)
                 }
@@ -310,25 +374,54 @@ class ViewModelUtente : ViewModel() {
 
     fun updateUserProfile(profiloUtente: ProfiloUtente) {
         viewModelScope.launch {
-            repositoryUtente.updateUserProfile(profiloUtente)
-            reloadUserProfile(profiloUtente.id)
+            try {
+                if (profiloUtente.dataDiNascita.before(Date())) {
+                    repositoryUtente.updateUserProfile(profiloUtente)
+                    reloadUserProfile(profiloUtente.id)
+                    erroreAggiornaProfilo.value = null
+                    aggiornaProfiloRiuscito.value = true
+                } else {
+                    erroreAggiornaProfilo.value = "Per favore, inserisci una data di nascita corretta"
+                    aggiornaProfiloRiuscito.value = false
+                }
+            } catch (e: Exception) {
+                erroreAggiornaProfilo.value = "Errore nell'aggiornamento del profilo: ${e.message}"
+                aggiornaProfiloRiuscito.value = false
+            }
         }
     }
 
+    fun resetErroreAggiornaProfilo(){
+        erroreAggiornaProfilo.value = null
+    }
+
+
     private fun reloadUserProfile(userId: String) {
         viewModelScope.launch {
-            val profile = repositoryUtente.getUserProfile(userId)
-            userProfile = profile
+            try {
+                val profile = repositoryUtente.getUserProfile(userId)
+                _userProfilo.value = profile
+            } catch (e: Exception) {
+                erroreAggiornaProfilo.value = "Errore durante il ricaricamento del profilo: ${e.message}"
+            }
         }
     }
     fun signOut() {
         repositoryUtente.signOut()
     }
 
+    fun eliminaAccount(userId: String){
+        viewModelScope.launch {
+            val risultato = repositoryUtente.eliminaAccount(userId)
+            _erroreEliminazioneUtente.value = risultato
+            signOut()
+        }
+    }
+
 
 
     fun filterAmici(query: String, callback: UserProfileCallback) {
-        var risultati = mutableListOf<String>()
+        val risultati = mutableListOf<String>()
 
         val lista_nomi = mutableListOf<String>()
         val lista_cognomi = mutableListOf<String>()
@@ -336,10 +429,9 @@ class ViewModelUtente : ViewModel() {
         val lista_email = mutableListOf<String>()
 
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val lista = repositoryUtente.getallutenti()
-
-
 
                 for (persona in lista) {
                     val oggetto_persona = repositoryUtente.getUserProfile(persona)
@@ -358,13 +450,12 @@ class ViewModelUtente : ViewModel() {
                 aggiungiElementiFiltrati(lista_cognomi,lista, risultati, query)
                 aggiungiElementiFiltrati(lista_matricole,lista, risultati, query)
 
-
-
                 callback(rimuovi_self(risultati))
             }catch (e: Exception) {
                 Log.e(TAG, "Errore durante il recupero degli utenti", e)
+            }finally {
+                _isLoading.value = false
             }
-
         }
 
     }
@@ -385,7 +476,7 @@ class ViewModelUtente : ViewModel() {
     }
 
     fun rimuovi_self( lista_elementi: List<String>,): List<String> {
-        val id = userProfile?.id
+        val id = _userProfilo.value?.id
 
         if(lista_elementi.contains(id))
             return lista_elementi.filter { it != id }
@@ -393,14 +484,23 @@ class ViewModelUtente : ViewModel() {
             return lista_elementi
     }
 
-    fun sonoAmici(idUtente2: String) {
-
+    fun ottieniCollega(userId: String){
+        viewModelScope.launch {
+            try {
+                val profilo = repositoryUtente.getUserProfile(userId)
+                _profiloCollega.value = profilo
+            }catch (e: Exception){
+                Log.e("ViewModelUtente", "Errore durante il recupero del profilo del collega $userId")
+                _profiloCollega.value = null
+            }
+        }
     }
+
+    fun resetProfiloCollega(){
+        _profiloCollega.value = null
+    }
+
 }
-
-
-
-
 
 typealias UserProfileCallback = (List<String>) -> Unit
 

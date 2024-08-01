@@ -24,6 +24,9 @@ import java.util.Date
 
 class ViewModelProgetto : ViewModel() {
     private val repositoryProgetto = RepositoryProgetto()
+    private var repositoryUtente = RepositoryUtente()
+    private val repositoryLeMieAttivita = ToDoRepository()
+
     var aggiungiProgettoRiuscito = mutableStateOf(false)
         private set
     var erroreAggiungiProgetto = mutableStateOf<String?>(null)
@@ -32,20 +35,20 @@ class ViewModelProgetto : ViewModel() {
         private set
     var erroreAbbandonaProgetto = mutableStateOf<String?>(null)
         private set
-    var progetti = mutableStateOf<List<Progetto>>(emptyList())
-        private set
     var progettiCompletati = mutableStateOf<List<Progetto>>(emptyList())
         private set
     var utenteCorrenteId = mutableStateOf<String?>(null)
-    var isLoading = mutableStateOf(false)
         private set
+
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     var cambia_lista_partecipanti = mutableStateOf(false)
 
     private val _codiceProgetto = MutableLiveData<String?>()
     val codiceProgetto: LiveData<String?> get() = _codiceProgetto
 
-    var repositoryUtente = RepositoryUtente()
-    val repositoryLeMieAttivita = ToDoRepository()
+
 
     var attivitaNonCompletate = mutableStateOf<List<LeMieAttivita>>(emptyList())
         private set
@@ -61,6 +64,9 @@ class ViewModelProgetto : ViewModel() {
 
     private val _attivitaProgetti = MutableLiveData<Map<String, Int>>()
     val attivitaProgetti: LiveData<Map<String, Int>> get() = _attivitaProgetti
+
+    private val _progettiCollega = MutableLiveData<List<Progetto>>()
+    val progettiCollega: LiveData<List<Progetto>> get() = _progettiCollega
 
     init {
         aggiornaUtenteCorrente()
@@ -207,49 +213,60 @@ class ViewModelProgetto : ViewModel() {
 
 
     fun aggiornaUtenteCorrente() {
-        utenteCorrenteId.value = repositoryProgetto.getUtenteCorrente()?.uid
-    }
-
-    // Questa funzione permette il caricamento dei progetti di un utente nella schermata Home dell' utente
-    fun caricaProgettiUtente(userId: String, loadingInit: Boolean) {
         viewModelScope.launch {
-            isLoading.value = loadingInit
             try {
-                delay(700)
-                val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
-                progetti.value = progettiUtente
-                Log.d("ViewModelProgetto", "Progetti caricati: ${progettiUtente.size}")
-            } catch (e: Exception) {
-                erroreCaricamentoProgetto.value = "Errore nel caricamento dei progetti."
-                Log.e("ViewModelProgetto", "Errore nel caricamento dei progetti", e)
-            } finally {
-                isLoading.value = false
+                val user = repositoryProgetto.getUtenteCorrente()
+                if(user != null){
+                    utenteCorrenteId.value = user.uid
+                    Log.d("ViewModelProgetto", "Utente corrente aggiornato: ${user.uid}")
+                }else{
+                    Log.e("ViewModelProgetto", "Utente corrente non trovato")
+                }
+            }catch (e: Exception){
+                Log.e("ViewModelProgetto", "Errore durante l'aggiornamento dell'utente corrente", e)
             }
         }
     }
 
-    fun caricaProgettiUtente1(userId: String, loadingInit: Boolean){
+    fun caricaProgettiUtente(userId: String, loadingInit: Boolean){
         viewModelScope.launch {
-            isLoading.value = loadingInit
+            _isLoading.value = loadingInit
             try {
-                delay(700)
                 val progetti = repositoryProgetto.getProgettiUtente(userId)
                 _progetti.value = progetti
 
                 // carichiamo le attività di ogni progetto
                 val attivitaMap = mutableMapOf<String, Int>()
-                for(progetto in progetti){
-                    val attivitaNonCompletate = repositoryLeMieAttivita.countNonCompletedTodoByProject(progetto.id ?: "") // da rivedere
-                    attivitaMap[progetto.id ?: ""] = attivitaNonCompletate // da rivedere
+                for (progetto in progetti) {
+                    val attivitaNonCompletate = repositoryLeMieAttivita.countNonCompletedTodoByProject(progetto.id ?: "")
+                    attivitaMap[progetto.id ?: ""] = attivitaNonCompletate
                 }
                 _attivitaProgetti.value = attivitaMap
-
-            }catch (e: Exception){
-                Log.e("ViewModelProgetto", "Errore nel caricemento dei progetti", e)
-            }finally {
-                isLoading.value = false
+            } catch (e: Exception) {
+                Log.e("ViewModelProgetto", "Errore nel caricamento dei progetti", e)
+                erroreCaricamentoProgetto.value = "Errore nel caricamento dei progetti."
+            } finally {
+                _isLoading.value = false
             }
         }
+    }
+
+    fun caricaProgettiCollega(userId: String, loadingInit: Boolean) {
+        viewModelScope.launch {
+            _isLoading.value = loadingInit
+            try {
+                val progetti = repositoryProgetto.getProgettiUtente(userId)
+                _progettiCollega.value = progetti
+            } catch (e: Exception) {
+                Log.e("ViewModelProgetto", "Errore nel caricamento dei progetti del collega", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun resetProgettiCollega() {
+        _progettiCollega.value = emptyList()
     }
 
     fun caricaProgettiCompletatiUtente(userId: String){
@@ -270,7 +287,7 @@ class ViewModelProgetto : ViewModel() {
         callback: (List<Progetto>) -> Unit
     ) {
         viewModelScope.launch {
-            isLoading.value = loadingInit
+            _isLoading.value = loadingInit
             try {
                 repositoryProgetto.getProgettiUtente_callback(userId) { progetti ->
                     callback(progetti)
@@ -279,25 +296,22 @@ class ViewModelProgetto : ViewModel() {
                 erroreCaricamentoProgetto.value = "Errore nel caricamento dei progetti."
                 callback(emptyList()) // Callback con lista vuota in caso di errore
             } finally {
-                isLoading.value = false
+                _isLoading.value = false
             }
         }
     }
 
-
-
-
     suspend fun getProgettiUtenteByIdUtente(
                 userId: String,
                 callback: (List<Progetto>, String?) -> Unit
-            ) {
-                try {
-                    val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
-                    callback(progettiUtente, null)
-                } catch (e: Exception) {
-                    callback(emptyList(), "Errore durante il recupero dei progetti: ${e.message}")
-                }
-            }
+    ) {
+        try {
+            val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
+            callback(progettiUtente, null)
+        } catch (e: Exception) {
+            callback(emptyList(), "Errore durante il recupero dei progetti: ${e.message}")
+        }
+    }
 
     fun creaProgetto(
         nome: String,
@@ -309,12 +323,17 @@ class ViewModelProgetto : ViewModel() {
             erroreAggiungiProgetto.value = "Per favore, inserisci il nome del progetto"
             return
         }
-        if (dataScadenza <= Date()) {
+        if (dataScadenza.before(Date())) {
             erroreAggiungiProgetto.value =
                 "La data di scadenza non può essere precedente alla data di creazione del progetto."
             return
         }
+        if(utenteCorrenteId.value.isNullOrEmpty()){
+            erroreAggiungiProgetto.value = "Utente corrente non trovato"
+            return
+        }
         viewModelScope.launch {
+            _isLoading.value = true //inizia il caricamento
             try {
                 val codiceProgetto = repositoryProgetto.generaCodiceProgetto()
                 val progetto = Progetto(
@@ -334,9 +353,10 @@ class ViewModelProgetto : ViewModel() {
                 erroreAggiungiProgetto.value = null
             } catch (e: Exception) {
                 aggiungiProgettoRiuscito.value = false
-                erroreAggiungiProgetto.value =
-                    "Si è verificato un errore durante la creazione del progetto. Riprovare."
+                erroreAggiungiProgetto.value = "Si è verificato un errore durante la creazione del progetto. Riprovare."
                 Log.e("ViewModelProgetto", "Errore durante la creazione del progetto", e)
+            }finally {
+                _isLoading.value = false
             }
         }
     }

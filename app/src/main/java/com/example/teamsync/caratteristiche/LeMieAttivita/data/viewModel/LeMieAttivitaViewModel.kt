@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.LeMieAttivita.data.viewModel
 
+import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import android.content.Context
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -59,20 +61,34 @@ class LeMieAttivitaViewModel() : ViewModel() {
     var leMieAttivitaNonCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
     var leMieAttivitaCompletate by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
-    var erroreAggiungiTask = mutableStateOf<String?>(null)
-        private set
 
-    var erroreEditTask = mutableStateOf<String?>(null)
-        private set
+    val repositoryUtente = RepositoryUtente()
 
     var leMieAttivitaPerUtente by mutableStateOf<List<LeMieAttivita>>(emptyList())
 
     private val _isPermissionGranted = MutableLiveData<Boolean>()
 
-    val isPermissionGranted: LiveData<Boolean> get() = _isPermissionGranted
+    var utenteCorrenteId = mutableStateOf<String?>(null)
 
-    fun onPermissionResult(granted: Boolean) {
-        _isPermissionGranted.value = granted
+
+    private val _erroreAggiungiTask = MutableLiveData<String?>()
+    val erroreAggiungiTask: LiveData<String?> = _erroreAggiungiTask
+
+    private val _erroreEditTask = MutableLiveData<String?>()
+    val erroreEditTask: LiveData<String?> = _erroreEditTask
+
+    fun setErroreAggiungiTask(message: String) {
+        _erroreAggiungiTask.value = message
+    }
+    fun setErroreEditTask(message: String) {
+        _erroreEditTask.value = message
+    }
+
+    fun resetErroreAggiungiTask() {
+        _erroreAggiungiTask.value = null
+    }
+    fun resetErroreEditTask() {
+        _erroreEditTask.value = null
     }
 
     fun getTodoUtente(idProg: String, utenteId: String) {
@@ -111,8 +127,13 @@ class LeMieAttivitaViewModel() : ViewModel() {
         priorita: Priorità,
         sezione: Int
     ) {
+        if (titolo.isBlank()) {
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: Il titolo non può essere omesso.")
+            Log.d("Errore Edit", "Errore Edit Task: " + "${erroreEditTask.value}");
+            return
+        }
         if (isDateBeforeToday(dataScad)) {
-            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task."
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
             return
         }
         viewModelScope.launch {
@@ -135,7 +156,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
-
+    val utenteId = repositoryUtente.getUtenteAttualeID()
     fun updateTodo(
         id: String,
         titolo: String,
@@ -147,14 +168,20 @@ class LeMieAttivitaViewModel() : ViewModel() {
         utenti: List<String>,
         fileUri: String?
     ) {
+        if (titolo.isBlank()) {
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: Il titolo non può essere omesso.")
+            Log.d("Errore Edit", "Errore Edit Task: " + "${erroreEditTask.value}");
+
+            return
+        }
         if (isDateBeforeToday(dataScad)) {
-            erroreEditTask.value = "MODIFICA RIFIUTATA: La data di scadenza non può essere precedente alla data della Task..."
+            setErroreEditTask("MODIFICA RIFIUTATA!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
             return
         }
         viewModelScope.launch {
             try {
                 repositoryLeMieAttivita.updateTodo(id, titolo, descrizione, dataScad, priorita,progetto,utenti,fileUri)
-                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+                if (sezione == 1) getTodoByProject(progetto)  else if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoUtente(progetto, utenteId.toString())
 
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
@@ -162,9 +189,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         }
     }
 
-    fun resetErroreAggiungiTask() {
-        erroreEditTask.value = null
-    }
+
 
     fun updateTaskTotali(id: String) {
         viewModelScope.launch {
@@ -332,6 +357,8 @@ class LeMieAttivitaViewModel() : ViewModel() {
         return dateToCompare.before(today.time)
     }
 
+
+
     fun addTodo(
         titolo: String,
         descrizione: String,
@@ -339,12 +366,19 @@ class LeMieAttivitaViewModel() : ViewModel() {
         priorita: Priorità,
         completato: Boolean,
         proprietario: String,
-        progetto : String
+        progetto : String,
+        sezione : Int
     ) {
-        if (isDateBeforeToday(dataScad)) {
-            erroreAggiungiTask.value = "AGGIUNGI RIFIUTATO: La data di scadenza non può essere precedente alla data di creazione della Task."
+        if (titolo.isBlank()) {
+            setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: Il titolo non può essere omesso.")
+            Log.e(TAG, "Errore Aggiungi Task: " + "${erroreAggiungiTask.value}");
             return
         }
+        if (isDateBeforeToday(dataScad)) {
+            setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
+            return
+        }
+
         viewModelScope.launch {
             repositoryLeMieAttivita.addTodo(
                 titolo,
@@ -355,7 +389,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
                 proprietario,
                 progetto
             )
-            getTodoByProject(progetto)
+           if(sezione == 1) getTodoByProject(progetto) else if (sezione == 2) getTodoUtente(progetto, utenteId.toString())
         }
     }
 
@@ -364,7 +398,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
             try {
 
                 repositoryLeMieAttivita.deleteTodo(id)
-                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+                if (sezione == 0) getTodoCompletateByProject(progetto) else if ( sezione == 1)getTodoByProject(progetto) else getTodoUtente(progetto, utenteId.toString())
             } catch (e: Exception) {
                 // Gestisci l'errore se necessario
             }
@@ -376,7 +410,7 @@ class LeMieAttivitaViewModel() : ViewModel() {
         viewModelScope.launch {
             try {
                 repositoryLeMieAttivita.completeTodo(id, completato)
-                if (sezione == 0) getTodoCompletateByProject(progetto) else getTodoByProject(progetto)
+                if (sezione == 0) getTodoCompletateByProject(progetto) else if (sezione==1) getTodoByProject(progetto) else getTodoUtente(progetto, utenteId.toString())
             } catch (e: Exception) {
                 //gestire errore
             }

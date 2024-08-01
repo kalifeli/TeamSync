@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,8 +37,10 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
+import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 
@@ -44,7 +50,7 @@ fun SezioneProfiloUtente(
     viewModelUtente: ViewModelUtente,
     isDarkTheme: Boolean
 ){
-    val userProfile = viewModelUtente.userProfile
+    val userProfile by viewModelUtente.userProfilo.observeAsState()
 
     ElevatedCard(
         onClick = {
@@ -70,6 +76,16 @@ fun SezioneProfiloUtente(
             Column(
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
+                if(userProfile == null){
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.CenterHorizontally),
+                        color = Grey50,
+                        trackColor = Red70,
+                        strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                    )
+                }
                 Text(
                     text = stringResource(id = R.string.ciao),
                     style = MaterialTheme.typography.headlineMedium,
@@ -139,5 +155,7 @@ fun PreviewImmagineProfiloUtente(){
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewSezioneProfiloUtente(){
-    SezioneProfiloUtente(navController = rememberNavController(), viewModelUtente = ViewModelUtente(), isDarkTheme = true)
+    SezioneProfiloUtente(navController = rememberNavController(), viewModelUtente = ViewModelUtente(
+        RepositoryUtente()
+    ), isDarkTheme = true)
 }

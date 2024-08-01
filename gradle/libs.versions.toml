@@ -1,18 +1,31 @@
 [versions]
 agp = "8.5.0"
+androidxEspressoCore = "3.4.0"
+androidxJunit = "1.2.1"
 coreSplashscreen = "1.0.1"
+coreTesting = "2.2.0"
+espressoCoreVersion = "3.6.1"
+junitJunit = "4.13"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
+kotlinxCoroutinesTest = "1.5.2"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.9.0"
 composeBom = "2023.08.00"
+lifecycleViewmodelKtx = "2.8.3"
 lottieCompose = "6.0.0"
 material = "1.6.8"
 material3 = "1.2.1"
+mockitoCore = "3.9.0"
+mockitoCoreVersion = "3.11.2"
+mockitoKotlin = "3.2.0"
+mockk = "1.12.0"
 navigationCompose = "2.7.7"
+truth = "1.6.0"
+truthVersion = "1.0.1"
 uiTextGoogleFonts = "1.6.7"
 material3Android = "1.2.1"
 material3Desktop = "1.2.1"
@@ -24,12 +37,20 @@ firebaseStorageKtx = "21.0.0"
 runtimeLivedata = "1.6.8"
 uiTooling = "1.6.8"
 junitJupiter = "5.8.1"
+junitJunitVersion = "4.12"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
+androidx-espresso-core-v340 = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspressoCore" }
+androidx-espresso-core-v361 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+androidx-junit-v121 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
+androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-truth = { module = "androidx.test.ext:truth", version.ref = "truth" }
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -51,11 +72,19 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version = "2.1.0" }
+junit-v413 = { module = "junit:junit", version.ref = "junitJunit" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-core-v3112 = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+truth = { module = "com.google.truth:truth", version.ref = "truthVersion" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+junit-junit = { group = "junit", name = "junit", version.ref = "junitJunitVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

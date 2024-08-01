@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -29,10 +30,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,9 +63,11 @@ import com.example.teamsync.R.drawable.icon
 import com.example.teamsync.R.drawable.logo_white
 import com.example.teamsync.R.drawable.registrazione
 import com.example.teamsync.caratteristiche.login.data.model.SessoUtente
+import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.ui.theme.Grey20
+import com.example.teamsync.ui.theme.Grey50
 import com.example.teamsync.ui.theme.Red70
 import com.example.teamsync.ui.theme.White
 import com.example.teamsync.util.ThemePreferences
@@ -77,38 +82,19 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
     val background: Painter = painterResource(id = registrazione)
     val backgroundB: Painter = painterResource(id = background_black)
 
-    var matricola by remember {
-        mutableStateOf("")
-    }
-    var email by remember {
-        mutableStateOf("")
-    }
-    var nome by remember {
-        mutableStateOf("")
-    }
-    var cognome by remember {
-        mutableStateOf("")
-    }
-    var password by remember {
-        mutableStateOf("")
-    }
-    var confermaPassword by remember {
-        mutableStateOf("")
-    }
-    var dataDiNascita by remember {
-        mutableStateOf(Date())
-    }
-    var sesso by remember {
-        mutableStateOf(SessoUtente.UOMO)
-    }
-    var passwordVisibile by remember {
-        mutableStateOf(false)
-    }
-    var confermaPasswordVisibile by remember {
-        mutableStateOf(false)
-    }
+    var matricola by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var nome by remember { mutableStateOf("") }
+    var cognome by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confermaPassword by remember { mutableStateOf("") }
+    var dataDiNascita by remember { mutableStateOf(Date()) }
+    var sesso by remember { mutableStateOf(SessoUtente.UOMO) }
+    var passwordVisibile by remember { mutableStateOf(false) }
+    var confermaPasswordVisibile by remember { mutableStateOf(false) }
     val erroreRegistrazione = viewModelUtente.erroreRegistrazione.value
     val registrazioneRiuscita = viewModelUtente.registrazioneRiuscita.value
+    val isLoading by viewModelUtente.isLoading.observeAsState()
     val context = LocalContext.current
 
     val calendar = Calendar.getInstance()
@@ -525,6 +511,18 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                         contentColor = if(isDarkTheme)Color.DarkGray else White// Cambia il colore del testo all'interno del pulsante
                     )
                 ) {  Text(text = stringResource(id = R.string.next)) }
+
+                if(isLoading == true) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.CenterHorizontally),
+                        color = Grey50,
+                        trackColor = Red70,
+                        strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                    )
+                }
             }
 
             Box(
@@ -568,14 +566,14 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
             }
         }
     }
-    LaunchedEffect(erroreRegistrazione) {
-        if(erroreRegistrazione != null ){
+    LaunchedEffect(erroreRegistrazione, isLoading) {
+        if(erroreRegistrazione != null  && !isLoading!!){
             Toast.makeText(context, erroreRegistrazione, Toast.LENGTH_LONG).show()
             viewModelUtente.resetErroreRegistrazione()
         }
     }
-    LaunchedEffect(registrazioneRiuscita) {
-        if(registrazioneRiuscita){
+    LaunchedEffect(registrazioneRiuscita,isLoading) {
+        if(registrazioneRiuscita && !isLoading!!){
             navController.navigate(Schermate.VerificaEmail.route)
             viewModelUtente.resetRegistrazioneRiuscita()
         }
@@ -586,5 +584,5 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
 @Preview
 @Composable
 fun PreviewRegistrazione() {
-    Registrazione(navController = (rememberNavController()), ViewModelUtente())
+    Registrazione(navController = (rememberNavController()), ViewModelUtente(RepositoryUtente()))
 }

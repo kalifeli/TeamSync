@@ -1,7 +1,7 @@
 package com.example.teamsync.caratteristiche.Notifiche.data.viewModel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.teamsync.caratteristiche.Notifiche.data.model.Notifiche
@@ -169,6 +169,32 @@ class ViewModelNotifiche : ViewModel() {
             }
         }
     }
+    fun eliminanotificheamicizia(userId1: String, userId2: String)
+    {
+        viewModelScope.launch {
+            repositoryNotifiche.deleteAmiciziaNotifiche(userId1,userId2)
+        }
+    }
+
+
+    fun controllaRichiestaAmicizia(userId1: String, userId2: String, onResult: (Boolean) -> Unit) {
+
+        viewModelScope.launch {
+                    try {
+                        val notifica = repositoryNotifiche.getNotificaRichiestaAmicizia(userId1, userId2)
+                        onResult(notifica != null)
+                    } catch (e: Exception) {
+                        Log.e("ViewModelNotifiche", "Errore durante il controllo della richiesta di amicizia", e)
+                        onResult(false)
+                    }
+                }
+                Log.e("ViewModelNotifiche", "Errore durante il controllo della richiesta di amicizia", )
+                onResult(false)
+            }
+
+
+
+
 
     fun eliminaNotificheUtente(userId: String){
         viewModelScope.launch {

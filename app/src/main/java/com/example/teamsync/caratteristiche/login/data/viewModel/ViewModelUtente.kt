@@ -331,6 +331,8 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
         }
     }
 
+
+
     fun sonoAmici(idUtente2: String, callback: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
@@ -349,6 +351,9 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
             }
         }
     }
+
+
+
     fun fai_amicizia(id_u: String, id_a: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {

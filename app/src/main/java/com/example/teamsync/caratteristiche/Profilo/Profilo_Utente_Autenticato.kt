@@ -310,7 +310,6 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
             singleLine = true,
             maxLines = 1,
             leadingIcon = {
-
                 IconButton(onClick = {
                     onSearch(searchQuery)  // Passaggio della query di ricerca corrente
                 }) {
@@ -321,7 +320,7 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
             shape = RoundedCornerShape(50.dp),
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = if(isDarkTheme) Color.Black else  Color.White,
-                focusedContainerColor = White
+                focusedContainerColor = if(isDarkTheme)Color.Black else  White
             )
         )
     }

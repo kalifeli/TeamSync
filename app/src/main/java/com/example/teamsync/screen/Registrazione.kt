@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -165,6 +167,12 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
             }
 
             Text(text = stringResource(id = R.string.iscriviti), fontSize = 35.sp, fontWeight = FontWeight.Bold, color = if (isDarkTheme) Color.White else  Color.Black, modifier = Modifier.padding(16.dp))
+
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally)
+            {
 
             Column(
                 modifier = Modifier
@@ -564,6 +572,7 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                     }
                 }
             }
+        }
         }
     }
     LaunchedEffect(erroreRegistrazione, isLoading) {

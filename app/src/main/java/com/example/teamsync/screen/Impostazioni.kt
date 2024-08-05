@@ -167,6 +167,7 @@ fun ImpostazioniContent(
                         text = "Account",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
+                        color = Color.Black
                     )
                 }
                 
@@ -198,7 +199,7 @@ fun ImpostazioniContent(
                         text = stringResource(id = R.string.supporto),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-
+                        color = Color.Black
                         )
                 }
 
@@ -232,7 +233,7 @@ fun ImpostazioniContent(
                         text = stringResource(id = R.string.azioni),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-
+                        color = Color.Black
                         )
                 }
 
@@ -288,8 +289,8 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController, viewMo
                 .padding(
                     top = 10.dp,
                     bottom = 8.dp
-                )
-
+                ),
+            tint = Color.Black
         )
         Row(
             modifier = Modifier.weight(1.5f),
@@ -313,7 +314,7 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController, viewMo
                             top = 10.dp,
                             bottom = 8.dp
                         ),
-                        color = White
+                        color = Color.White
 
                     )
                 }
@@ -350,7 +351,10 @@ fun SettingItemRow(setting: SettingItem,navController: NavHostController, viewMo
                     modifier = Modifier.padding(
                         top = 10.dp,
                         bottom = 8.dp
-                    )
+                    ),
+                    color = Color.Black
+
+
 
                 )
             }

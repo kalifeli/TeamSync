@@ -40,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -96,6 +95,7 @@ fun ProfiloUtenteCliccato(
     var showMenu by remember { mutableStateOf(false) }
     var abilitaBottone by remember { mutableStateOf(false) }
     var disabilitaclick by remember { mutableStateOf(true) }
+    var esisterichiestaamicizia by remember { mutableStateOf(false) }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
 
@@ -113,6 +113,12 @@ fun ProfiloUtenteCliccato(
             matricola = profilo.matricola
             email = profilo.email
             viewModelprogetto.caricaProgettiCollega(id, true)
+
+        }
+        userProfile?.let {
+            viewModelNotifiche.controllaRichiestaAmicizia(id,it.id) { result ->
+                esisterichiestaamicizia = result
+            }
         }
     }
 
@@ -274,7 +280,7 @@ fun ProfiloUtenteCliccato(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = if (isDarkTheme) Color.DarkGray else Color.Transparent)
+                .background(color = if (isDarkTheme) Color.DarkGray else Color.White)
 
         )
         {
@@ -370,58 +376,116 @@ fun ProfiloUtenteCliccato(
                     if (amicizia == "false") {
                         when (provenienza) {
                             "profilo" -> {
-                                Button(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(70.dp)
-                                        .padding(horizontal = 16.dp),
-                                    onClick =
-                                    {
-                                        avvia_notifica = true
-                                        navController.navigate(Schermate.Profilo.route)
-                                    },
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isDarkTheme) Color.Black else Red70, // Cambia il colore di sfondo del pulsante
-                                        contentColor = Color.White
-                                    )
-                                )
-                                {
-                                    Text(
-                                        text = stringResource(id = R.string.richiestaAmicizia),
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(vertical = 12.dp)
-                                    )
-                                }
+                                        if (esisterichiestaamicizia) {
+
+                                            Button(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(70.dp)
+                                                    .padding(horizontal = 16.dp),
+                                                onClick =
+                                                {
+
+                                                    navController.navigate(Schermate.Notifiche.route)
+                                                },
+                                                shape = RoundedCornerShape(8.dp),
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = if (isDarkTheme) Color.Black else Red70, // Cambia il colore di sfondo del pulsante
+                                                    contentColor = Color.White
+                                                )
+                                            )
+                                            {
+                                                Text(
+                                                    text = stringResource(id = R.string.richiestaAmicizia),
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier.padding(vertical = 12.dp)
+                                                )
+                                            }
+                                        } else {
+
+                                            Button(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(70.dp)
+                                                    .padding(horizontal = 16.dp),
+                                                onClick =
+                                                {
+                                                    avvia_notifica = true
+                                                    navController.navigate(Schermate.Profilo.route)
+                                                },
+                                                shape = RoundedCornerShape(8.dp),
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = if (isDarkTheme) Color.Black else Red70, // Cambia il colore di sfondo del pulsante
+                                                    contentColor = Color.White
+                                                )
+                                            )
+                                            {
+                                                Text(
+                                                    text = stringResource(id = R.string.richiediAmicizia),
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier.padding(vertical = 12.dp)
+                                                )
+                                            }
+                                        }
                                 Spacer(modifier = Modifier.height(5.dp))
-                            }
+                                    }
 
                             "task" -> {
-                                Button(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(70.dp)
-                                        .padding(horizontal = 16.dp),
-                                    onClick =
+                                if (esisterichiestaamicizia) {
+
+                                    Button(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(70.dp)
+                                            .padding(horizontal = 16.dp),
+                                        onClick =
+                                        {
+
+                                            navController.navigate(Schermate.Notifiche.route)
+                                        },
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (isDarkTheme) Color.Black else Red70, // Cambia il colore di sfondo del pulsante
+                                            contentColor = Color.White
+                                        )
+                                    )
                                     {
-                                        avvia_notifica = true
-                                        navController.navigate("task_selezionata/${task}/${progetto}")
-                                    },
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
-                                        contentColor = Color.White
+                                        Text(
+                                            text = stringResource(id = R.string.richiestaAmicizia),
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 12.dp)
+                                        )
+                                    }
+                                } else {
+                                    Button(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(70.dp)
+                                            .padding(horizontal = 16.dp),
+                                        onClick =
+                                        {
+                                            avvia_notifica = true
+                                            navController.navigate("task_selezionata/${task}/${progetto}")
+                                        },
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
+                                            contentColor = Color.White
+                                        )
                                     )
-                                )
-                                {
-                                    Text(
-                                        text = stringResource(id = R.string.richiestaAmicizia),
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(vertical = 12.dp)
-                                    )
+                                    {
+                                        Text(
+                                            text = stringResource(id = R.string.richiediAmicizia),
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 12.dp)
+                                        )
+                                    }
                                 }
+
                                 Spacer(modifier = Modifier.height(5.dp))
                             }
 
@@ -464,30 +528,60 @@ fun ProfiloUtenteCliccato(
                                     }
 
                                     "progetto" -> {
-                                        Button(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(70.dp)
-                                                .padding(horizontal = 16.dp),
-                                            onClick =
+                                        if (esisterichiestaamicizia) {
+
+                                            Button(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(70.dp)
+                                                    .padding(horizontal = 16.dp),
+                                                onClick =
+                                                {
+
+                                                    navController.navigate(Schermate.Notifiche.route)
+                                                },
+                                                shape = RoundedCornerShape(8.dp),
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = if (isDarkTheme) Color.Black else Red70, // Cambia il colore di sfondo del pulsante
+                                                    contentColor = Color.White
+                                                )
+                                            )
                                             {
-                                                avvia_notifica = true
-                                                navController.navigate("progetto_da_accettare/${progetto}/${provenienza}/${sottoprovenienza}")
-                                            },
-                                            shape = RoundedCornerShape(8.dp),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = if (isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
-                                                contentColor = Color.White
+                                                Text(
+                                                    text = stringResource(id = R.string.richiestaAmicizia),
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier.padding(vertical = 12.dp)
+                                                )
+                                            }
+                                        } else {
+
+                                            Button(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(70.dp)
+                                                    .padding(horizontal = 16.dp),
+                                                onClick =
+                                                {
+                                                    avvia_notifica = true
+                                                    navController.navigate("progetto_da_accettare/${progetto}/${provenienza}/${sottoprovenienza}")
+                                                },
+                                                shape = RoundedCornerShape(8.dp),
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = if (isDarkTheme) Color.Black else Red70,  // Cambia il colore di sfondo del pulsante
+                                                    contentColor = Color.White
+                                                )
                                             )
-                                        )
-                                        {
-                                            Text(
-                                                text = stringResource(id = R.string.richiestaAmicizia),
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                modifier = Modifier.padding(vertical = 12.dp)
-                                            )
+                                            {
+                                                Text(
+                                                    text = stringResource(id = R.string.richiediAmicizia),
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier.padding(vertical = 12.dp)
+                                                )
+                                            }
                                         }
+
                                         Spacer(modifier = Modifier.height(5.dp))
 
                                     }
@@ -495,30 +589,59 @@ fun ProfiloUtenteCliccato(
                             }
 
                             "progetto" -> {
-                                Button(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(70.dp)
-                                        .padding(horizontal = 16.dp),
-                                    onClick =
+                                if (esisterichiestaamicizia) {
+
+                                    Button(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(70.dp)
+                                            .padding(horizontal = 16.dp),
+                                        onClick =
+                                        {
+
+                                            navController.navigate(Schermate.Notifiche.route)
+                                        },
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (isDarkTheme) Color.Black else Red70, // Cambia il colore di sfondo del pulsante
+                                            contentColor = Color.White
+                                        )
+                                    )
                                     {
-                                        avvia_notifica = true
-                                        navController.navigate("progetto_da_accettare/${progetto}/progetto/${sottoprovenienza}")
-                                    },
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isDarkTheme) Color.Black else Red70,
-                                        contentColor = Color.White
+                                        Text(
+                                            text = stringResource(id = R.string.richiestaAmicizia),
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 12.dp)
+                                        )
+                                    }
+                                } else {
+                                    Button(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(70.dp)
+                                            .padding(horizontal = 16.dp),
+                                        onClick =
+                                        {
+                                            avvia_notifica = true
+                                            navController.navigate("progetto_da_accettare/${progetto}/progetto/${sottoprovenienza}")
+                                        },
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (isDarkTheme) Color.Black else Red70,
+                                            contentColor = Color.White
+                                        )
                                     )
-                                )
-                                {
-                                    Text(
-                                        text = stringResource(id = R.string.richiestaAmicizia),
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(vertical = 12.dp)
-                                    )
+                                    {
+                                        Text(
+                                            text = stringResource(id = R.string.richiediAmicizia),
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 12.dp)
+                                        )
+                                    }
                                 }
+
                                 Spacer(modifier = Modifier.height(5.dp))
 
                             }
@@ -539,6 +662,8 @@ fun ProfiloUtenteCliccato(
                                     viewModel.finisci_amicizia(profile.id, id)
                                     {
                                         viewModel.getUserProfile()
+                                        viewModelNotifiche.eliminanotificheamicizia(profile.id,id)
+                                        viewModelNotifiche.eliminanotificheamicizia(id,profile.id)
                                         if (provenienza == "profilo")
                                             navController.navigate(Schermate.Profilo.route)
                                         if (provenienza == "progetto")
@@ -581,7 +706,6 @@ fun ProfiloUtenteCliccato(
                                     onClick = {
                                         showMenu = true // Mostra l'alert dialog
                                     },
-
 
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(

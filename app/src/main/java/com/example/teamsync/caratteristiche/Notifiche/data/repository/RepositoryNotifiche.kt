@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.Notifiche.data.repository
 
+import android.util.Log
 import com.example.teamsync.caratteristiche.Notifiche.data.model.Notifiche
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -136,6 +137,50 @@ class RepositoryNotifiche {
             throw e
         }
     }
+
+    suspend fun getNotificaRichiestaAmicizia(mittenteId: String, destinatarioId: String): Notifiche? {
+        return try {
+            // Recupera la notifica di richiesta di amicizia
+            val querySnapshot =  firestore.collection("Notifiche")
+                .whereEqualTo("mittente", mittenteId)
+                .whereEqualTo("destinatario", destinatarioId)
+                .whereEqualTo("tipo", "Richiesta_Amicizia")
+                .get()
+                .await()
+            val documents = querySnapshot.documents
+            if (documents.isNotEmpty()) {
+                // Converte il primo documento in un oggetto Notifiche
+                documents[0].toObject(Notifiche::class.java)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            // Gestisci l'eccezione e ritorna null in caso di errore
+            Log.e("RepositoryNotifiche", "Errore durante il recupero della notifica di richiesta di amicizia", e)
+            null
+        }
+    }
+
+    suspend fun deleteAmiciziaNotifiche(mittenteId: String, destinatarioId: String) {
+        try {
+            val querySnapshot = firestore.collection("Notifiche")
+                .whereEqualTo("mittente", mittenteId)
+                .whereEqualTo("destinatario", destinatarioId)
+                .whereIn("tipo", listOf("Richiesta_Amicizia", "Accetta_Amicizia"))
+                .get()
+                .await()
+            val batch = firestore.batch()
+            for (document in querySnapshot.documents) {
+                batch.delete(document.reference)
+            }
+            batch.commit().await()
+            println("Notifiche di amicizia tra $mittenteId e $destinatarioId eliminate con successo")
+        } catch (e: Exception) {
+            println("Errore durante l'eliminazione delle notifiche di amicizia: $e")
+            throw e
+        }
+    }
+
 
 
 

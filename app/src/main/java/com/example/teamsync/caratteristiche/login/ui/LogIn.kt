@@ -151,6 +151,7 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(40.dp))
             Column(modifier = Modifier.verticalScroll(rememberScrollState())
+
                 .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally)

@@ -194,7 +194,7 @@
 
 
     <!--Terms Screen-->
-    <string name="tiroloTerm"> Termini &amp; Condizioni </string>
+    <string name="tiroloTerm"> Terms and Policies</string>
     <string name="ultimaMod"> Last Modify : </string>
     <string name="tornaSu"> Scroll Up </string>
 
@@ -220,7 +220,7 @@
     <string name="chiudi"> Close</string>
 
     <!--BottomNav Screen-->
-    <string name="profilo"> Profile</string>
+    <string name="profilo">Profile</string>
 
     <!--Priorità -->
     <string name="PrioritaALTA"> HIGH</string>

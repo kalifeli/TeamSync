@@ -1492,7 +1492,8 @@ fun EditTodoDialog(
         },
         confirmButton = {
             Button(
-                colors = ButtonDefaults.buttonColors(Red70),
+                colors = ButtonDefaults.buttonColors( containerColor = Red70,
+                    contentColor = Color.White),
                 onClick = {
                     val updatedTodo = todoItem.copy(
                         titolo = titolo,
@@ -1521,7 +1522,11 @@ fun EditTodoDialog(
                     onSave(updatedTodo)
                 },
             ) {
-                Text(stringResource(id = R.string.salvaEdit))
+
+                Text(
+                    text = stringResource(id = R.string.salvaEdit),
+                    style = TextStyle(color = Color.White )
+                )
             }
         },
         dismissButton = {

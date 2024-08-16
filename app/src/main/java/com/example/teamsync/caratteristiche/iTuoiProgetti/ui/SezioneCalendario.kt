@@ -74,7 +74,7 @@ fun SezioneCalendario(isDarkTheme: Boolean){
         },
         modifier = Modifier
             .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp))
-            .size(width = 160.dp, height = 100.dp),
+            .size(width = 200.dp, height = 130.dp),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if(isDarkTheme) Color.Black else White
         ),

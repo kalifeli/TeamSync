@@ -189,7 +189,7 @@ fun SingolaScelta(
             // Testo dell'opzione
             Text(
                 text = label,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (isDarkTheme) White else Color.Black
             )

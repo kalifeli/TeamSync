@@ -33,10 +33,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -109,7 +109,7 @@ fun ProfiloSchermata(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = "Profilo",
+                            text = stringResource(R.string.profilo),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
@@ -362,10 +362,13 @@ fun RicercaAggiungiColleghi(onSearch: (String) -> Unit) {
 
             },
             shape = RoundedCornerShape(50.dp),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = if(isDarkTheme) Color.Black else  Color.White,
-                focusedContainerColor = if(isDarkTheme)Color.Black else  White
-            )
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor =  if (isDarkTheme) Color.White else Color.Black,
+                focusedBorderColor =   if (isDarkTheme) Color.White  else Red70,
+                focusedTextColor =  if (isDarkTheme) Color.White else Color.Black,
+                unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                cursorColor = if (isDarkTheme) Color.White else Red70,
+                ),
         )
     }
 }

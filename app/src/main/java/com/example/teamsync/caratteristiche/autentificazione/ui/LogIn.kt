@@ -345,7 +345,7 @@ fun LoginScreen(
                             colors = if (isDarkTheme) ButtonDefaults.buttonColors(
                                 containerColor = Color.White,
                                 contentColor = Color.DarkGray
-                            ) else ButtonDefaults.buttonColors(containerColor = Red70)
+                            ) else ButtonDefaults.buttonColors(containerColor = Red70, contentColor = Color.White)
                         ) {
                             Text(text = stringResource(id = R.string.accedi))
                         }
@@ -397,8 +397,9 @@ fun LoginScreen(
                                 )
                             }
                         }
+                        Spacer(modifier = Modifier.height(20.dp))
                     }
-                    Spacer(modifier = Modifier.height(30.dp))
+
                 }
                 }
             }

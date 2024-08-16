@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.util.theme.Grey35
@@ -97,12 +98,13 @@ fun CondividiProgettoDialog(
                         viewModelProgetto.condividiCodiceProgetto(contesto,it)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Red70),
-                // il pulsante viene abilitato solo se il codice è stato caricato
+                colors = ButtonDefaults.buttonColors( containerColor = Red70,
+                contentColor = Color.White),
                 enabled = codiceProgetto.value != null
             ) {
-                Text(text = stringResource(id = R.string.Condividi))
+                Text(text = stringResource(id = R.string.Condividi), style = TextStyle(color =Color.White ))
             }
+
         },
         dismissButton ={
             TextButton(

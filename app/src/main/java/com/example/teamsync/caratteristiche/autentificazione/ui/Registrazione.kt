@@ -589,7 +589,6 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
                                     color = if (isDarkTheme) White else Color.Black,
                                     modifier = Modifier.weight(1f)
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
                                 Box(
                                     modifier = Modifier.clickable { navController.navigate(Schermate.Login.route) }
                                 ) {

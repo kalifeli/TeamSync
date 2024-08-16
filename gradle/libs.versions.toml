@@ -1,4 +1,5 @@
 [versions]
+accompanistPermissions = "0.35.1-alpha"
 agp = "8.5.0"
 androidxEspressoCore = "3.4.0"
 androidxJunit = "1.2.1"
@@ -23,7 +24,11 @@ mockitoCore = "3.9.0"
 mockitoCoreVersion = "3.11.2"
 mockitoKotlin = "3.2.0"
 mockk = "1.12.0"
+mockkVersion = "1.13.5"
 navigationCompose = "2.7.7"
+objenesis = "3.2"
+robolectric = "4.7.3"
+shadowsCore = "4.7.3"
 truth = "1.6.0"
 truthVersion = "1.0.1"
 uiTextGoogleFonts = "1.6.7"
@@ -40,6 +45,8 @@ junitJupiter = "5.8.1"
 junitJunitVersion = "4.12"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-compose-material3-material3 = { module = "androidx.compose.material3:material3" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
@@ -52,6 +59,7 @@ androidx-material = { module = "androidx.compose.material:material", version.ref
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-truth = { module = "androidx.test.ext:truth", version.ref = "truth" }
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+coil-kt-coil-compose = { module = "io.coil-kt:coil-compose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -81,7 +89,12 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore
 mockito-core-v3112 = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-v1135 = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
+objenesis = { module = "org.objenesis:objenesis", version.ref = "objenesis" }
+shadows-core = { module = "org.robolectric:shadows-core", version.ref = "shadowsCore" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 truth = { module = "com.google.truth:truth", version.ref = "truthVersion" }
+ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunitVersion" }

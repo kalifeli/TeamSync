@@ -2,9 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleGmsGoogleServices)
-
-    //id("kotlin-kapt")
-    //id("com.google.dagger.hilt.android")
+    id("org.jetbrains.dokka") version "1.9.20"
 }
 
 android {
@@ -91,12 +89,16 @@ dependencies {
     //Material3
     implementation(libs.material3)
 
+
+    implementation(libs.ui)
+    implementation(libs.androidx.compose.material3.material3)
+    implementation(libs.coil.kt.coil.compose)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("com.google.accompanist:accompanist-permissions:0.35.1-alpha")
+    implementation(libs.accompanist.permissions)
 
 
     // Splash API
@@ -121,9 +123,23 @@ dependencies {
     testImplementation (libs.kotlinx.coroutines.test)
     testImplementation (libs.androidx.core.testing)
     testImplementation (libs.mockk)
+    testImplementation(libs.mockk.v1135)
+    testImplementation(libs.objenesis)
+
 
     // Espresso per Android Instrumentation tests (androidTest)
     androidTestImplementation (libs.androidx.espresso.core.v340)
     androidTestImplementation (libs.androidx.junit.v121)
 
+}
+tasks.dokkaHtml {
+    outputDirectory.set(layout.buildDirectory.dir("dokka"))
+
+    dokkaSourceSets.configureEach {
+        if (name == "main") {
+            includeNonPublic.set(false)
+            skipEmptyPackages.set(true)
+            reportUndocumented.set(true)
+        }
+    }
 }

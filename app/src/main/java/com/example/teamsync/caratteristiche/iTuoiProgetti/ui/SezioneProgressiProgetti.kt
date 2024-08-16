@@ -20,13 +20,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.teamsync.ui.theme.Red70
-import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.theme.Red70
+import com.example.teamsync.util.theme.White
 import androidx.compose.ui.text.font.FontWeight
-import com.example.teamsync.ui.theme.Grey35
+import com.example.teamsync.util.theme.Grey35
 import com.example.teamsync.R
 
-
+/**
+ * Composable che mostra una sezione di progressi dei progetti completati rispetto a quelli totali.
+ * Include una rappresentazione grafica dei progressi usando un indicatore circolare.
+ *
+ * @param progettiCompletati Il numero di progetti completati dall'utente.
+ * @param progettiUtente Il numero totale di progetti dell'utente.
+ * @param isDarkTheme Indica se l'app è in modalità tema scuro.
+ */
 @Composable
 fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int, isDarkTheme: Boolean){
     val progressi = progettiCompletati/progettiUtente.toFloat() // la conversione a float è necessaria per la circular progress indicator
@@ -85,6 +92,9 @@ fun SezioneProgressiProgetti(progettiCompletati: Int, progettiUtente: Int, isDar
     }
 }
 
+/**
+ * Anteprima della funzione [SezioneProgressiProgetti] con valori predefiniti.
+ */
 @Preview
 @Composable
 fun PreviewSezioneProgressiProgetti(){

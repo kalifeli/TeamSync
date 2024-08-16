@@ -5,6 +5,7 @@
     <string name="project_tasks_description">Here you will find the tasks assigned for this project.</string>
     <string name="bottoneNonCompletate">Incomplete</string>
     <string name="bottoneCompletate">Completed</string>
+    <string name="bottoneLeMie">Mine</string>
     <string name="titoloEdit">Title</string>
     <string name="descrizioneEdit">Description</string>
     <string name="dataEdit">Expiry Date</string>
@@ -35,14 +36,14 @@
     <string name="dataDiCreazioneduepunti">Creation Date:</string>
     <string name="dataDiScadenzaduepunti">Expiration Date:</string>
     <string name="Prioritaduepunti">Priority:</string>
-    <string name="listaPartecipantiDuePunti">Lista Partecipanti:</string>
+    <string name="listaPartecipantiDuePunti">List of Participants:</string>
     <string name="fileAllegatoDuePunti">Attached File:</string>
     <string name="bottoneFile">Click here to view the file</string>
     <string name="nessunFile">No file attached....</string>
     <string name="capito">Copy</string>
     <string name="codiceProgetto">Project Code</string>
     <string name="condividiCodice">Share the project code</string>
-
+    <string name="CaricamentoAttivita">Loading activities…</string>
     <string name="completed_tasks_count">Completed %1$d/%2$d Activities</string>
     <string name="abbandonaProg">Are you sure you want to abandon the project? Once confirmed, you won\'t be able to go back!</string>
     <string name="nomeDelega">Name: %s</string>
@@ -50,13 +51,8 @@
     <string name="dataDiScadenzaDelega">Expiry Date: %s</string>
     <string name="DescrizioneDelega">Description: %s</string>
     <string name="listaPartecipanti">Participants List -></string>
-
     <string name="AggiungiPersone">Add People</string>
-
     <string name="leMie">Mine</string>
-
-
-
 
 
     <!--Schermata Impostazioni -->
@@ -163,6 +159,7 @@
     <string name="dataConsegna"> Delivery Date </string>
     <string name="voto"> Grade </string>
     <string name="nv">Not graded</string>
+    <string name="permessoNegato">Permission denied</string>
 
     <!--ITuoiProgetti Screen-->
     <string name="sincronizza"> Synchronize </string>
@@ -175,6 +172,7 @@
     <string name="AggiungiUnProgetto"> Add a Project</string>
     <string name="perUnirti"> To join an existing project, enter the unique code provided by the project creator.</string>
     <string name="unisciti"> Join </string>
+    <string name="messaggioCondividiProgetto"> Here is the code to add the project: %s </string>
 
 
     <string name="iTuoiProgetti"> Your Projects </string>
@@ -185,10 +183,12 @@
     <string name="taskCompletate">Completed Tasks </string>
     <string name="progettiCompletati">Completed Projects </string>
     <string name="ricercaColleghi">Search Colleagues/Add Colleagues </string>
+    <string name="CaricamentoProgetti">Loading projects… </string>
     <string name="Calendario">Calendar </string>
 
     <!--ProfiloProgetto Screen-->
     <string name="Informazioni"> Information </string>
+    <string name="InfoProgetto"> Project Info </string>
     <string name="Partecipanti"> Participants </string>
     <string name="entraNelProcetto"> Join the project </string>
 
@@ -202,6 +202,11 @@
     <string name="nonLette"> Unread </string>
     <string name="lette">  All </string>
     <string name="notifiche">  Notification </string>
+    <string name="contrassegnaComeLette"> Mark as read </string>
+    <string name="cancellaNotifiche"> Clear notifications </string>
+    <string name="noNotifiche"> No notifications available. Please check back later. </string>
+    <string name="noNotificheDaLeggere"> You have no notifications at this time. Come back later to see if there\'s anything new. </string>
+
 
     <!--Profilo altri utenti Screen-->
     <string name="richiestaAmicizia"> sent you a friend request </string>
@@ -216,5 +221,32 @@
 
     <!--BottomNav Screen-->
     <string name="profilo"> Profile</string>
+
+    <!--Priorità -->
+    <string name="PrioritaALTA"> HIGH</string>
+    <string name="PrioritaMedia"> MEDIUM</string>
+    <string name="PrioritaBassa"> LOW</string>
+    <string name="NessunaPriorita"> NONE</string>
+
+    <!--NoInternetScreen -->
+    <string name="NessunaConnessioneH1"> No internet connection</string>
+    <string name="NessunaConnessioneH2"> Please check your connection and try again</string>
+    <string name="Riprova"> Try again </string>
+
+    <!--User Sex -->
+    <string name="sesso_uomo">Male</string>
+    <string name="sesso_donna">Female</string>
+    <string name="sesso_altro">Other</string>
+
+    <!--Sezione Profilo Utente -->
+    <string name="preparazioneAccount"> We are preparing your account for use… </string>
+    <string name="iTuoiAmici"> Your Friends </string>
+    <string name="trovaColleghi"> Find Colleagues </string>
+    <string name="nessunCollegaTrovato"> No colleague found. </string>
+    <string name="listaAmiciVuota">  Your friends list is empty. Search for colleagues to start connecting. </string>
+
+    <!--Avvisi Toast -->
+    <string name="noNotificheToast"> You have no new notifications to read!</string>
+
 
 </resources>

@@ -3,8 +3,10 @@ package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +19,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,13 +39,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
-import com.example.teamsync.data.models.Priorità
-import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.Priorita
+import com.example.teamsync.util.theme.Grey50
+import com.example.teamsync.util.theme.Red70
+import com.example.teamsync.util.theme.White
 
+/**
+ * Composable che visualizza la sezione "I Tuoi Progetti" con una lista di progetti.
+ * I progetti possono essere ordinati per data di creazione, scadenza o priorità,
+ * e possono essere filtrati per mostrare o nascondere i progetti completati.
+ *
+ * @param progetti Lista di progetti dell'utente.
+ * @param navController Controller di navigazione per navigare tra le schermate.
+ * @param attivitaProgetti Mappa delle attività non completate per ciascun progetto.
+ * @param viewModelProgetto ViewModel per gestire i dati e le operazioni sui progetti.
+ * @param isDarkTheme Indica se l'app è in modalità tema scuro.
+ */
 @Composable
 fun SezioneITUoiProgetti(
     progetti: List<Progetto>,
@@ -52,30 +69,31 @@ fun SezioneITUoiProgetti(
     val contesto = LocalContext.current
     val preferences = contesto.getSharedPreferences("preferenze_progetti", Context.MODE_PRIVATE)
 
-    val comparatore = Comparator<Progetto> { Progetto1, Progetto2 ->
-        val priorita1 = Progetto1.priorita
-        val priorita2 = Progetto2.priorita
+    // Comparator per ordinare i progetti in base alla priorità
+    val comparatore = Comparator<Progetto> { progetto1, progetto2 ->
+        val priorita1 = progetto1.priorita
+        val priorita2 = progetto2.priorita
 
         // Confronto basato sull'ordine dell'enumerazione Priorità
         when {
-            priorita1 == Priorità.ALTA && priorita2 != Priorità.ALTA -> -1 // ALTA prima di qualsiasi altra
-            priorita1 != Priorità.ALTA && priorita2 == Priorità.ALTA -> 1  // ALTA prima di qualsiasi altra
+            priorita1 == Priorita.ALTA && priorita2 != Priorita.ALTA -> -1 // ALTA prima di qualsiasi altra
+            priorita1 != Priorita.ALTA && priorita2 == Priorita.ALTA -> 1  // ALTA prima di qualsiasi altra
 
-            priorita1 == Priorità.MEDIA && priorita2 == Priorità.BASSA -> -1 // MEDIA prima di BASSA
-            priorita1 == Priorità.BASSA && priorita2 == Priorità.MEDIA -> 1  // MEDIA prima di BASSA
+            priorita1 == Priorita.MEDIA && priorita2 == Priorita.BASSA -> -1 // MEDIA prima di BASSA
+            priorita1 == Priorita.BASSA && priorita2 == Priorita.MEDIA -> 1  // MEDIA prima di BASSA
 
-            priorita1 == Priorità.MEDIA && priorita2 == Priorità.NESSUNA -> -1 // MEDIA prima di NESSUNA
-            priorita1 == Priorità.NESSUNA && priorita2 == Priorità.MEDIA -> 1  // MEDIA prima di NESSUNA
+            priorita1 == Priorita.MEDIA && priorita2 == Priorita.NESSUNA -> -1 // MEDIA prima di NESSUNA
+            priorita1 == Priorita.NESSUNA && priorita2 == Priorita.MEDIA -> 1  // MEDIA prima di NESSUNA
 
-            priorita1 == Priorità.BASSA && priorita2 == Priorità.NESSUNA -> -1 // BASSA prima di NESSUNA
-            priorita1 == Priorità.NESSUNA && priorita2 == Priorità.BASSA -> 1  // BASSA prima di NESSUNA
+            priorita1 == Priorita.BASSA && priorita2 == Priorita.NESSUNA -> -1 // BASSA prima di NESSUNA
+            priorita1 == Priorita.NESSUNA && priorita2 == Priorita.BASSA -> 1  // BASSA prima di NESSUNA
 
             else -> 0 // Rimane invariato
         }
     }
 
-    val visualizza_completati by remember { mutableStateOf(preferences.getBoolean("preferenza_progetti_completati", false)) }
-    val ordine_progetti by remember {
+    val visualizzaCompletati by remember { mutableStateOf(preferences.getBoolean("preferenza_progetti_completati", false)) }
+    val ordineProgetti by remember {
         mutableStateOf(
             preferences.getString(
                 "ordine_progetti",
@@ -83,6 +101,8 @@ fun SezioneITUoiProgetti(
             )
         )
     }
+
+    val caricamentoProgetti by viewModelProgetto.isLoading.observeAsState()
 
 
     Column(
@@ -97,7 +117,33 @@ fun SezioneITUoiProgetti(
         )
     }
     Spacer(modifier = Modifier.height(8.dp))
-    if(progetti.isEmpty()){
+
+    if(caricamentoProgetti == true){
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isDarkTheme) Color.Black else Color.White),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = Grey50,
+                    trackColor = Red70,
+                    strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                )
+                Text(
+                    text = stringResource(id = R.string.CaricamentoProgetti),
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+        }
+
+    }else if(progetti.isEmpty()){
+        // Se non ci sono progetti, mostra un messaggio vuoto
         ElevatedCard(
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 16.dp
@@ -133,15 +179,16 @@ fun SezioneITUoiProgetti(
             }
         }
     }else {
+        // Mostra i progetti in una riga orizzontale con ordinamento e filtraggio
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            when(ordine_progetti){
+            when(ordineProgetti){
                 "cronologico" ->
                 {
                     items(progetti.sortedByDescending { it.dataCreazione }) { progetto ->
                         val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
-                        if(visualizza_completati)
+                        if(visualizzaCompletati)
                         {
                             ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
 
@@ -159,7 +206,7 @@ fun SezioneITUoiProgetti(
                 {
                     items(progetti.sortedBy { it.dataScadenza }) { progetto ->
                         val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
-                        if(visualizza_completati)
+                        if(visualizzaCompletati)
                         {
                             ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
 
@@ -174,7 +221,7 @@ fun SezioneITUoiProgetti(
                 {
                     items(progetti.sortedWith(comparatore)) { progetto ->
                         val attivitaNonCompletate = attivitaProgetti[progetto.id] ?: 0
-                        if(visualizza_completati)
+                        if(visualizzaCompletati)
                         {
                             ITuoiProgettiItem(navController = navController, progetto = progetto, viewModelProgetto = viewModelProgetto, attivitaNonCompletate = attivitaNonCompletate, isDarkTheme = isDarkTheme)
 
@@ -190,6 +237,9 @@ fun SezioneITUoiProgetti(
     }
 }
 
+/**
+ * Anteprima del composable SezioneITUoiProgetti.
+ */
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewSezioneITuoiProgetti(){

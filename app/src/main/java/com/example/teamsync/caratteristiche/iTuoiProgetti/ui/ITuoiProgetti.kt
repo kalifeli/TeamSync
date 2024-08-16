@@ -70,206 +70,340 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
+import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRepository
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
-import com.example.teamsync.caratteristiche.login.data.repository.RepositoryUtente
-import com.example.teamsync.caratteristiche.login.data.viewModel.ViewModelUtente
-import com.example.teamsync.data.models.Priorità
+import com.example.teamsync.caratteristiche.autentificazione.data.repository.RepositoryUtente
+import com.example.teamsync.caratteristiche.autentificazione.data.viewModel.ViewModelUtente
+import com.example.teamsync.util.Priorita
 import com.example.teamsync.navigation.Schermate
-import com.example.teamsync.ui.theme.Grey20
-import com.example.teamsync.ui.theme.Grey35
-import com.example.teamsync.ui.theme.Grey50
-import com.example.teamsync.ui.theme.Red70
-import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.NoInternetScreen
+import com.example.teamsync.util.theme.Grey20
+import com.example.teamsync.util.theme.Grey35
+import com.example.teamsync.util.theme.Grey50
+import com.example.teamsync.util.theme.Red70
+import com.example.teamsync.util.theme.White
 import com.example.teamsync.util.ThemePreferences
+import com.example.teamsync.util.isInternetAvailable
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Funzione Composable che visualizza la schermata dei progetti dell'utente.
+ *
+ * @param navController Controller di navigazione per la navigazione tra le schermate.
+ * @param viewModelProgetto ViewModel per gestire i dati relativi ai progetti.
+ * @param viewModelUtente ViewModel per gestire i dati relativi all'utente.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ITuoiProgetti(
     navController: NavController,
     viewModelProgetto: ViewModelProgetto,
     viewModelUtente: ViewModelUtente,
-){
+) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
 
-    var expended by remember {
-        mutableStateOf(false)
-    }
-    var mostraCreaProgettoDialog by remember {
-        mutableStateOf(false)
-    }
+    // Stati mutabili per vari componenti dell'interfaccia utente
+    var expended by remember { mutableStateOf(false) }
+    var mostraCreaProgettoDialog by remember { mutableStateOf(false) }
     val aggiungiProgettoRiuscito = viewModelProgetto.aggiungiProgettoRiuscito.value
     val progettiCompletati by viewModelProgetto.progettiCompletati
 
-    val utenteCorrenteId by viewModelProgetto.utenteCorrenteId
+    var utenteCorrenteId by viewModelProgetto.utenteCorrenteId
+    val utente by viewModelUtente.userProfilo.observeAsState()
     val context = LocalContext.current
     val isLoading by viewModelProgetto.isLoading.observeAsState()
 
-    val progetti by viewModelProgetto.progetti1.observeAsState(emptyList())
+    val progetti by viewModelProgetto.progetti.observeAsState(emptyList())
     val attivitaProgetti by viewModelProgetto.attivitaProgetti.observeAsState(emptyMap())
+    val erroreCaricamentoProgetto by viewModelProgetto.erroreCaricamentoProgetto
+
+    val isConnected = remember { mutableStateOf(isInternetAvailable(context)) }
+
+    // Stato per gestire il logout
+    var isLoggedOut by remember { mutableStateOf(false) }
+
+    // Controllo periodico della connessione internet
+    LaunchedEffect(Unit) {
+        // Periodicamente avviene un controllo per verificare che ci sia la connessione ad internet
+        while (true) {
+            isConnected.value = isInternetAvailable(context)
+            delay(5000) // controllo ogni 5 secondi
+        }
+    }
 
     LaunchedEffect(Unit) {
-        viewModelUtente.resetProfiloCollega()
-    }
-
-    LaunchedEffect(utenteCorrenteId) {
-        if(!utenteCorrenteId.isNullOrEmpty()){
-            viewModelProgetto.caricaProgettiUtente(utenteCorrenteId!!, false)
-            viewModelProgetto.caricaProgettiCompletatiUtente(utenteCorrenteId!!)
+        var retryCount = 0
+        while (utente == null && retryCount < 5) {
+            delay(2000) // Attendi 2 secondi prima di riprovare
+            viewModelUtente.getUserProfile()
+            retryCount++
+            Log.d("iTuoiProgetti", "Tentativo di caricamento profilo utente #$retryCount")
         }
-        Log.d("View", "utente corrente : ${viewModelProgetto.utenteCorrenteId.value}")
+        if (utente == null) {
+            Toast.makeText(context, "Impossibile caricare il profilo utente. Riprova più tardi.", Toast.LENGTH_LONG).show()
+        }
     }
 
-    Scaffold(
-       topBar = {
-           CenterAlignedTopAppBar(
-               title = {
-                   Text(
-                       text = "Home",
-                       style = MaterialTheme.typography.headlineSmall,
-                       fontWeight = FontWeight.Bold,
-                       textAlign = TextAlign.Center,
-                       color = if(isDarkTheme) White else Color.Black,
-                   )
-               },
+    LaunchedEffect(utente) {
+        if (utente != null) {
+            viewModelProgetto.resetDatiProgetti() // Resetta i dati prima di caricarne di nuovi
+            utente?.id?.let {
+                utenteCorrenteId = it
+                viewModelProgetto.caricaProgettiUtente(it, true)
+                viewModelProgetto.caricaProgettiCompletatiUtente(it)
+            }
+        } else {
+            Log.e("iTuoiProgetti", "Utente non caricato correttamente.")
+            viewModelUtente.getUserProfile()
+        }
+    }
 
-               actions = {
-                   Box{
-                       IconButton(
-                           onClick = {expended = true },
-                           colors = IconButtonDefaults.iconButtonColors(
-                               contentColor = if(isDarkTheme) White else Color.Black,
-                           )
-                       ) {
-                           Icon(Icons.Default.MoreVert, contentDescription = "Menu a tendina", tint = if(isDarkTheme) White else Color.Black)
-                       }
-                       DropdownMenu(
-                           expanded = expended,
-                           onDismissRequest = { expended = false },
-                           modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
-                       ) {
-                           DropdownMenuItem(
-                               text = { Text(text = stringResource(id = R.string.sincronizza), color = if(isDarkTheme) White else Color.Black)},
-                               onClick = {
-                                   expended = false
-                                   utenteCorrenteId?.let {
-                                       viewModelProgetto.caricaProgettiUtente(it, true)
-                                       viewModelProgetto.caricaProgettiCompletatiUtente(it)
-                                   }
-                               },
-                               leadingIcon = {
-                                   Icon(Icons.Default.Refresh, contentDescription = "icona sincronizzazione", tint = if(isDarkTheme) White else Color.Black)
-                               },
-                               modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
-                           )
+    LaunchedEffect(viewModelUtente.isLoading, utente) {
+        if (!isLoggedOut && viewModelUtente.isLoading.value == false) {
+            // Aspetta un momento per assicurarti che l'utente abbia avuto tempo per essere caricato
+            delay(500)
+            if (utente == null) {
+                Toast.makeText(context, "Errore nel caricamento del profilo utente.", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
-                           DropdownMenuItem(
-                               text = { Text(text = stringResource(id = R.string.impostazioni), color = if(isDarkTheme) White else Color.Black) },
-                               onClick = {
-                                   expended = false
-                                   navController.navigate(Schermate.Impostazioni.route)
-                                         },
-                               leadingIcon = {
-                                   Icon(Icons.Default.Settings, contentDescription = "icona Impostazioni", tint = if(isDarkTheme) White else Color.Black)
-                               },
-                               modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
-                           )
-                           DropdownMenuItem(
-                               text = { Text(text = stringResource(id = R.string.Esci), color = if(isDarkTheme) White else Color.Black)},
-                               onClick = {
-                                   expended = false
-                                   viewModelProgetto.logout()
-                                   navController.navigate(Schermate.Login.route)
-                               },
-                               leadingIcon = {
-                                   Icon(
-                                       painter = painterResource(id = R.drawable.ic_logout),
-                                       contentDescription = "icona Logout",
-                                       tint = if(isDarkTheme) White else Color.Black,
-                                       modifier = Modifier.size(20.dp),
-                                   )
-                               },
-                               modifier = Modifier.background(if(isDarkTheme) Color.DarkGray else Grey20)
-                           )
-                           
-                       }
-                   }
+    // Visualizza il messaggio di errore se il caricamento del progetto fallisce
+    LaunchedEffect(erroreCaricamentoProgetto) {
+        if (!erroreCaricamentoProgetto.isNullOrEmpty()) {
+            Toast.makeText(context, erroreCaricamentoProgetto, Toast.LENGTH_LONG).show()
+            viewModelProgetto.resetErroreCaricamentoProgetto()
+        }
 
-               },
-               colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                   containerColor = if(isDarkTheme) Color.DarkGray else White,
-                   titleContentColor = if(isDarkTheme) White else Color.Black,
-                   actionIconContentColor = if(isDarkTheme) White else Color.Black,
-                   navigationIconContentColor = if(isDarkTheme) White else Color.Black
-               )
-           )
-       },
-       floatingActionButton = {
-           FloatingActionButton(
-               onClick = {
-                   mostraCreaProgettoDialog = true
-               },
-               containerColor = Red70,
-               contentColor = White,
-           ) {
-               Icon(Icons.Default.Add, contentDescription = "Aggiungi progetto")
-           }
-       },
-       content = {padding ->
+    }
 
-           Column(
-               modifier = Modifier
-                   .fillMaxSize()
-                   .background(if (isDarkTheme) Color.DarkGray else White)
-                   .padding(padding)
-                   .padding(horizontal = 16.dp)
-           ) {
-               Row(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .padding(8.dp),
-                   verticalAlignment = Alignment.Top,
-                   horizontalArrangement = Arrangement.Center
-               ){
-                   if (isLoading == true) {
-                       CircularProgressIndicator(
-                           modifier = Modifier
-                               .padding(8.dp)
-                               .align(Alignment.Top),
-                           color = Grey50,
-                           trackColor = Red70,
-                           strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
-                       )
-                   }
-               }
+    if (utente == null && !isLoggedOut) {
+        // Mostra schermata di caricamento fino a quando i dati del profilo utente non sono caricati
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isDarkTheme) Color.Black else Color.White),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = Grey50,
+                    trackColor = Red70,
+                    strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                )
+                Text(
+                    text = "Stiamo preparando il tuo account per l'utilizzo...",
+                    color = if (isDarkTheme) Color.White else Color.Black,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+        }
+    } else {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "Home",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            color = if (isDarkTheme) White else Color.Black,
+                        )
+                    },
+
+                    actions = {
+                        if (isConnected.value) {
+                            Box {
+                                IconButton(
+                                    onClick = { expended = true },
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        contentColor = if (isDarkTheme) White else Color.Black,
+                                    )
+                                ) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = "Menu a tendina",
+                                        tint = if (isDarkTheme) White else Color.Black
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = expended,
+                                    onDismissRequest = { expended = false },
+                                    modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Grey20)
+                                ) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = stringResource(id = R.string.sincronizza),
+                                                color = if (isDarkTheme) White else Color.Black
+                                            )
+                                        },
+                                        onClick = {
+                                            expended = false
+                                            utente?.id?.let {
+                                                viewModelProgetto.caricaProgettiUtente(it, true)
+                                                viewModelProgetto.caricaProgettiCompletatiUtente(it)
+                                            }
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Default.Refresh,
+                                                contentDescription = "icona sincronizzazione",
+                                                tint = if (isDarkTheme) White else Color.Black
+                                            )
+                                        },
+                                        modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Grey20)
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = stringResource(id = R.string.impostazioni),
+                                                color = if (isDarkTheme) White else Color.Black
+                                            )
+                                        },
+                                        onClick = {
+                                            expended = false
+                                            navController.navigate(Schermate.Impostazioni.route)
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Default.Settings,
+                                                contentDescription = "icona Impostazioni",
+                                                tint = if (isDarkTheme) White else Color.Black
+                                            )
+                                        },
+                                        modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Grey20)
+                                    )
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = stringResource(id = R.string.Esci),
+                                                color = if (isDarkTheme) White else Color.Black
+                                            )
+                                        },
+                                        onClick = {
+                                            isLoggedOut = true
+                                            expended = false
+                                            viewModelUtente.signOut()
+                                            navController.navigate(Schermate.Login.route)
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_logout),
+                                                contentDescription = "icona Logout",
+                                                tint = if (isDarkTheme) White else Color.Black,
+                                                modifier = Modifier.size(20.dp),
+                                            )
+                                        },
+                                        modifier = Modifier.background(if (isDarkTheme) Color.DarkGray else Grey20)
+                                    )
+
+                                }
+                            }
+                        }
+
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = if (isDarkTheme) Color.DarkGray else White,
+                        titleContentColor = if (isDarkTheme) White else Color.Black,
+                        actionIconContentColor = if (isDarkTheme) White else Color.Black,
+                        navigationIconContentColor = if (isDarkTheme) White else Color.Black
+                    )
+                )
+            },
+            floatingActionButton = {
+                if (isConnected.value) {
+                    FloatingActionButton(
+                        onClick = {
+                            mostraCreaProgettoDialog = true
+                        },
+                        containerColor = Red70,
+                        contentColor = White,
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Aggiungi progetto")
+                    }
+                }
+            },
+            content = { padding ->
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(if (isDarkTheme) Color.DarkGray else White)
+                        .padding(padding)
+                        .padding(horizontal = 16.dp)
+                ) {
+
+                    if (!isConnected.value) {
+                        NoInternetScreen(
+                            isDarkTheme = isDarkTheme,
+                            onRetry = { isConnected.value = isInternetAvailable(context) }
+                        )
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.Top,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            if (isLoading == true) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .align(Alignment.Top),
+                                    color = Grey50,
+                                    trackColor = Red70,
+                                    strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                                )
+                            }
+                        }
 
 
-               SezioneProfiloUtente(navController, viewModelUtente, isDarkTheme)
+                        SezioneProfiloUtente(navController, viewModelUtente, isDarkTheme)
 
-               Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-               SezioneITUoiProgetti(navController = navController, progetti = progetti, viewModelProgetto = viewModelProgetto, attivitaProgetti = attivitaProgetti,
-                   isDarkTheme = isDarkTheme
-               )
+                        SezioneITUoiProgetti(
+                            navController = navController,
+                            progetti = progetti,
+                            viewModelProgetto = viewModelProgetto,
+                            attivitaProgetti = attivitaProgetti,
+                            isDarkTheme = isDarkTheme
+                        )
 
-               Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
 
-               Row(
-                   modifier = Modifier
-                       .fillMaxSize(),
-                   horizontalArrangement = Arrangement.spacedBy(32.dp)
-               ) {
-                   SezioneProgressiProgetti(progettiCompletati = progettiCompletati.size, progettiUtente = progetti.size, isDarkTheme = isDarkTheme)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalArrangement = Arrangement.spacedBy(32.dp)
+                        ) {
+                            SezioneProgressiProgetti(
+                                progettiCompletati = progettiCompletati.size,
+                                progettiUtente = progetti.size,
+                                isDarkTheme = isDarkTheme
+                            )
 
-                   SezioneCalendario(isDarkTheme)
-               }
-           }
-       }
-   )
+                            SezioneCalendario(isDarkTheme)
+                        }
+                    }
+                }
+            }
+        )
+    }
+
     if (mostraCreaProgettoDialog) {
         CreaProgettoDialog(
             onDismissRequest = { mostraCreaProgettoDialog = false },
@@ -279,6 +413,8 @@ fun ITuoiProgetti(
     }
 
 
+
+    // Visualizza messaggio di successo se la creazione del progetto è riuscita
     LaunchedEffect(viewModelProgetto.erroreAggiungiProgetto.value) {
         if(viewModelProgetto.erroreAggiungiProgetto.value != null){
             Toast.makeText(context, viewModelProgetto.erroreAggiungiProgetto.value, Toast.LENGTH_LONG).show()
@@ -290,7 +426,7 @@ fun ITuoiProgetti(
     LaunchedEffect(aggiungiProgettoRiuscito) {
         if(aggiungiProgettoRiuscito){
             Toast.makeText(context, progettoAggiuntoString, Toast.LENGTH_LONG).show()
-            utenteCorrenteId?.let {
+            utente?.id?.let {
                 viewModelProgetto.caricaProgettiUtente(it, false)
                 viewModelProgetto.caricaProgettiCompletatiUtente(it)
             }
@@ -301,10 +437,13 @@ fun ITuoiProgetti(
 
 }
 
-
-
-
-
+/**
+ * Funzione Composable che visualizza il dialog per creare un nuovo progetto.
+ *
+ * @param onDismissRequest Funzione da chiamare quando il dialog viene chiuso.
+ * @param viewModelProgetto ViewModel per gestire i dati relativi ai progetti.
+ * @param isDarkTheme Booleano per determinare se il tema scuro è attivo.
+ */
 @Composable
 fun CreaProgettoDialog(
     onDismissRequest: () -> Unit,
@@ -314,7 +453,7 @@ fun CreaProgettoDialog(
     var nome by remember { mutableStateOf("") }
     var descrizione by remember { mutableStateOf("") }
     var dataScadenza by remember { mutableStateOf(Date()) }
-    var priorita by remember { mutableStateOf(Priorità.NESSUNA) }
+    var priorita by remember { mutableStateOf(Priorita.NESSUNA) }
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     var mostraAggiungiProgetto by remember {
@@ -338,6 +477,15 @@ fun CreaProgettoDialog(
     val maxCharsNome = 20
     val maxCharsDescrizione = 200
 
+    val isConnected = remember { mutableStateOf(isInternetAvailable(context)) }
+
+    LaunchedEffect(Unit) {
+        // Periodicamente avviene un controllo per verificare che ci sia la connessione ad internet
+        while(true){
+            isConnected.value = isInternetAvailable(context)
+            delay(5000) // controllo ogni 5 secondi
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -349,234 +497,256 @@ fun CreaProgettoDialog(
                 },
         containerColor = if(isDarkTheme) Color.Black else White,
         text = {
-            Column {
-                OutlinedTextField(
-                    value = nome,
-                    onValueChange = {
-                        if (it.length <= maxCharsNome) {
-                            nome = it
-                        }
-                    },
-                    label = {
-                        Text(
-                            stringResource(id = R.string.nome),
-                        ) },
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Red70,
-                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                    ),
-                    maxLines = 2
-                )
-                Text(
-                    text = "${nome.length} / $maxCharsNome",
-                    color = if (isDarkTheme) Color.White else Color.Black,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(end = 8.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = descrizione,
-                    onValueChange = { if (it.length <= maxCharsDescrizione) {
-                        descrizione = it
-                    } },
-                    label = {
-                        Text(
-                            stringResource(id = R.string.descrizioneEdit)
-                        ) },
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Red70,
-                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                    ),
-                    maxLines = 4
-                )
-                Text(
-                    text = "${descrizione.length} / $maxCharsDescrizione",
-                    color = if (isDarkTheme) Color.White else Color.Black,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(end = 8.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = dataScadenzaStr,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(
-                        stringResource(id = R.string.datadiscadenza),
-                    ) },
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    trailingIcon = { 
-                        IconButton(
-                            onClick = { datePickerDialog.show() },
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_calendario_evento),
-                                contentDescription = "scegli data di scadenza progetto",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Red70,
-                        unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                        focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                        unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                        focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                        focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                    ),
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                var expanded by remember { mutableStateOf(false) }
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (!isConnected.value) {
+                    NoInternetScreen(
+                        isDarkTheme = isDarkTheme,
+                        onRetry = { isConnected.value = isInternetAvailable(context) }
+                    )
+                } else {
                     OutlinedTextField(
-                        value = priorita.name,
+                        value = nome,
+                        onValueChange = {
+                            if (it.length <= maxCharsNome) {
+                                nome = it
+                            }
+                        },
+                        label = {
+                            Text(
+                                stringResource(id = R.string.nome),
+                            )
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Red70,
+                            unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                            focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                            unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        ),
+                        maxLines = 2
+                    )
+                    Text(
+                        text = "${nome.length} / $maxCharsNome",
+                        color = if (isDarkTheme) Color.White else Color.Black,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(end = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = descrizione,
+                        onValueChange = {
+                            if (it.length <= maxCharsDescrizione) {
+                                descrizione = it
+                            }
+                        },
+                        label = {
+                            Text(
+                                stringResource(id = R.string.descrizioneEdit)
+                            )
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Red70,
+                            unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                            focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                            unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                        ),
+                        maxLines = 4
+                    )
+                    Text(
+                        text = "${descrizione.length} / $maxCharsDescrizione",
+                        color = if (isDarkTheme) Color.White else Color.Black,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(end = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = dataScadenzaStr,
                         onValueChange = {},
                         readOnly = true,
                         label = {
                             Text(
-                                stringResource(id = R.string.priorità),
-                            ) },
+                                stringResource(id = R.string.datadiscadenza),
+                            )
+                        },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .fillMaxWidth(),
                         trailingIcon = {
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown",
-                                modifier = Modifier.clickable { expanded = true })
+                            IconButton(
+                                onClick = { datePickerDialog.show() },
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_calendario_evento),
+                                    contentDescription = "scegli data di scadenza progetto",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Red70,
-                            unfocusedBorderColor = if(isDarkTheme) White else Color.Black,
-                            focusedContainerColor = if(isDarkTheme) Color.Black else White ,
-                            unfocusedLabelColor = if(isDarkTheme) White else Color.Black,
-                            focusedLabelColor = if(isDarkTheme) White else Color.Black,
-                            focusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                            unfocusedTextColor = if(isDarkTheme) Color.White else Color.Black,
-                            unfocusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                            unfocusedLeadingIconColor = if(isDarkTheme) Color.White else Color.Black,
-                            focusedTrailingIconColor = if(isDarkTheme) Color.White else Color.Black,
+                            unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                            focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                            unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                            focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
                         ),
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.background(if(isDarkTheme) Color.Black else Grey20),
+                    var expanded by remember { mutableStateOf(false) }
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Priorità.entries.forEach { p ->
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(10.dp)
-                                                .clip(CircleShape)
-                                                .border(
-                                                    0.5.dp,
-                                                    if (isDarkTheme) White else Color.Black,
-                                                    CircleShape
-                                                )
-                                                .background(p.colore)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(p.name)
-
-                                    }
-                                       },
-                                onClick = {
-                                    priorita = p
-                                    expanded = false
-                                },
-                                modifier = Modifier.background(if(isDarkTheme) Color.Black else Grey20),
-                                colors = MenuDefaults.itemColors(
-                                    textColor = if(isDarkTheme) White else Color.Black,
-                                    leadingIconColor = if(isDarkTheme) White else Color.Black,
-                                    trailingIconColor = if(isDarkTheme) White else Color.Black,
+                        OutlinedTextField(
+                            value = priorita.nomeTradotto(),
+                            onValueChange = {},
+                            readOnly = true,
+                            label = {
+                                Text(
+                                    stringResource(id = R.string.priorità),
                                 )
-                            )
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            trailingIcon = {
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown",
+                                    modifier = Modifier.clickable { expanded = true })
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Red70,
+                                unfocusedBorderColor = if (isDarkTheme) White else Color.Black,
+                                focusedContainerColor = if (isDarkTheme) Color.Black else White,
+                                unfocusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedLabelColor = if (isDarkTheme) White else Color.Black,
+                                focusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTextColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                unfocusedLeadingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                                focusedTrailingIconColor = if (isDarkTheme) Color.White else Color.Black,
+                            ),
+                        )
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.background(if (isDarkTheme) Color.Black else Grey20),
+                        ) {
+                            Priorita.entries.forEach { p ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(10.dp)
+                                                    .clip(CircleShape)
+                                                    .border(
+                                                        0.5.dp,
+                                                        if (isDarkTheme) White else Color.Black,
+                                                        CircleShape
+                                                    )
+                                                    .background(p.colore)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(p.nomeTradotto())
+
+                                        }
+                                    },
+                                    onClick = {
+                                        priorita = p
+                                        expanded = false
+                                    },
+                                    modifier = Modifier.background(if (isDarkTheme) Color.Black else Grey20),
+                                    colors = MenuDefaults.itemColors(
+                                        textColor = if (isDarkTheme) White else Color.Black,
+                                        leadingIconColor = if (isDarkTheme) White else Color.Black,
+                                        trailingIconColor = if (isDarkTheme) White else Color.Black,
+                                    )
+                                )
+                            }
                         }
                     }
-                }
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.CenterHorizontally),
-                    color = Red70,
-                    thickness = 2.dp
-                )
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.uniscitiAUnProgetto),
-                        textAlign = TextAlign.Center,
-                        color = if(isDarkTheme) Color.White else Color.Black
-                    )
-                    Text(
-                        text = stringResource(id = R.string.conUnCodice),
-                        textDecoration = TextDecoration.Underline,
-                        textAlign = TextAlign.Center,
-                        color = Red70,
+                    HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { mostraAggiungiProgetto = true }
-                            .padding(horizontal = 2.dp),
+                            .padding(16.dp)
+                            .align(Alignment.CenterHorizontally),
+                        color = Red70,
+                        thickness = 2.dp
                     )
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(id = R.string.uniscitiAUnProgetto),
+                            textAlign = TextAlign.Center,
+                            color = if (isDarkTheme) Color.White else Color.Black
+                        )
+                        Text(
+                            text = stringResource(id = R.string.conUnCodice),
+                            textDecoration = TextDecoration.Underline,
+                            textAlign = TextAlign.Center,
+                            color = Red70,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { mostraAggiungiProgetto = true }
+                                .padding(horizontal = 2.dp),
+                        )
+                    }
                 }
             }
+
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    viewModelProgetto.creaProgetto(
-                        nome = nome,
-                        descrizione = descrizione,
-                        dataScadenza = dataScadenza,
-                        priorita = priorita
-                    )
-                },
-                colors = ButtonDefaults.buttonColors(Red70)
-            ) {
-                Text(stringResource(id = R.string.crea), color = White)
+            if(isConnected.value) {
+                Button(
+                    onClick = {
+                        viewModelProgetto.creaProgetto(
+                            nome = nome,
+                            descrizione = descrizione,
+                            dataScadenza = dataScadenza,
+                            priorita = priorita
+                        )
+                    },
+                    colors = ButtonDefaults.buttonColors(Red70)
+                ) {
+                    Text(stringResource(id = R.string.crea), color = White)
+                }
             }
         },
         dismissButton = {
@@ -590,6 +760,7 @@ fun CreaProgettoDialog(
             }
         }
     )
+    // Visualizza la dialog per l'aggiunta di un progetto tramite codice
     if(mostraAggiungiProgetto){
         AggiungiProgettoDialog(
             onDismissRequest = { mostraAggiungiProgetto = false },
@@ -597,15 +768,23 @@ fun CreaProgettoDialog(
             isDarkTheme = isDarkTheme
         )
     }
+
+    // Visualizza messaggio di errore se aggiungere un progetto fallisce
     LaunchedEffect(viewModelProgetto.erroreAggiungiProgetto.value) {
         if(viewModelProgetto.erroreAggiungiProgetto.value != null){
             Toast.makeText(context, viewModelProgetto.erroreAggiungiProgetto.value, Toast.LENGTH_LONG).show()
             viewModelProgetto.resetErroreAggiungiProgetto()
         }
-
     }
 }
 
+/**
+ * Funzione Composable che visualizza il dialog per aggiungere un progetto esistente tramite codice.
+ *
+ * @param onDismissRequest Funzione da chiamare quando il dialog viene chiuso.
+ * @param viewModelProgetto ViewModel per gestire i dati relativi ai progetti.
+ * @param isDarkTheme Booleano per determinare se il tema scuro è attivo.
+ */
 @Composable
 fun AggiungiProgettoDialog(
     onDismissRequest: () -> Unit,
@@ -633,7 +812,7 @@ fun AggiungiProgettoDialog(
                     color = if(isDarkTheme) White else Color.Black
                 )
                 OutlinedTextField(
-                    value = codiceProgetto , 
+                    value = codiceProgetto ,
                     onValueChange = {codiceProgetto = it},
                     label = {
                         Text(
@@ -659,7 +838,7 @@ fun AggiungiProgettoDialog(
             }
         },
         onDismissRequest = onDismissRequest,
-        confirmButton = { 
+        confirmButton = {
             Button(
                 onClick = {
                     utenteId?.let {
@@ -690,18 +869,20 @@ fun AggiungiProgettoDialog(
     )
 }
 
-
-
-
-
-
+/**
+ * Anteprima della funzione ITuoiProgetti per scopi di sviluppo.
+ */
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewITuoiProgetti(){
-    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(), ViewModelUtente(
+    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente())), ViewModelUtente(
         RepositoryUtente()
     ))
 }
+
+/**
+ * Anteprima della funzione AggiungiProgettoDialog per scopi di sviluppo.
+ */
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewAggiungiProgetto(){

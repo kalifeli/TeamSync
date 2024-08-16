@@ -2,10 +2,11 @@
 <resources>
     <string name="app_name" translatable="false">TeamSync</string>
 
-    <!--To Do Screen-->
+    <!--Schermata Le Mie Attività-->
     <string name="project_tasks_description">Qui troverai le Task che sono assegnate per questo progetto.</string>
     <string name="bottoneNonCompletate">Incomplete</string>
     <string name="bottoneCompletate">Completate</string>
+    <string name="bottoneLeMie">Le Mie</string>
     <string name="titoloEdit">Titolo</string>
     <string name="descrizioneEdit">Descrizione</string>
     <string name="dataEdit">Data Scadenza</string>
@@ -43,8 +44,7 @@
     <string name="capito">Capito</string>
     <string name="codiceProgetto">Codice Progetto </string>
     <string name="condividiCodice">Condividi il codice del progetto</string>
-
-
+    <string name="CaricamentoAttivita">Caricamento delle attività…</string>
     <string name="completed_tasks_count">Sono state completate %1$d/%2$d Attività</string>
     <string name="abbandonaProg">Sei sicuro di abbandonare il progetto? Una volta confermato non potrai tornare più indietro!</string>
     <string name="nomeDelega">Nome: %s</string>
@@ -54,17 +54,8 @@
     <string name="listaPartecipanti">Lista Partecipanti-></string>
 
 
-
-
     <string name="AggiungiPersone">Aggiungi Persone</string>
-
-
     <string name="leMie">Le Mie</string>
-
-
-
-
-
 
     <!--Impostazioni Screen-->
     <string name="impostazioni">Impostazioni</string>
@@ -131,11 +122,12 @@
 
     <!--User Profile Screen-->
     <string name="modificaProfiloScreen">Modifica Profilo </string>
-    <string name="caricamento">Caricamento in corso... </string>
+    <string name="caricamento">Caricamento in corso… </string>
     <string name="matricola1">Matricola </string>
     <string name="dataDiNascita">Data di Nascita </string>
     <string name="caricaImmagine">Cambia Immagine</string>
     <string name="rimuoviImmagine">Rimuovi Immagine</string>
+    <string name="permessoNegato">Permesso Negato</string>
 
     <!--Login Screen-->
     <string name="accedi">Accedi </string>
@@ -169,7 +161,6 @@
 
     <!--Modifica Progetto Screen-->
     <string name="titolo"> Modifica Progetto </string>
-
     <string name="fineProgetto"> Hai terminato il progetto e sei pronto alla consegna? Contrassegnalo come completato! </string>
     <string name="dataConsegna"> Data di consegna </string>
     <string name="voto"> Voto </string>
@@ -195,12 +186,15 @@
     <string name="taskCompletate">Task Completate </string>
     <string name="progettiCompletati">Progetti Completati </string>
     <string name="ricercaColleghi">Ricerca Colleghi/Aggiungi Colleghi </string>
-
+    <string name="CaricamentoProgetti">Caricamento dei progetti in corso… </string>
     <string name="Calendario">Calendario </string>
+    <string name="messaggioCondividiProgetto">Ecco il codice per poter aggiungere il progetto: %s </string>
+
 
 
     <!--ProfiloProgetto Screen-->
     <string name="Informazioni"> Informazioni </string>
+    <string name="InfoProgetto"> Info Progetto </string>
     <string name="Partecipanti"> Partecipanti </string>
     <string name="entraNelProcetto"> Entra nel progetto </string>
 
@@ -213,6 +207,10 @@
     <string name="nonLette"> Non lette </string>
     <string name="lette">  Tutte </string>
     <string name="notifiche">  Notifiche </string>
+    <string name="contrassegnaComeLette"> Contrassegna come lette </string>
+    <string name="cancellaNotifiche"> Cancella notifiche </string>
+    <string name="noNotifiche"> Nessuna notifica disponibile. Prova a controllare più tardi. </string>
+    <string name="noNotificheDaLeggere"> Non hai notifiche al momento. Torna più tardi per verificare se ci sono novità. </string>
 
     <!--Profilo altri utenti Screen-->
     <string name="richiestaAmicizia"> ti ha inviato una richiesta di amicizia </string>
@@ -227,6 +225,32 @@
 
     <!--BottomNav Screen-->
     <string name="profilo"> Profilo</string>
+
+    <!--Priorità -->
+    <string name="PrioritaALTA"> ALTA</string>
+    <string name="PrioritaMedia"> MEDIA</string>
+    <string name="PrioritaBassa"> BASSA</string>
+    <string name="NessunaPriorita"> NESSUNA</string>
+
+    <!--NoInternetScreen -->
+    <string name="NessunaConnessioneH1"> Nessuna connessione a Internet</string>
+    <string name="NessunaConnessioneH2"> Controlla la tua connessione e riprova</string>
+    <string name="Riprova"> Riprova </string>
+
+    <!--Sesso Utente -->
+    <string name="sesso_uomo">Uomo</string>
+    <string name="sesso_donna">Donna</string>
+    <string name="sesso_altro">Altro</string>
+
+    <!--Sezione Profilo Utente -->
+    <string name="preparazioneAccount"> Stiamo preparando il tuo account per l\'utilizzo… </string>
+    <string name="iTuoiAmici"> I Tuoi Amici </string>
+    <string name="trovaColleghi"> Trova Colleghi </string>
+    <string name="nessunCollegaTrovato"> Non è stato trovato nessun collega. </string>
+    <string name="listaAmiciVuota">  La tua lista amici è vuota. Cerca colleghi per iniziare a connetterti. </string>
+    <!--Avvisi Toast -->
+    <string name="noNotificheToast"> Non hai nuove notifiche da leggere!</string>
+
 
 
 </resources>

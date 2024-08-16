@@ -1,6 +1,6 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository
 
-import android.util.Log
+
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -32,10 +32,16 @@ class RepositoryProgetto {
                 .await()
                 .toObjects(Progetto::class.java)
         } catch (e: Exception) {
-            Log.e("RepositoryProgetto", "Errore nel caricamento dei progetti dell'utente", e)
             emptyList()
         }
     }
+
+    /**
+     * Recupera la lista dei progetti completati a cui partecipa un utente specifico.
+     *
+     * @param userId L'ID dell'utente di cui si vogliono recuperare i progetti completati.
+     * @return Una lista di oggetti `Progetto` completati a cui l'utente partecipa. Restituisce una lista vuota in caso di errore.
+     */
     suspend fun getProgettiCompletatiUtente(userId: String): List<Progetto>{
         return try {
             firestore.collection("progetti")
@@ -121,10 +127,6 @@ class RepositoryProgetto {
         }
     }
 
-
-
-
-
     /**
      * Funzione che recupera l'utente attualmente autenticato.
      *
@@ -135,14 +137,9 @@ class RepositoryProgetto {
      *
      * @throws Exception Se si verifica un errore durante il recupero dell'utente attualmente autenticato, l'eccezione sarà rilanciata.
      */
-    suspend fun getUtenteCorrente(): FirebaseUser? {
-        return try {
-            auth.currentUser
-        } catch (e: Exception) {
-            throw e
-        }
+    fun getUtenteCorrente(): FirebaseUser? {
+        return auth.currentUser
     }
-
 
     /**
      * Funzione che genera un codice univoco per un progetto.
@@ -155,7 +152,6 @@ class RepositoryProgetto {
     fun generaCodiceProgetto(): String {
         return UUID.randomUUID().toString().substring(0, 8)
     }
-
 
     /**
      * Funzione che recupera l'ID di un progetto in base a un codice specificato.
@@ -184,36 +180,39 @@ class RepositoryProgetto {
         }
     }
 
-
     /**
-     * Funzione che esegue il logout dell'utente attualmente autenticato.
+     * Recupera la lista dei partecipanti di un progetto.
      *
-     * La funzione utilizza Firebase Authentication per eseguire il logout dell'utente attualmente autenticato chiamando il metodo `signOut` sull'istanza `auth`.
-     * Dopo la chiamata a questa funzione, l'utente non sarà più autenticato nell'app.
+     * @param progettoId L'ID del progetto di cui si vogliono recuperare i partecipanti.
+     * @return Una lista di ID degli utenti partecipanti al progetto.
+     * @throws Exception Se si verifica un errore durante l'operazione.
      */
-    fun logout() {
-        auth.signOut()
-    }
-
     suspend fun getPartecipantiDelProgetto(progettoId: String): List<String> {
         return try {
-
             val docSnapshot = firestore.collection("progetti").document(progettoId).get().await()
 
             // Verifica se il documento esiste
             if (docSnapshot.exists()) {
                 // Ottieni il campo "partecipanti" dal documento
-                val partecipanti = docSnapshot.get("partecipanti") as? List<String>
-                partecipanti
-                    ?: emptyList() // Restituisci la lista dei partecipanti, se presente, altrimenti una lista vuota
+                val partecipanti = docSnapshot.get("partecipanti")
+
+                // Effettua il cast in modo sicuro e restituisce la lista
+                (partecipanti as? List<*>)?.filterIsInstance<String>() ?: emptyList()
             } else {
-                emptyList() // Se il documento non esiste, restituisci una lista vuota
+                emptyList() // Se il documento non esiste, restituisce una lista vuota
             }
         } catch (e: Exception) {
             throw e
         }
     }
 
+
+    /**
+     * Elimina un progetto dal database.
+     *
+     * @param progettoId L'ID del progetto da eliminare.
+     * @throws Exception Se si verifica un errore durante l'operazione.
+     */
     private fun eliminaProgetto(progettoId: String) {
         try {
 
@@ -226,6 +225,12 @@ class RepositoryProgetto {
         }
     }
 
+    /**
+     * Elimina le notifiche associate a un progetto.
+     *
+     * @param progettoId L'ID del progetto di cui si vogliono eliminare le notifiche.
+     * @throws Exception Se si verifica un errore durante l'operazione.
+     */
     suspend fun eliminaNotificheDelProgetto(progettoId: String) {
         try {
             // Ottieni tutte le notifiche associate al progetto
@@ -244,6 +249,13 @@ class RepositoryProgetto {
         }
     }
 
+    /**
+     * Recupera un progetto dato il suo ID.
+     *
+     * @param progettoId L'ID del progetto da recuperare.
+     * @return L'oggetto `Progetto` corrispondente all'ID specificato, oppure `null` se non viene trovato alcun progetto.
+     * @throws Exception Se si verifica un errore durante l'operazione.
+     */
     suspend fun getProgettoById(progettoId: String): Progetto? {
         return try {
             val documentSnapshot =
@@ -254,25 +266,34 @@ class RepositoryProgetto {
                 null
             }
         } catch (e: Exception) {
-            Log.e("RepositoryProgetto", "Errore nel caricamento del progetto", e)
             null
         }
     }
 
+    /**
+     * Aggiorna i dati di un progetto nel database.
+     *
+     * @param progetto Un'istanza della classe `Progetto` contenente i dati aggiornati.
+     * @throws Exception Se si verifica un errore durante l'aggiornamento del documento su Firestore.
+     */
     suspend fun aggiornaProgetto(progetto: Progetto) {
         try {
             progetto.id?.let { id ->
                 firestore.collection("progetti").document(id).set(progetto).await()
             }
         } catch (e: Exception) {
-            Log.e("RepositoryProgetto", "Errore durante l'aggiornamento del progetto", e)
             throw e
 
         }
     }
 
-
-    suspend fun getProgettiUtente_callback(userId: String, callback: (List<Progetto>) -> Unit) {
+    /**
+     * Recupera la lista dei progetti a cui partecipa un utente specifico utilizzando una callback.
+     *
+     * @param userId L'ID dell'utente di cui si vogliono recuperare i progetti.
+     * @param callback La funzione di callback da eseguire con la lista dei progetti.
+     */
+    suspend fun progettiutenteCallback(userId: String, callback: (List<Progetto>) -> Unit) {
         try {
             val querySnapshot = firestore.collection("progetti")
                 .whereArrayContains("partecipanti", userId)
@@ -289,18 +310,3 @@ class RepositoryProgetto {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

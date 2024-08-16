@@ -28,20 +28,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.teamsync.R
-import com.example.teamsync.ui.theme.Grey35
-import com.example.teamsync.ui.theme.White
+import com.example.teamsync.util.theme.Grey35
+import com.example.teamsync.util.theme.White
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Composable che visualizza una sezione calendario.
+ * L'utente può visualizzare il calendario attraverso un DatePickerDialog senza la possibilità di scegliere una data.
+ *
+ * @param isDarkTheme Booleano che indica se l'app è in modalità tema scuro.
+ */
 @Composable
 fun SezioneCalendario(isDarkTheme: Boolean){
+    // Data corrente formattata
     val currentDate = remember { Date() }
     val dateFormatter = remember { SimpleDateFormat("d MMMM", Locale.getDefault()) }
     val formattedDate = dateFormatter.format(currentDate)
+
+    // Contesto corrente e calendario
     val contesto = LocalContext.current
     val calendario = Calendar.getInstance()
+
+    // Dialog per selezionare la data
     val visualizzaCalendario = DatePickerDialog(
         contesto,
         if(isDarkTheme) R.style.CustomDatePickerDialogDark else R.style.CustomDatePickerDialog,
@@ -53,6 +64,7 @@ fun SezioneCalendario(isDarkTheme: Boolean){
         calendario.get(Calendar.DAY_OF_MONTH)
     )
 
+    // Card elevata che visualizza il calendario e apre il DatePickerDialog al click
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 16.dp
@@ -68,19 +80,23 @@ fun SezioneCalendario(isDarkTheme: Boolean){
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
+        // Contenuto della card
         Column(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Titolo della card
             Text(
                 text = stringResource(id = R.string.Calendario),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = if(isDarkTheme) White else Color.Black
             )
+
             Spacer(modifier = Modifier.size(8.dp))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
@@ -91,6 +107,7 @@ fun SezioneCalendario(isDarkTheme: Boolean){
                     )
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
+                // Icona del calendario
                 Icon(
                     painter = painterResource(id = R.drawable.ic_calendario_evento),
                     contentDescription = "Icona Calendario",
@@ -98,6 +115,7 @@ fun SezioneCalendario(isDarkTheme: Boolean){
                     tint = Color.Black
                 )
                 Spacer(modifier = Modifier.size(4.dp))
+                // Data corrente formattata
                 Text(
                     text = formattedDate,
                     style = MaterialTheme.typography.bodyMedium,
@@ -109,6 +127,9 @@ fun SezioneCalendario(isDarkTheme: Boolean){
     }
 }
 
+/**
+ * Anteprima del composable SezioneCalendario con tema scuro.
+ */
 @Preview(showSystemUi = false)
 @Composable
 fun PreviewSezioneCalendario(){

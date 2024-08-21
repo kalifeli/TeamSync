@@ -1,4 +1,4 @@
-# Sommario {#sommario .list-paragraph .TOC-Heading}
+# Sommario 
 
 [1 Introduzione [3](#introduzione)](#introduzione)
 

@@ -1,6 +1,3 @@
-Ecco un esempio di `README.md` che puoi utilizzare per il tuo progetto "TeamSync":
-
----
 
 # TeamSync
 

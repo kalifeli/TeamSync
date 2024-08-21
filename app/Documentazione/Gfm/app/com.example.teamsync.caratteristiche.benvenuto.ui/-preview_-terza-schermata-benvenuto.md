@@ -1,0 +1,11 @@
+//[app](../../index.md)/[com.example.teamsync.caratteristiche.benvenuto.ui](index.md)/[Preview_TerzaSchermataBenvenuto](-preview_-terza-schermata-benvenuto.md)
+
+# Preview_TerzaSchermataBenvenuto
+
+[androidJvm]\
+
+@[Preview](https://developer.android.com/reference/kotlin/androidx/compose/ui/tooling/preview/Preview.html)
+
+@[Composable](https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html)
+
+fun [Preview_TerzaSchermataBenvenuto](-preview_-terza-schermata-benvenuto.md)()

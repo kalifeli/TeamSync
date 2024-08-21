@@ -127,7 +127,7 @@ dependencies {
 }
 
 tasks.dokkaHtml {
-    outputDirectory.set(layout.buildDirectory.dir("dokka"))
+    outputDirectory.set(layout.projectDirectory.dir("Documentazione/Html"))
 
     dokkaSourceSets.configureEach {
         if (name == "main") {
@@ -139,10 +139,10 @@ tasks.dokkaHtml {
 }
 
 tasks.dokkaGfm {
-    outputDirectory.set(layout.buildDirectory.dir("dokka/gfm")) // Imposta la directory di output
+    outputDirectory.set(layout.projectDirectory.dir("Documentazione/Gfm"))
 
     dokkaSourceSets.configureEach {
-        if(name =="main") {
+        if (name == "main") {
             includeNonPublic.set(false) // Non include membri non pubblici
             skipEmptyPackages.set(true) // Salta i pacchetti vuoti
             reportUndocumented.set(true) // Riporta i membri non documentati

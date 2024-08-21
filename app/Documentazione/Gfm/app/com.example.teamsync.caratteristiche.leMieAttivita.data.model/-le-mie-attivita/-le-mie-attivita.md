@@ -1,0 +1,6 @@
+//[app](../../../index.md)/[com.example.teamsync.caratteristiche.leMieAttivita.data.model](../index.md)/[LeMieAttivita](index.md)/[LeMieAttivita](-le-mie-attivita.md)
+
+# LeMieAttivita
+
+[androidJvm]\
+constructor(id: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)? = null, titolo: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, descrizione: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, dataScadenza: [Date](https://developer.android.com/reference/kotlin/java/util/Date.html) = Date(), priorita: [Priorita](../../com.example.teamsync.util/-priorita/index.md) = Priorita.NESSUNA, completato: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) = false, fileUri: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)? = null, progetto: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, dataCreazione: [Date](https://developer.android.com/reference/kotlin/java/util/Date.html) = Date(), utenti: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)&gt; = emptyList())

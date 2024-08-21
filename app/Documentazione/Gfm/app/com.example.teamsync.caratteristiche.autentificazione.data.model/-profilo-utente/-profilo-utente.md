@@ -1,0 +1,6 @@
+//[app](../../../index.md)/[com.example.teamsync.caratteristiche.autentificazione.data.model](../index.md)/[ProfiloUtente](index.md)/[ProfiloUtente](-profilo-utente.md)
+
+# ProfiloUtente
+
+[androidJvm]\
+constructor(id: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, nome: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, cognome: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, matricola: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, dataDiNascita: [Date](https://developer.android.com/reference/kotlin/java/util/Date.html) = Date(), sesso: [SessoUtente](../-sesso-utente/index.md) = SessoUtente.UOMO, email: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) = &quot;&quot;, primoAccesso: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) = true, immagine: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)? = null, amici: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)&gt; = emptyList())

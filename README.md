@@ -293,7 +293,8 @@ preferenze personali.
                           cui l\'utente           
                           interagisce, come       
                           pulsanti, menu e        
-                          schermate.              
+                          schermate.      
+                          
   -----------------------------------------------------------------------
 
 # Kotlin App
@@ -575,10 +576,10 @@ altri utenti.
 
 #### Diagramma dei requisiti funzionali
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image1.emf){width="6.3in"
+![](images/image1.emf){width="6.3in"
 height="8.933333333333334in"}
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image2.emf){width="6.3in"
+![](images/image2.emf){width="6.3in"
 height="8.915277777777778in"}
 
 ### Requisiti Non Funzionali
@@ -612,7 +613,7 @@ ritardi.
 
 #### Diagramma dei requisiti non funzionali
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image3.emf){width="2.1532491251093613in"
+![](images/image3.emf){width="2.1532491251093613in"
 height="2.2240102799650043in"}
 
 ## Casi d'Uso
@@ -630,7 +631,7 @@ sistema, delineando i requisiti funzionali dell\'applicazione.
 
 ### Attori
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image4.emf){width="3.3278915135608047in"
+![](images/image4.emf){width="3.3278915135608047in"
 height="2.2958869203849517in"}
 
 Nel progetto **TeamSync**, abbiamo deciso di rappresentare
@@ -851,7 +852,7 @@ funzionamento dell\'applicazione.
 
 ### Gestione dell'Autenticazione e Registrazione Utente
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image5.emf){width="5.67217738407699in"
+![](images/image5.emf){width="5.67217738407699in"
 height="3.379718941382327in"}
 
 **CU1: Autentificazione Utente**
@@ -992,7 +993,7 @@ height="3.379718941382327in"}
 
 ### Gestione dei Progetti
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image6.emf){width="5.59922353455818in"
+![](images/image6.emf){width="5.59922353455818in"
 height="4.5479429133858265in"}
 
 **CU5: Creazione di un Progetto**
@@ -1140,7 +1141,7 @@ height="4.5479429133858265in"}
 
 ### Gestione delle Attività
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image7.emf){width="6.3in"
+![](images/image7.emf){width="6.3in"
 height="4.2391961942257215in"}
 
 **CU12: Creazione di un\'Attività**
@@ -1347,7 +1348,7 @@ height="4.2391961942257215in"}
 
 ### Gestione del Profilo Utente
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image8.emf){width="5.1552821522309715in"
+![](images/image8.emf){width="5.1552821522309715in"
 height="3.7518241469816274in"}
 
 **CU20: Personalizzazione del profilo**
@@ -1497,7 +1498,7 @@ height="3.7518241469816274in"}
 
 ### Gestione degli Amici
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image9.emf){width="5.4947615923009625in"
+![](images/image9.emf){width="5.4947615923009625in"
 height="3.512952755905512in"}.
 
 **CU27: Visualizzazione profilo Collega**
@@ -1550,12 +1551,12 @@ height="3.512952755905512in"}.
 
 ### Gestione delle Notifiche
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image10.emf){width="5.686304680664917in"
+![](images/image10.emf){width="5.686304680664917in"
 height="3.8676356080489938in"}
 
 ### Gestione delle Impostazioni
 
-![](vertopal_4c6415411bb247c783c72c46fa58464b/media/image11.emf){width="5.594176509186352in"
+![](images/image11.emf){width="5.594176509186352in"
 height="4.855972222222222in"}
 
 ## Architettura dell'applicazione
@@ -1616,7 +1617,7 @@ dell\'architettura MVVM.
 
 ![Immagine che contiene testo, schermata, menu, design Descrizione
 generata
-automaticamente](vertopal_4c6415411bb247c783c72c46fa58464b/media/image12.png){width="4.8930905511811025in"
+automaticamente](images/image12.png){width="4.8930905511811025in"
 height="6.332108486439195in"}
 
 Ogni package all\'interno del progetto è strutturato con una

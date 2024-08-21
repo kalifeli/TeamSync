@@ -47,8 +47,15 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/NOTICE.md"
+            excludes += "/META-INF/LICENSE"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/LICENSE-notice.md"
+
         }
     }
+
     buildToolsVersion = "34.0.0"
 }
 
@@ -69,69 +76,56 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.core.splashscreen) // Splash API
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.navigation.compose) // Navigation Compose
+    implementation(libs.material3)
+    implementation(libs.androidx.compose.material3.material3)
+    implementation(libs.coil.kt.coil.compose)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.material)
+    implementation(libs.ui.tooling)
+    implementation(libs.lottie.compose) // Lottie Animation
+    implementation(libs.androidx.lifecycle.viewmodel.ktx) // ViewModel
+    implementation(libs.androidx.lifecycle.livedata.ktx) // LiveData
+
+    // Test dependencies
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.junit)
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.mockito.core.v3112)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.v1135)
+    testImplementation(libs.objenesis)
+
+    // Instrumented test dependencies
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.navigation.testing) // Navigation testing
+    // Dipendenze per il test unitario
+    testImplementation(libs.mockk.v1132)
+
+    // Dipendenze per i test strumentali
+    androidTestImplementation (libs.mockk.android)
+    testImplementation(libs.mockito.core.v500)
+    androidTestImplementation (libs.mockito.android)
+    // Dipendenza per fare mocking di classi final
+    testImplementation (libs.mockito.inline)
+    androidTestImplementation(libs.testng)
+
+
+    // Debug dependencies
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    // Splash API
-    implementation(libs.androidx.core.splashscreen)
-    implementation (libs.coil.compose)
-    //Navigation Compose
-    implementation(libs.androidx.navigation.compose)
-    //Material3
-    implementation(libs.material3)
 
-
-    implementation(libs.ui)
-    implementation(libs.androidx.compose.material3.material3)
-    implementation(libs.coil.kt.coil.compose)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
-    implementation(libs.accompanist.permissions)
-
-
-    // Splash API
-    implementation(libs.androidx.core.splashscreen)
-
-    implementation (libs.androidx.material)
-    implementation (libs.ui.tooling)
-
-    // Splash API
-    implementation(libs.androidx.core.splashscreen)
-
-    // Lottie Animation
-    implementation (libs.lottie.compose)
-
-    // Dependencies per il ViewModel
-    implementation (libs.androidx.lifecycle.viewmodel.ktx)
-    implementation (libs.androidx.lifecycle.livedata.ktx)
-    // Dependencies per il test
-    testImplementation (libs.junit)
-    testImplementation (libs.mockito.core.v3112)
-    testImplementation (libs.mockito.kotlin)
-    testImplementation (libs.kotlinx.coroutines.test)
+    // Dipendenza necessaria per InstantTaskExecutorRule
     testImplementation (libs.androidx.core.testing)
-    testImplementation (libs.mockk)
-    testImplementation(libs.mockk.v1135)
-    testImplementation(libs.objenesis)
-
-
-    // Espresso per Android Instrumentation tests (androidTest)
-    androidTestImplementation (libs.androidx.espresso.core.v340)
-    androidTestImplementation (libs.androidx.junit.v121)
-
 }
+
 tasks.dokkaHtml {
     outputDirectory.set(layout.buildDirectory.dir("dokka"))
 
@@ -140,6 +134,18 @@ tasks.dokkaHtml {
             includeNonPublic.set(false)
             skipEmptyPackages.set(true)
             reportUndocumented.set(true)
+        }
+    }
+}
+
+tasks.dokkaGfm {
+    outputDirectory.set(layout.buildDirectory.dir("dokka/gfm")) // Imposta la directory di output
+
+    dokkaSourceSets.configureEach {
+        if(name =="main") {
+            includeNonPublic.set(false) // Non include membri non pubblici
+            skipEmptyPackages.set(true) // Salta i pacchetti vuoti
+            reportUndocumented.set(true) // Riporta i membri non documentati
         }
     }
 }

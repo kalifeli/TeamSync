@@ -1,48 +1,55 @@
 [versions]
 accompanistPermissions = "0.35.1-alpha"
-agp = "8.5.0"
-androidxEspressoCore = "3.4.0"
+agp = "8.5.2"
+androidxEspressoCore = "3.6.1"
 androidxJunit = "1.2.1"
 coreSplashscreen = "1.0.1"
 coreTesting = "2.2.0"
 espressoCoreVersion = "3.6.1"
-junitJunit = "4.13"
+junitJunit = "4.13.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
 kotlinxCoroutinesTest = "1.5.2"
-lifecycleRuntimeKtx = "2.7.0"
-activityCompose = "1.9.0"
-composeBom = "2023.08.00"
-lifecycleViewmodelKtx = "2.8.3"
+lifecycleRuntimeKtx = "2.8.4"
+activityCompose = "1.9.1"
+composeBom = "2024.08.00"
+lifecycleViewmodelKtx = "2.8.4"
 lottieCompose = "6.0.0"
 material = "1.6.8"
 material3 = "1.2.1"
-mockitoCore = "3.9.0"
-mockitoCoreVersion = "3.11.2"
-mockitoKotlin = "3.2.0"
-mockk = "1.12.0"
+mockitoAndroid = "5.0.0"
+mockitoCore = "5.0.0"
+mockitoCoreVersion = "5.0.0"
+mockitoInline = "5.0.0"
+mockitoKotlin = "4.0.0"
+mockitoMockitoCore = "5.0.0"
+mockk = "1.13.5"
+mockkAndroid = "1.13.5"
+mockkMockk = "1.13.5"
 mockkVersion = "1.13.5"
 navigationCompose = "2.7.7"
-objenesis = "3.2"
+navigationTesting = "2.7.7"
+objenesis = "3.3"
 robolectric = "4.7.3"
 shadowsCore = "4.7.3"
 truth = "1.6.0"
 truthVersion = "1.0.1"
-uiTextGoogleFonts = "1.6.7"
+uiTextGoogleFonts = "1.6.8"
 material3Android = "1.2.1"
 material3Desktop = "1.2.1"
-googleGmsGoogleServices = "4.4.1"
+googleGmsGoogleServices = "4.4.2"
 firebaseFirestore = "25.0.0"
 firebaseAuth = "23.0.0"
 firebaseDatabase = "21.0.0"
 firebaseStorageKtx = "21.0.0"
 runtimeLivedata = "1.6.8"
 uiTooling = "1.6.8"
-junitJupiter = "5.8.1"
-junitJunitVersion = "4.12"
+junitJupiter = "5.8.2"
+junitJunitVersion = "4.13.2"
+testng = "6.9.6"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -57,6 +64,7 @@ androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-lived
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 androidx-truth = { module = "androidx.test.ext:truth", version.ref = "truth" }
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 coil-kt-coil-compose = { module = "io.coil-kt:coil-compose" }
@@ -85,10 +93,15 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-core-v3112 = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
+mockito-core-v500 = { module = "org.mockito:mockito-core", version.ref = "mockitoMockitoCore" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
+mockk-v1132 = { module = "io.mockk:mockk", version.ref = "mockkMockk" }
 mockk-v1135 = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 objenesis = { module = "org.objenesis:objenesis", version.ref = "objenesis" }
 shadows-core = { module = "org.robolectric:shadows-core", version.ref = "shadowsCore" }
@@ -98,6 +111,7 @@ ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunitVersion" }
+testng = { group = "org.testng", name = "testng", version.ref = "testng" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

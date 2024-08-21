@@ -1,6 +1,5 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.model
 
-import com.example.teamsync.caratteristiche.leMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.util.Priorita
 import com.google.firebase.firestore.DocumentId
 import java.util.Date

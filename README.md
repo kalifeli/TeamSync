@@ -31,7 +31,7 @@ All'inizio, il codice presentava una struttura rudimentale, con l'obiettivo prin
 
 1. **Clona il Repository:**
    ```bash
-   git clone https://github.com/tuo-utente/TeamSync.git
+   [repository](https://github.com/kalifeli/TeamSync.git)
    cd TeamSync
    ```
 

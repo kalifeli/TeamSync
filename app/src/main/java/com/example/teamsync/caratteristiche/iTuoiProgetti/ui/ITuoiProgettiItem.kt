@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,7 +82,7 @@ fun ITuoiProgettiItem(
         ),
         modifier = Modifier
             .size(width = 220.dp, height = 140.dp)
-            .border(1.dp, if(isDarkTheme) White else White,shape = RoundedCornerShape(16.dp)),
+            .border(1.dp, if (isDarkTheme) White else White, shape = RoundedCornerShape(16.dp)),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if(isDarkTheme) Color.Black else White
         ),
@@ -163,7 +164,7 @@ fun ITuoiProgettiItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "$attivitaNonCompletate attività",
+                        text = "$attivitaNonCompletate " + stringResource(id = R.string.Attività),
                         textAlign = TextAlign.End,
                         fontSize = 12.sp,
                         color = if(isDarkTheme) White else Color.Black

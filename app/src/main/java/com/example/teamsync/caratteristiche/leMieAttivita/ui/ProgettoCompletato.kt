@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -93,7 +94,7 @@ fun ProgettoCompletatoScreen(
     ) {
         item {
             Text(
-                text = "Progetto completato",
+                text = stringResource(id = R.string.progettoCompletato),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = if (isDarkTheme) Color.White else Color.Black,
@@ -122,14 +123,16 @@ fun ProgettoCompletatoScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(end = 16.dp)
                 ) {
                     Text(
-                        text = "Data Consegna:",
+                        text = stringResource(id = R.string.dataConsegna) + ":",
                         style = MaterialTheme.typography.titleMedium,
                         color = if (isDarkTheme) Color.White else Color.Black,
                         fontWeight = FontWeight.Bold,
@@ -146,7 +149,7 @@ fun ProgettoCompletatoScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Voto:",
+                        text = stringResource(id = R.string.voto) + ":",
                         style = MaterialTheme.typography.titleMedium,
                         color = if (isDarkTheme) Color.White else Color.Black,
                         fontWeight = FontWeight.Bold,
@@ -160,7 +163,7 @@ fun ProgettoCompletatoScreen(
                 }
             }
             Text(
-                text = "Partecipanti:",
+                text = stringResource(id = R.string.Partecipanti)+ ":",
                 style = MaterialTheme.typography.titleMedium,
                 color = if (isDarkTheme) Color.White else Color.Black,
                 fontWeight = FontWeight.Bold,

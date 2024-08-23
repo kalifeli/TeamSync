@@ -69,6 +69,9 @@
     <string name="help">Aiuto &amp; Supporto</string>
     <string name="terms">Termini e Condizioni</string>
     <string name="eliminaAccount">Elimina Account</string>
+    <string name="eliminaAccountDescrizione"> Sei sicuro di eliminare il tuo account? Cliccando conferma non potrai tornare più indietro e perderai tutti i tuoi dati. </string>
+
+
 
     <!-- Schermata Impostazioni Notifiche -->
     <string name="avvisamiquando">Avvisami quando</string>
@@ -189,6 +192,7 @@
     <string name="CaricamentoProgetti">Caricamento dei progetti in corso… </string>
     <string name="Calendario">Calendario </string>
     <string name="messaggioCondividiProgetto">Ecco il codice per poter aggiungere il progetto: %s </string>
+    <string name="Attività"> attività </string>
 
 
 
@@ -251,6 +255,7 @@
     <!--Avvisi Toast -->
     <string name="noNotificheToast"> Non hai nuove notifiche da leggere!</string>
 
+    <string name="progettoCompletato"> Progetto completato </string>
 
 
 </resources>

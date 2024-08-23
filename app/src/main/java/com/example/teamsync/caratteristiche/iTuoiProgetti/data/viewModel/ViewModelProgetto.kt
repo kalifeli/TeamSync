@@ -39,6 +39,7 @@ class ViewModelProgetto(
     var erroreAggiungiProgetto = mutableStateOf<String?>(null)
         private set
 
+
     /**
      * Messaggio di errore per il caricamento dei progetti.
      */
@@ -111,6 +112,10 @@ class ViewModelProgetto(
     private val _progettiCollega = MutableLiveData<List<Progetto>>()
     val progettiCollega: LiveData<List<Progetto>> get() = _progettiCollega
 
+    private val _erroreModificaProgetto = MutableLiveData<String?>()
+    val erroreModificaProgeto: LiveData<String?> get() = _erroreModificaProgetto
+
+
     /**
      * Inizializza il ViewModel e carica i dati dell'utente corrente.
      */
@@ -177,8 +182,25 @@ class ViewModelProgetto(
         dataScadenza: Date,
         priorita: Priorita,
         voto: String,
-        dataConsegna: Date
+        dataConsegna: Date,
+        dataCreazione: Date
     ) {
+        if (nome.isBlank()) {
+            _erroreModificaProgetto.value = "Per favore, inserisci il nome del progetto"
+            return
+        }
+        if (dataScadenza.before(dataCreazione)) {
+            _erroreModificaProgetto.value =
+                "La data di scadenza non può essere precedente alla data di creazione del progetto."
+            return
+        }
+        if(dataConsegna.before(dataCreazione)){
+            _erroreModificaProgetto.value =
+                "La data di consegna non può essere precedente alla data di creazione del progetto."
+            return
+        }
+
+
         viewModelScope.launch {
             try {
                 val progetto = repositoryProgetto.getProgettoById(progettoId)
@@ -195,11 +217,16 @@ class ViewModelProgetto(
                     utenteCorrenteId.value?.let {
                         caricaProgettiUtente(it, false)
                     }
+                    _erroreModificaProgetto.value = null
                 }
             } catch (e: Exception) {
-                Log.e("ViewModelProgetto", "Errore durante l'aggiornamento del progetto", e)
+                _erroreModificaProgetto.value = "Errore durante l'aggiornamento del progetto"
             }
         }
+    }
+
+    fun resetErroreModificaProgetto(){
+        _erroreModificaProgetto.value = null
     }
 
     /**

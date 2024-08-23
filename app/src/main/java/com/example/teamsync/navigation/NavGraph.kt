@@ -101,7 +101,6 @@ fun NavGraph(){
                     NotificationScreen(viewModelUtente, navController, viewModelNotifiche)
                 }
             }
-
         }
         composable(route = Schermate.Profilo.route) {
             Scaffold (
@@ -123,7 +122,6 @@ fun NavGraph(){
             val projectId = backStackEntry.arguments?.getString("sezioneFaq")
             Faq(navController = navController, sezioneFaq = projectId ?: "", viewModel = faqViewModel)
         }
-
 
         composable(
             route = "utente/{id}/{amicizia}/{provenienza}/{id_task}/{id_progetto}/{sottoprovenienza}",

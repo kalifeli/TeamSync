@@ -315,14 +315,14 @@ fun DeleteAccountDialog(
     AlertDialog(
         title = {
             Text(
-                text = "Elimina Account",
+                text = stringResource(id = R.string.eliminaAccount),
                 textAlign = TextAlign.Center,
                 color = if (isDarkTheme) Color.White else Color.Black
             )
         },
         text = {
             Text(
-                text = "Sei sicuro di eliminare il tuo account? Cliccando conferma non potrai tornare più indietro e perderai tutti i tuoi dati.",
+                text = stringResource(id = R.string.eliminaAccountDescrizione),
                 color = if (isDarkTheme) Color.White else Color.Black,
             )
         },
@@ -333,13 +333,13 @@ fun DeleteAccountDialog(
                 onClick = { onSuccess() },
                 colors = ButtonDefaults.buttonColors(Red70),
             ) {
-                Text(text = "Conferma")
+                Text(text = stringResource(id = R.string.conferma))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
                 Text(
-                    text = "Annulla",
+                    text = stringResource(id = R.string.annullaEdit),
                     color = if (isDarkTheme) Color.White else Color.Black
                 )
             }

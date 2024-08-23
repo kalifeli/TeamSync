@@ -67,6 +67,7 @@
     <string name="help">Help &amp; Support</string>
     <string name="terms">Terms and Policies</string>
     <string name="eliminaAccount">Delete Account</string>
+    <string name="eliminaAccountDescrizione"> Are you sure you want to delete your account? By clicking confirm you will not be able to go back and you will lose all your data. </string>
 
     <!-- Schermata Impostazioni Notifiche -->
     <string name="avvisamiquando">Notify me when</string>
@@ -185,6 +186,7 @@
     <string name="ricercaColleghi">Search Colleagues/Add Colleagues </string>
     <string name="CaricamentoProgetti">Loading projects… </string>
     <string name="Calendario">Calendar </string>
+    <string name="Attività"> task </string>
 
     <!--ProfiloProgetto Screen-->
     <string name="Informazioni"> Information </string>
@@ -247,6 +249,8 @@
 
     <!--Avvisi Toast -->
     <string name="noNotificheToast"> You have no new notifications to read!</string>
+
+    <string name="progettoCompletato"> Project completed </string>
 
 
 </resources>

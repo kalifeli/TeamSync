@@ -45,6 +45,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -94,12 +95,14 @@ fun SchermataModificaProgetto(
     var nomeProgetto by remember { mutableStateOf("") }
     var descrizioneProgetto by remember { mutableStateOf("") }
     var dataScadenzaProgetto by remember { mutableStateOf(Date()) }
+    var dataCreazioneProgetto by remember { mutableStateOf(Date()) }
     var priorita by remember { mutableStateOf(Priorita.NESSUNA) }
     var voto by remember { mutableStateOf("Non valutato") }
     var dataConsegnaProgetto by remember { mutableStateOf(Date()) }
     var completato by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
     var erroreModificaProgetto by remember { mutableStateOf<String?>(null)}
+    val erroreModificaProgetto1 by viewModelProgetto.erroreModificaProgeto.observeAsState()
     var mostraVoto by remember { mutableStateOf(false) }
     val contesto = LocalContext.current
 
@@ -157,6 +160,7 @@ fun SchermataModificaProgetto(
             nomeProgetto = progetto.nome
             descrizioneProgetto = progetto.descrizione ?: ""
             dataScadenzaProgetto = progetto.dataScadenza
+            dataCreazioneProgetto = progetto.dataCreazione
             priorita = progetto.priorita
             completato = progetto.completato
             voto = progetto.voto
@@ -231,6 +235,10 @@ fun SchermataModificaProgetto(
                     strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
             }
         }else {
+            erroreModificaProgetto1?.let {
+                Toast.makeText(contesto, erroreModificaProgetto1, Toast.LENGTH_LONG).show()
+                viewModelProgetto.resetErroreModificaProgetto()
+            }
             erroreModificaProgetto?.let {
                 Toast.makeText(contesto, erroreModificaProgetto, Toast.LENGTH_LONG).show()
             }
@@ -616,9 +624,12 @@ fun SchermataModificaProgetto(
                                     dataScadenzaProgetto,
                                     priorita,
                                     voto,
-                                    dataConsegnaProgetto
+                                    dataConsegnaProgetto,
+                                    dataCreazioneProgetto
                                 )
-                                navController.popBackStack()
+                                if(erroreModificaProgetto1 == null){
+                                    Toast.makeText(contesto, "Progetto aggiornato correttamente!", Toast.LENGTH_LONG).show()
+                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth(0.5f)

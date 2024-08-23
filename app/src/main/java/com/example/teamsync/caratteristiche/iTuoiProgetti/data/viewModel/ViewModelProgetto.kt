@@ -194,6 +194,7 @@ class ViewModelProgetto(
                 "La data di scadenza non può essere precedente alla data di creazione del progetto."
             return
         }
+
         if(dataConsegna.before(dataCreazione)){
             _erroreModificaProgetto.value =
                 "La data di consegna non può essere precedente alla data di creazione del progetto."

@@ -383,7 +383,7 @@ fun ListaColleghi(
                     .height(70.dp)
                     .padding(horizontal = 16.dp),
                 onClick = {
-                    viewModelProgetto.aggiungiPartecipante(idProgetto, userProfile?.id ?: "")
+                    viewModelProgetto.aggiungiPartecipanteAlProgetto(idProgetto, userProfile?.id ?: "")
                     for (p in partecipanti) {
                         if (p != userProfile?.id) {
                             val contenuto = userProfile?.nome + " " + (userProfile?.cognome

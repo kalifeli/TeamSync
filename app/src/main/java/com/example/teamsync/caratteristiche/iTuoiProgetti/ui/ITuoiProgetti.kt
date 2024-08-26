@@ -2,7 +2,6 @@ package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
 
 import android.app.DatePickerDialog
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -66,26 +65,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.teamsync.R
-import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRepository
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
-import com.example.teamsync.caratteristiche.autentificazione.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.autentificazione.data.viewModel.ViewModelUtente
-import com.example.teamsync.util.Priorita
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel.ViewModelProgetto
 import com.example.teamsync.navigation.Schermate
 import com.example.teamsync.util.NoInternetScreen
+import com.example.teamsync.util.Priorita
+import com.example.teamsync.util.ThemePreferences
+import com.example.teamsync.util.isInternetAvailable
 import com.example.teamsync.util.theme.Grey20
 import com.example.teamsync.util.theme.Grey35
 import com.example.teamsync.util.theme.Grey50
 import com.example.teamsync.util.theme.Red70
 import com.example.teamsync.util.theme.White
-import com.example.teamsync.util.ThemePreferences
-import com.example.teamsync.util.isInternetAvailable
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -122,6 +116,9 @@ fun ITuoiProgetti(
     val progetti by viewModelProgetto.progetti.observeAsState(emptyList())
     val attivitaProgetti by viewModelProgetto.attivitaProgetti.observeAsState(emptyMap())
     val erroreCaricamentoProgetto by viewModelProgetto.erroreCaricamentoProgetto
+
+    val statoAggiuntaPartecipante by viewModelProgetto.statoAggiuntaPartecipante.observeAsState()
+    val erroreAggiuntaPartecipante by viewModelProgetto.erroreAggiuntaPartecipante.observeAsState()
 
     val isConnected = remember { mutableStateOf(isInternetAvailable(context)) }
 
@@ -181,6 +178,20 @@ fun ITuoiProgetti(
             viewModelProgetto.resetErroreCaricamentoProgetto()
         }
 
+    }
+
+    LaunchedEffect(statoAggiuntaPartecipante) {
+        statoAggiuntaPartecipante?.let {
+            if (it) {
+                Toast.makeText(context, "Partecipante aggiunto con successo", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    LaunchedEffect(erroreAggiuntaPartecipante) {
+        erroreAggiuntaPartecipante?.let {
+            Toast.makeText(context, "Errore: $it", Toast.LENGTH_SHORT).show()
+        }
     }
 
     if (utente == null && !isLoggedOut) {

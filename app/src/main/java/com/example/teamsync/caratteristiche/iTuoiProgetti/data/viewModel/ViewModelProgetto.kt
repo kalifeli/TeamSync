@@ -14,8 +14,6 @@ import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
 import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRepository
 import com.example.teamsync.util.Priorita
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -497,9 +495,18 @@ class ViewModelProgetto(
                 val progettoId = repositoryProgetto.getProgettoIdByCodice(codice)
                 val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
                 if (progettoId != null && !utentePartecipa(progettiUtente, progettoId)) {
-                    repositoryProgetto.aggiungiPartecipante(
-                        progettoId, utenteCorrenteId.value
-                    )
+                    utenteCorrenteId.value?.let {
+                        repositoryProgetto.aggiungiPartecipante(
+                            progettoId,
+                            it,
+                            onSuccess = {
+                                _statoAggiuntaPartecipante.value = true
+                            },
+                            onFailure = { e ->
+                                _erroreAggiuntaPartecipante.value = e.message
+                            }
+                        )
+                    }
                     aggiungiProgettoRiuscito.value = true
                     erroreAggiungiProgetto.value = null
                 } else if (progettoId == null) {
@@ -693,26 +700,29 @@ class ViewModelProgetto(
         }
     }
 
+    private val _statoAggiuntaPartecipante = MutableLiveData<Boolean>()
+    val statoAggiuntaPartecipante: LiveData<Boolean> get() = _statoAggiuntaPartecipante
+
+    private val _erroreAggiuntaPartecipante = MutableLiveData<String>()
+    val erroreAggiuntaPartecipante: LiveData<String> get() = _erroreAggiuntaPartecipante
     /**
      * Aggiunge un partecipante a un progetto.
      *
      * @param progettoId L'ID del progetto.
      * @param userId L'ID dell'utente da aggiungere.
      */
-    fun aggiungiPartecipante(progettoId: String, userId: String) {
-        // Assicurati che progettoId sia correttamente valorizzato e che il documento esista
-        if (progettoId.isNotEmpty()) {
-            val progettoReference = FirebaseFirestore.getInstance().collection("progetti").document(progettoId)
-
-            progettoReference.update("partecipanti", FieldValue.arrayUnion(userId))
-                .addOnSuccessListener {
-                    Log.d("RepositoryProgetto", "Utente $userId aggiunto con successo al progetto $progettoId")
+    fun aggiungiPartecipanteAlProgetto(progettoId: String, userId: String) {
+        viewModelScope.launch {
+            repositoryProgetto.aggiungiPartecipante(
+                progettoId,
+                userId,
+                onSuccess = {
+                    _statoAggiuntaPartecipante.value = true
+                },
+                onFailure = { e ->
+                    _erroreAggiuntaPartecipante.value = e.message
                 }
-                .addOnFailureListener { e ->
-                    Log.e("RepositoryProgetto", "Errore nell'aggiungere l'utente al progetto: ${e.message}")
-                }
-        } else {
-            Log.e("RepositoryProgetto", "Errore: progettoId è vuoto o nullo")
+            )
         }
     }
 

@@ -533,7 +533,7 @@ fun gestisciClickNotifca(navController: NavHostController, notifica: Notifiche, 
 fun gestisciCheckNotifica(navController: NavHostController, notifica: Notifiche, userProfile: ProfiloUtente, vmNotifiche: ViewModelNotifiche, viewmodelProgetto: ViewModelProgetto, viewModelUtente: ViewModelUtente, listap: List<String>?, nomeProgetto: String) {
     if (notifica.tipo == "Richiesta_Progetto") {
         vmNotifiche.cambiastatoAccettatoNotifica(notifica.id)
-        viewmodelProgetto.aggiungiPartecipante(notifica.progettoId, userProfile.id)
+        viewmodelProgetto.aggiungiPartecipanteAlProgetto(notifica.progettoId, userProfile.id)
 
         listap?.forEach { p ->
             if (p != userProfile.id) {

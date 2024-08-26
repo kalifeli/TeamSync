@@ -1,6 +1,7 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository
 
 
+import android.util.Log
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -89,12 +90,23 @@ class RepositoryProgetto {
      *
      * @throws Exception Se si verifica un errore durante l'aggiornamento del documento su Firestore, l'eccezione sarà rilanciata.
      */
-    suspend fun aggiungiPartecipante(progettoId: String?, userId: String?) {
-        try {
-            val progettoRef = firestore.collection("progetti").document(progettoId ?: "")
-            progettoRef.update("partecipanti", FieldValue.arrayUnion(userId)).await()
-        } catch (e: Exception) {
-            throw e
+    fun aggiungiPartecipante(progettoId: String, userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        if (progettoId.isNotEmpty()) {
+            val progettoReference = FirebaseFirestore.getInstance().collection("progetti").document(progettoId)
+
+            progettoReference.update("partecipanti", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener {
+                    Log.d("RepositoryProgetto", "Utente $userId aggiunto con successo al progetto $progettoId")
+                    onSuccess()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("RepositoryProgetto", "Errore nell'aggiungere l'utente al progetto: ${e.message}")
+                    onFailure(e)
+                }
+        } else {
+            val exception = IllegalArgumentException("Errore: progettoId è vuoto o nullo")
+            Log.e("RepositoryProgetto", exception.message.toString())
+            onFailure(exception)
         }
     }
 

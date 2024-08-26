@@ -1,9 +1,11 @@
 package com.example.teamsync.caratteristiche.notifiche.data.viewModel
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.autentificazione.data.viewModel.ViewModelUtente
 import com.example.teamsync.caratteristiche.notifiche.data.model.Notifiche
 import com.example.teamsync.caratteristiche.notifiche.data.repository.RepositoryNotifiche
@@ -14,7 +16,8 @@ import kotlinx.coroutines.launch
  */
 class ViewModelNotifiche(
     private val repositoryNotifiche : RepositoryNotifiche,
-    private val viewModelUtente : ViewModelUtente
+    private val viewModelUtente : ViewModelUtente,
+    private val context: Context
 ) : ViewModel() {
 
     var notificheList = mutableStateOf<List<Notifiche>>(emptyList())
@@ -29,6 +32,7 @@ class ViewModelNotifiche(
         private set
     var erroreLetturaNotifiche = mutableStateOf<String?>(null)
         private set
+
 
 
     init {
@@ -61,12 +65,12 @@ class ViewModelNotifiche(
                     notificheList.value = notifiche
                     erroreLetturaNotifiche.value = null
                 } else {
-                    erroreLetturaNotifiche.value = "Impossibile ottenere l'ID utente"
+                    erroreLetturaNotifiche.value = context.getString(R.string.errore_id_utente)
                 }
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                erroreLetturaNotifiche.value = "Errore durante il recupero delle notifiche"
+                erroreLetturaNotifiche.value = context.getString(R.string.errore_lettura_notifiche)
             } finally {
                 isLoading.value = false
             }
@@ -98,7 +102,7 @@ class ViewModelNotifiche(
                 erroreLetturaNotifiche.value = null
                 letturaNotificheStato.value = true
             } catch (e: Exception) {
-                erroreLetturaNotifiche.value = "Errore durante il cambio di stato della notifica"
+                erroreLetturaNotifiche.value = context.getString(R.string.errore_stato_notifica)
                 letturaNotificheStato.value = false
             }
         }
@@ -246,7 +250,7 @@ class ViewModelNotifiche(
             } catch (e: Exception) {
                 Log.e("ViewModelNotifiche", "Errore durante l'eliminazione delle notifiche per l'utente $userId", e)
                 eliminazioneNotificheStato.value = false
-                erroreEliminazioneNotifiche.value = "Errore durante l'eliminazione delle notifiche"
+                erroreEliminazioneNotifiche.value = context.getString(R.string.errore_eliminazione_notifiche)
             }
         }
     }

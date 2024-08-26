@@ -9,6 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -56,11 +57,12 @@ import com.example.teamsync.caratteristiche.impostazioni.ui.UserProfileScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavGraph(){
+    val contesto = LocalContext.current
     val navController = rememberNavController()
-    val viewModelUtente = ViewModelUtente(RepositoryUtente())
-    val viewModelProgetto = ViewModelProgetto(RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente()))
-    val viewModelLeMieAttivita = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente())
-    val viewModelNotifiche = ViewModelNotifiche(RepositoryNotifiche(), viewModelUtente)
+    val viewModelUtente = ViewModelUtente(RepositoryUtente(contesto), contesto)
+    val viewModelProgetto = ViewModelProgetto(RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente(contesto), contesto), contesto)
+    val viewModelLeMieAttivita = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente(contesto))
+    val viewModelNotifiche = ViewModelNotifiche(RepositoryNotifiche(), viewModelUtente, contesto)
     val terminiCondizioniViewModel = TerminiCondizioniViewModel(RepositoryTerms())
     val faqViewModel = FaqViewModel(RepositoryFaq())
 

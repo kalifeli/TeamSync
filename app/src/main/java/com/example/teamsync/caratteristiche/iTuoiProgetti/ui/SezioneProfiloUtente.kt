@@ -186,6 +186,6 @@ fun PreviewImmagineProfiloUtente(){
 @Composable
 fun PreviewSezioneProfiloUtente(){
     SezioneProfiloUtente(navController = rememberNavController(), viewModelUtente = ViewModelUtente(
-        RepositoryUtente()
+        RepositoryUtente(LocalContext.current), LocalContext.current
     ), isDarkTheme = true)
 }

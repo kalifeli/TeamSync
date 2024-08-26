@@ -376,14 +376,16 @@ fun SchermataVuotaNotifiche(
  */
 @Composable
 fun NotificationItem(iconColor: Color, notifica: Notifiche, navController: NavHostController, vmNotifiche: ViewModelNotifiche, userProfile: ProfiloUtente) {
+    val contesto = LocalContext.current
     val apertura = remember { mutableStateOf(false) }
-    val viewmodelUtente = ViewModelUtente(RepositoryUtente())
-    val viewmodelProgetto = ViewModelProgetto(repositoryProgetto = RepositoryProgetto(), repositoryLeMieAttivita = ToDoRepository(), viewModelUtente = ViewModelUtente(RepositoryUtente()))
+    val viewmodelUtente = ViewModelUtente(RepositoryUtente(contesto), contesto)
+    val viewmodelProgetto = ViewModelProgetto(repositoryProgetto = RepositoryProgetto(), repositoryLeMieAttivita = ToDoRepository(), viewModelUtente = ViewModelUtente(RepositoryUtente(contesto), contesto), contesto)
     var listap by remember { mutableStateOf<List<String>?>(emptyList()) }
     var nomeProgetto by remember { mutableStateOf("") }
     val isLoading by viewmodelProgetto.caricaNome.observeAsState()
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val loadingRichiestaAmicizia = remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         viewmodelUtente.getUserProfile()

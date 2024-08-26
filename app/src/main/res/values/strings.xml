@@ -118,7 +118,7 @@
 
     <!--User Profile Screen-->
     <string name="modificaProfiloScreen">Edit Profile </string>
-    <string name="caricamento">Loading... </string>
+    <string name="caricamento">Loading… </string>
     <string name="matricola1">Student ID </string>
     <string name="dataDiNascita">Date of Birth </string>
     <string name="caricaImmagine">Change Image</string>
@@ -252,5 +252,96 @@
 
     <string name="progettoCompletato"> Project completed </string>
 
+    <!-- Error and success messages for ViewModelProgetto -->
+    <string name="errore_nome_progetto_vuoto">Please enter the project name</string>
+    <string name="errore_data_scadenza_invalid">The due date cannot be earlier than the project creation date.</string>
+    <string name="errore_data_consegna_invalid">The delivery date cannot be earlier than the project creation date.</string>
+    <string name="errore_aggiornamento_progetto">Error while updating the project</string>
+    <string name="errore_caricamento_progetti">Error loading projects.</string>
+    <string name="errore_creazione_progetto">An error occurred while creating the project. Please try again.</string>
+    <string name="errore_codice_non_valido">The entered code is not valid. Please try again or contact the project creator</string>
+    <string name="errore_gia_partecipante">You are already part of this project!</string>
+    <string name="errore_abbandono_progetto">An error occurred. Please try again</string>
+    <string name="errore_progetto_non_trovato">Project name not available. Try again later</string>
+    <string name="errore_utente_non_trovato">Current user not found</string>
+    <string name="messaggio_progetto_aggiornato">Project successfully updated</string>
+    <string name="messaggio_progetto_creato">Project successfully created</string>
+    <string name="messaggio_partecipante_aggiunto">Participant successfully added</string>
+    <string name="messaggio_progetto_abbandonato">Project successfully abandoned</string>
+    <!-- Error messages for adding a task -->
+    <string name="errore_aggiungi_titolo_omesso">ADD REJECTED!!!: The title cannot be omitted.</string>
+    <string name="errore_aggiungi_data_precedente">ADD REJECTED!!!: The due date cannot be earlier than the task creation date.</string>
+    <string name="errore_aggiungi_data_successiva">ADD REJECTED!!!: The due date cannot be later than the project due date.</string>
+
+    <!-- Error messages for editing a task -->
+    <string name="errore_modifica_titolo_omesso">Error: The task title cannot be empty.</string>
+    <string name="errore_modifica_data_precedente">Error: The task due date cannot be earlier than today.</string>
+    <string name="errore_modifica_data_successiva">Error: The task due date cannot be later than the project due date.</string>
+    <string name="errore_generico_modifica">Error updating the task.</string>
+    <string name="errore_caricamento_file">Error during file upload.</string>
+
+    <!-- Generic messages -->
+    <string name="errore_task_non_trovata">Error: Task not found.</string>
+    <string name="messaggio_caricamento_in_corso">Loading…</string>
+    <string name="titolo_task_vuoto">Error: The task title cannot be empty.</string>
+    <string name="data_scadenza_task_non_valida">Error: The task due date cannot be earlier than today.</string>
+    <string name="data_scadenza_task_oltre_progetto">Error: The task due date cannot be later than the project due date.</string>
+    <string name="errore_generico_aggiornamento">Error updating the task.</string>
+    <string name="errore_eliminazione_task">Error deleting the task .</string>
+    <string name="errore_completamento_task">Error completing the task .</string>
+    <string name="errore_aggiunta_persona_task">Error adding a person .</string>
+    <string name="errore_rimozione_persona_task">Error removing a person .</string>
+    <string name="errore_recupero_task">Error retrieving the task.</string>
+    <string name="errore_dataScadenza_task_precedente_creazione"> The due date cannot be earlier than the Task creation date.</string>
+
+    <!-- Error messages for notification reading -->
+    <string name="errore_lettura_notifiche">Error retrieving notifications</string>
+    <string name="errore_id_utente">Unable to obtain user ID</string>
+    <string name="errore_stato_notifica">Error changing notification status</string>
+
+    <!-- Error messages for notification deletion -->
+    <string name="errore_eliminazione_notifiche">Error deleting notifications</string>
+    <string name="errore_eliminazione_notifica_utente">Error deleting notifications </string>
+    <string name="errore_eliminazione_notifiche_amicizia">Error deleting friendship notifications</string>
+    <string name="errore_creazione_notifica">Error creating notification</string>
+
+    <!-- Success messages -->
+    <string name="successo_stato_notifica">Notification status changed successfully</string>
+    <string name="successo_eliminazione_notifica">Notification deleted successfully</string>
+
+    <string name="errore_inserisci_email">Please enter your email address.</string>
+    <string name="errore_email_non_valido">The email address entered is not valid.</string>
+    <string name="errore_inserisci_password">Please enter your password.</string>
+    <string name="errore_email_non_verificata">The email has not been verified. Please verify your email address.</string>
+    <string name="errore_password_dimenticata">Forgot your password?</string>
+    <string name="errore_credenziali_errate">Incorrect email or password. Please check your credentials and try again.</string>
+    <string name="errore_login">Error during login:</string>
+    <string name="errore_matricola_non_valida">The student ID must start with S and contain 7 digits.</string>
+    <string name="errore_inserisci_matricola">Please enter your student ID number.</string>
+    <string name="errore_inserisci_nome">Please enter your name.</string>
+    <string name="errore_inserisci_cognome">Please enter your surname.</string>
+    <string name="errore_data_nascita_non_valida">Please enter a valid date of birth.</string>
+    <string name="errore_conferma_password">Please confirm the password entered.</string>
+    <string name="errore_password_non_corrispondenti">Passwords do not match.</string>
+    <string name="errore_registrazione_fallita">Registration failed. Please try again.</string>
+    <string name="errore_verifica_email">An error occurred during email verification.</string>
+    <string name="errore_nome_vuoto">The name cannot be empty.</string>
+    <string name="errore_nome_non_valido">The name contains invalid characters.</string>
+    <string name="errore_cognome_vuoto">The surname cannot be empty.</string>
+    <string name="errore_cognome_non_valido">The surname contains invalid characters.</string>
+    <string name="errore_matricola_vuota">The student ID cannot be empty.</string>
+    <string name="errore_email_vuota">The email address cannot be empty.</string>
+    <string name="errore_aggiornamento_profilo">Error updating profile:</string>
+    <string name="errore_ricaricamento_profilo">Error reloading profile:</string>
+    <string name="errore_reset_password_fallito">Password reset failed. Please try again.</string>
+    <string name="errore_rimozione_amicizia">Error while attempting to remove friendship.</string>
+    <string name="errore_verifica_amicizia">Error verifying friendship.</string>
+    <string name="errore_creazione_amicizia">Error while attempting to make friendship.</string>
+    <string name="errore_caricamento_profilo_utente">Error loading user profile:</string>
+    <string name="errore_utente_non_autenticato">Unauthenticated user. Unable to load profile.</string>
+    <string name="errore_caricamento_profilo_collega">Error retrieving colleague\'s profile.</string>
+    <string name="errore_caricamento_utente">Error loading user.</string>
+    <string name="errore_email_in_uso"> The email address is already in use </string>
+    <string name="errore_generico"> An error occurred. Please try again.</string>
 
 </resources>

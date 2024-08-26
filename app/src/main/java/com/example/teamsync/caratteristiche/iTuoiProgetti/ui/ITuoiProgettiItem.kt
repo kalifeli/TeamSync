@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -229,6 +230,7 @@ fun ITuoiProgettiItem(
 @Composable
 fun PreviewITuoiProgettiItem(){
     ITuoiProgettiItem( navController = rememberNavController(),progetto = Progetto(nome = "TeamSync"), viewModelProgetto = ViewModelProgetto(
-        RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente())
+        RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente(LocalContext.current), LocalContext.current),
+        LocalContext.current
     ), attivitaNonCompletate = 3 , isDarkTheme = false)
 }

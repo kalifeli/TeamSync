@@ -1,4 +1,5 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -184,7 +185,8 @@ fun Progetto(
                         nomeProgetto,
                         viewNotifiche,
                         sottoprovenienza,
-                        provenienza
+                        provenienza,
+                        context
                     )
                 }
             }
@@ -290,7 +292,8 @@ fun ListaColleghi(
     nomeProgetto : String,
     viewNotifiche: ViewModelNotifiche,
     sottoprovenienza : String,
-    provenienza: String
+    provenienza: String,
+    context: Context
 ) {
     val userProfile by viewModelUtente.userProfilo.observeAsState()
     val isLoading by viewModelProgetto.isLoading.observeAsState()
@@ -303,7 +306,7 @@ fun ListaColleghi(
 
     LaunchedEffect(Unit) {
         userProfile?.let { profile ->
-            viewModelProgetto.getProgettiUtenteByIdUtente(profile.id) { progetti, _ ->
+            viewModelProgetto.getProgettiUtenteByIdUtente(profile.id ) { progetti, _ ->
                 mostraPulsante.value = !(viewModelProgetto.utentePartecipa(progetti, idProgetto))
             }
         }

@@ -1,6 +1,6 @@
 package com.example.teamsync.caratteristiche.autentificazione.data.viewModel
 
-import android.content.ContentValues.TAG
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.util.Patterns
@@ -12,6 +12,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.autentificazione.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.autentificazione.data.model.SessoUtente
 import com.example.teamsync.caratteristiche.autentificazione.data.repository.EmailAlreadyInUseException
@@ -25,7 +26,7 @@ import java.util.Date
 /**
  * ViewModel per gestire le operazioni relative all'utente, come login, registrazione e gestione del profilo.
  */
-class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewModel() {
+class ViewModelUtente(private val repositoryUtente : RepositoryUtente, private val context: Context) : ViewModel() {
     /**
      * Indica l'utente corrente.
      */
@@ -130,15 +131,15 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
         password: String,
     ) {
         if(email.isBlank()){
-            erroreLogin.value = "Per favore, inserisci l'indirizzo email."
+            erroreLogin.value = context.getString(R.string.errore_inserisci_email)
             return
         }
         if(!EmailValidator.isValidEmail(email)){
-            erroreLogin.value = "L'indirizzo email inserito non è valido."
+            erroreLogin.value = context.getString(R.string.errore_email_non_valido)
             return
         }
         if (password.isBlank()){
-            erroreLogin.value = "Per favore, inserisci la password."
+            erroreLogin.value = context.getString(R.string.errore_inserisci_password)
             return
         }
 
@@ -155,20 +156,18 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
                     tentativiLoginFalliti.intValue = 0 // reset del contatore in caso di login riuscito
                     getUserProfile()
                 }else{
-                    erroreLogin.value = "L'email non è stata verificata. Per favore, verifica il tuo indirizzo email."
+                    erroreLogin.value = context.getString(R.string.errore_email_non_verificata)
                 }
             }catch (e: Exception){
                 tentativiLoginFalliti.intValue += 1
                 if (tentativiLoginFalliti.intValue > 3) {
-                    erroreLogin.value = "Hai dimenticato la password?"
+                    erroreLogin.value = context.getString(R.string.errore_password_dimenticata)
                 } else {
-                    erroreLogin.value = "Email o password errate. Controlla le tue credenziali e riprova."
+                    erroreLogin.value = context.getString(R.string.errore_credenziali_errate)
                 }
-                println("Errore durante il login: ${e.message}")
                 e.printStackTrace()
             }
         }
-
     }
 
     /**
@@ -224,7 +223,7 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
                 erroreRegistrazione.value = e.message
                 registrazioneRiuscita.value = false
             }catch (e: Exception){
-                erroreRegistrazione.value = "Registrazione fallita. Riprovare."
+                erroreRegistrazione.value = context.getString(R.string.errore_registrazione_fallita)
                 registrazioneRiuscita.value = false
             }finally {
                 _isLoading.value = false
@@ -264,25 +263,25 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
 
         return when {
             // Controlla se il campo matricola è vuoto
-            matricola.isBlank() -> "Per favore, inserisci il numero di matricola."
+            matricola.isBlank() -> context.getString(R.string.errore_inserisci_matricola)
             // Controlla che la matricola inserita sia valida
-            !matricolaPattern.matches(matricola) -> "La matricola deve iniziare con 'S' e contenere 7 numeri."
+            !matricolaPattern.matches(matricola) -> context.getString(R.string.errore_matricola_non_valida)
             // Controlla se il campo email è vuoto
-            email.isBlank() -> "Per favore, inserisci il tuo indirizzo email."
+            email.isBlank() -> context.getString(R.string.errore_email_vuota)
             // Controlla se l'email è valida
-            !EmailValidator.isValidEmail(email) -> "L'indirizzo email inserito non è valido."
+            !EmailValidator.isValidEmail(email) -> context.getString(R.string.errore_email_non_valido)
             // Controlla se il campo nome è vuoto
-            nome.isBlank() -> "Per favore, inserisci il tuo nome."
+            nome.isBlank() -> context.getString(R.string.errore_nome_vuoto)
             // Controlla se il campo cognome è vuoto
-            cognome.isBlank() -> "Per favore, inserisci il tuo cognome."
+            cognome.isBlank() -> context.getString(R.string.errore_cognome_vuoto)
             // Controlla se la data di nascita è nel futuro o uguale alla data attuale
-            dataNascita >= Date() -> "Per favore, inserisci una data di nascita valida."
+            dataNascita >= Date() -> context.getString(R.string.errore_data_nascita_non_valida)
             // Controlla se il campo password è vuoto
-            password.isBlank() -> "Per favore, inserisci la password."
+            password.isBlank() -> context.getString(R.string.errore_inserisci_password)
             // Controlla se il campo confermaPassword è vuoto
-            confermaPassword.isBlank() -> "Per favore, conferma la password inserita."
+            confermaPassword.isBlank() -> context.getString(R.string.errore_conferma_password)
             // Controlla se la password e la conferma password coincidono
-            password != confermaPassword -> "Le password non coincidono."
+            password != confermaPassword -> context.getString(R.string.errore_password_non_corrispondenti)
             // Se tutti i campi sono validi, restituisce null
             else -> null
         }
@@ -300,7 +299,7 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
                     erroreVerificaEmail.value = null
                 }
             }catch (e: Exception){
-                erroreVerificaEmail.value = "Si è verificato un errore durante la conferma dell'email."
+                erroreVerificaEmail.value = context.getString(R.string.errore_verifica_email)
             }
         }
     }
@@ -327,7 +326,7 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
         if(email.isNotBlank()) {
             if(!EmailValidator.isValidEmail(email)){
                 resetPasswordRiuscito.value = false
-                erroreResetPassword.value = "L'indirizzo email inserito non è valido."
+                erroreResetPassword.value = context.getString(R.string.errore_email_non_valido)
                 return
             }
             viewModelScope.launch {
@@ -337,11 +336,11 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
                     erroreResetPassword.value = null
                 }catch (e: Exception){
                     resetPasswordRiuscito.value = false
-                    erroreResetPassword.value = "Reset della password fallito. Riprova."
+                    erroreResetPassword.value = context.getString(R.string.errore_reset_password_fallito)
                 }
             }
         }else{
-            erroreResetPassword.value = "Per favore, inserisci l'indirizzo email."
+            erroreResetPassword.value = context.getString(R.string.errore_email_vuota)
         }
     }
 
@@ -537,7 +536,7 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
                 erroreAggiornaProfilo.value = null
                 aggiornaProfiloRiuscito.value = true
             } catch (e: Exception) {
-                erroreAggiornaProfilo.value = "Errore nell'aggiornamento del profilo: ${e.message}"
+                erroreAggiornaProfilo.value = context.getString(R.string.errore_aggiornamento_profilo)
                 aggiornaProfiloRiuscito.value = false
             }
         }
@@ -556,15 +555,15 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
         val matricolaPattern = Regex("^S\\d{7}$")
 
         return when {
-            profiloUtente.nome.isBlank() -> "Il nome non può essere vuoto."
-            !nomePattern.matches(profiloUtente.nome) -> "Il nome contiene caratteri non validi."
-            profiloUtente.cognome.isBlank() -> "Il cognome non può essere vuoto."
-            !cognomePattern.matches(profiloUtente.cognome) -> "Il cognome contiene caratteri non validi."
-            profiloUtente.dataDiNascita >= Date() -> "Per favore, inserisci una data di nascita valida."
-            profiloUtente.matricola.isBlank() -> "La matricola non può essere vuota."
-            !matricolaPattern.matches(profiloUtente.matricola) -> "La matricola deve iniziare con 'S' e contenere 7 numeri."
-            profiloUtente.email.isBlank() -> "L'indirizzo email non può essere vuoto."
-            !EmailValidator.isValidEmail(profiloUtente.email) -> "L'indirizzo email inserito non è valido."
+            profiloUtente.nome.isBlank() -> context.getString(R.string.errore_nome_vuoto)
+            !nomePattern.matches(profiloUtente.nome) -> context.getString(R.string.errore_nome_non_valido)
+            profiloUtente.cognome.isBlank() -> context.getString(R.string.errore_cognome_vuoto)
+            !cognomePattern.matches(profiloUtente.cognome) -> context.getString(R.string.errore_cognome_non_valido)
+            profiloUtente.dataDiNascita >= Date() -> context.getString(R.string.errore_data_nascita_non_valida)
+            profiloUtente.matricola.isBlank() -> context.getString(R.string.errore_matricola_vuota)
+            !matricolaPattern.matches(profiloUtente.matricola) -> context.getString(R.string.errore_matricola_non_valida)
+            profiloUtente.email.isBlank() -> context.getString(R.string.errore_email_vuota)
+            !EmailValidator.isValidEmail(profiloUtente.email) -> context.getString(R.string.errore_email_non_valido)
             else -> null
         }
     }
@@ -588,7 +587,7 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
                 val profile = repositoryUtente.getUserProfile(userId)
                 _userProfilo.value = profile
             } catch (e: Exception) {
-                erroreAggiornaProfilo.value = "Errore durante il ricaricamento del profilo: ${e.message}"
+                erroreAggiornaProfilo.value = context.getString(R.string.errore_caricamento_profilo_utente)
             }
         }
     }
@@ -651,7 +650,7 @@ class ViewModelUtente(private val repositoryUtente : RepositoryUtente) : ViewMod
 
                 callback(rimuoviSelf(risultati))
             }catch (e: Exception) {
-                Log.e(TAG, "Errore durante il recupero degli utenti", e)
+                Log.e("ViewModelUtente", "Errore durante il recupero degli utenti", e)
             }finally {
                 _isLoading.value = false
             }

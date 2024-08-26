@@ -460,7 +460,7 @@ fun LoginScreen(
 @Preview
 @Composable
 fun Login() {
-    LoginScreen(navController = (rememberNavController()), ViewModelUtente(RepositoryUtente()), ViewModelProgetto(
-        RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente())
+    LoginScreen(navController = (rememberNavController()), ViewModelUtente(RepositoryUtente(LocalContext.current), LocalContext.current), ViewModelProgetto(
+        RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente(LocalContext.current), LocalContext.current ), LocalContext.current
     ))
 }

@@ -107,7 +107,7 @@
     <string name="sesso">Sesso</string>
     <string name="confermaPassword">Conferma Password</string>
     <string name="next">Avanti</string>
-    <string name="accountgia">Hai gia un account? </string>
+    <string name="accountgia">Hai già un account? </string>
 
     <!--Schermata Benvenuto Screen-->
     <string name="benvenuto">Benvenuto in TeamSync </string>
@@ -139,7 +139,7 @@
     <string name="registrati">Registrati </string>
 
     <!--Password dimenticata Screen-->
-    <string name="nonPreoccuparti">Non Preoccuparti! Cliccando su "Procedi", verrà inviato un link per il recupero della password dimenticata all\' indirizzo email associato al tuo account TeamSync.</string>
+    <string name="nonPreoccuparti">Non Preoccuparti! Cliccando su "Procedi", verrà inviato un link per il recupero della password dimenticata all\'indirizzo email associato al tuo account TeamSync.</string>
     <string name="procedi">Procedi </string>
 
     <!--Verifica Email Screen-->
@@ -256,6 +256,99 @@
     <string name="noNotificheToast"> Non hai nuove notifiche da leggere!</string>
 
     <string name="progettoCompletato"> Progetto completato </string>
+
+    <!-- Messaggi di errore e successo per ViewModelProgetto -->
+    <string name="errore_nome_progetto_vuoto">Per favore, inserisci il nome del progetto</string>
+    <string name="errore_data_scadenza_invalid">La data di scadenza non può essere precedente alla data di creazione del progetto.</string>
+    <string name="errore_data_consegna_invalid">La data di consegna non può essere precedente alla data di creazione del progetto.</string>
+    <string name="errore_aggiornamento_progetto">Errore durante l\'aggiornamento del progetto</string>
+    <string name="errore_caricamento_progetti">Errore nel caricamento dei progetti.</string>
+    <string name="errore_creazione_progetto">Si è verificato un errore durante la creazione del progetto. Riprovare.</string>
+    <string name="errore_codice_non_valido">Il codice inserito non è valido. Riprovare o contattare il creatore del progetto</string>
+    <string name="errore_gia_partecipante">Fai già parte di questo progetto!</string>
+    <string name="errore_abbandono_progetto">Si è verificato un errore. Per favore riprovare</string>
+    <string name="errore_progetto_non_trovato">Nome progetto non disponibile. Riprovare più tardi</string>
+    <string name="errore_utente_non_trovato">Utente corrente non trovato</string>
+    <string name="messaggio_progetto_aggiornato">Progetto aggiornato con successo</string>
+    <string name="messaggio_progetto_creato">Progetto creato con successo</string>
+    <string name="messaggio_partecipante_aggiunto">Partecipante aggiunto con successo</string>
+    <string name="messaggio_progetto_abbandonato">Progetto abbandonato con successo</string>
+    <!-- Messaggi di errore per l'aggiunta di un'attività -->
+    <string name="errore_aggiungi_titolo_omesso">AGGIUNGI RIFIUTATO!!!: Il titolo non può essere omesso.</string>
+    <string name="errore_aggiungi_data_precedente">AGGIUNGI RIFIUTATO!!!: La data di scadenza non può essere precedente alla data di creazione della Task.</string>
+    <string name="errore_aggiungi_data_successiva">AGGIUNGI RIFIUTATO!!!: La data di scadenza non può essere successiva alla data di scadenza del progetto.</string>
+
+    <!-- Messaggi di errore per la modifica di un'attività -->
+    <string name="errore_modifica_titolo_omesso">Errore: Il titolo dell\'attività non può essere vuoto.</string>
+    <string name="errore_modifica_data_precedente">Errore: La data di scadenza dell\'attività non può essere precedente alla data odierna.</string>
+    <string name="errore_modifica_data_successiva">Errore: La data di scadenza dell\'attività non può essere successiva alla data di scadenza del progetto.</string>
+    <string name="errore_generico_modifica">Errore durante aggiornamento attività.</string>
+    <string name="errore_caricamento_file">Errore durante il caricamento del file.</string>
+
+    <!-- Messaggi generici -->
+    <string name="errore_task_non_trovata">Errore: Attività non trovata.</string>
+    <string name="messaggio_caricamento_in_corso">Caricamento in corso…</string>
+    <string name="titolo_task_vuoto">Errore: Il titolo della task non può essere vuoto.</string>
+    <string name="data_scadenza_task_non_valida">Errore: La data di scadenza della task non può essere precedente a oggi.</string>
+    <string name="data_scadenza_task_oltre_progetto">Errore: La data di scadenza della task non può essere successiva alla data di scadenza del progetto.</string>
+    <string name="errore_generico_aggiornamento">Errore durante l\'aggiornamento della task.</string>
+    <string name="errore_eliminazione_task">Errore nell\'eliminazione della task.</string>
+    <string name="errore_completamento_task">Errore nel completamento della task .</string>
+    <string name="errore_aggiunta_persona_task">Errore nell\'aggiungere una persona .</string>
+    <string name="errore_rimozione_persona_task">Errore nel rimuovere una persona.</string>
+    <string name="errore_recupero_task">Errore nel reperire la task .</string>
+    <string name="errore_dataScadenza_task_precedente_creazione"> La data di scadenza non può essere precedente alla data di creazione della Task.</string>
+
+    <!-- Messaggi di errore per la lettura delle notifiche -->
+    <string name="errore_lettura_notifiche">Errore durante il recupero delle notifiche</string>
+    <string name="errore_id_utente">Impossibile ottenere l\'ID utente</string>
+    <string name="errore_stato_notifica">Errore durante il cambio di stato della notifica</string>
+
+    <!-- Messaggi di errore per l'eliminazione delle notifiche -->
+    <string name="errore_eliminazione_notifiche">Errore durante l\'eliminazione delle notifiche</string>
+    <string name="errore_eliminazione_notifica_utente">Errore durante l\'eliminazione delle notifiche</string>
+    <string name="errore_eliminazione_notifiche_amicizia">Errore durante l\'eliminazione delle notifiche di amicizia</string>
+    <string name="errore_creazione_notifica">Errore durante la creazione della notifica</string>
+
+    <!-- Messaggi di successo -->
+    <string name="successo_stato_notifica">Stato della notifica cambiato con successo</string>
+    <string name="successo_eliminazione_notifica">Notifica eliminata con successo</string>
+
+    <string name="errore_inserisci_email">Per favore, inserisci l\'indirizzo email.</string>
+    <string name="errore_email_non_valido">L\'indirizzo email inserito non è valido.</string>
+    <string name="errore_inserisci_password">Per favore, inserisci la password.</string>
+    <string name="errore_email_non_verificata">L\'email non è stata verificata. Per favore, verifica il tuo indirizzo email.</string>
+    <string name="errore_password_dimenticata">Hai dimenticato la password?</string>
+    <string name="errore_credenziali_errate">Email o password errate. Controlla le tue credenziali e riprova.</string>
+    <string name="errore_login">Errore durante il login:</string>
+    <string name="errore_matricola_non_valida">La matricola deve iniziare con S e contenere 7 numeri.</string>
+    <string name="errore_inserisci_matricola">Per favore, inserisci il numero di matricola.</string>
+    <string name="errore_inserisci_nome">Per favore, inserisci il tuo nome.</string>
+    <string name="errore_inserisci_cognome">Per favore, inserisci il tuo cognome.</string>
+    <string name="errore_data_nascita_non_valida">Per favore, inserisci una data di nascita valida.</string>
+    <string name="errore_conferma_password">Per favore, conferma la password inserita.</string>
+    <string name="errore_password_non_corrispondenti">Le password non coincidono.</string>
+    <string name="errore_registrazione_fallita">Registrazione fallita. Riprovare.</string>
+    <string name="errore_verifica_email">Si è verificato un errore durante la verifica dell\'email.</string>
+    <string name="errore_nome_vuoto">Il nome non può essere vuoto.</string>
+    <string name="errore_nome_non_valido">Il nome contiene caratteri non validi.</string>
+    <string name="errore_cognome_vuoto">Il cognome non può essere vuoto.</string>
+    <string name="errore_cognome_non_valido">Il cognome contiene caratteri non validi.</string>
+    <string name="errore_matricola_vuota">La matricola non può essere vuota.</string>
+    <string name="errore_email_vuota">L\'indirizzo email non può essere vuoto.</string>
+    <string name="errore_aggiornamento_profilo">Errore nell\'aggiornamento del profilo:</string>
+    <string name="errore_ricaricamento_profilo">Errore durante il ricaricamento del profilo:</string>
+    <string name="errore_reset_password_fallito">Reset della password fallito. Riprova.</string>
+    <string name="errore_rimozione_amicizia">Errore durante il tentativo di rimuovere l\'amicizia.</string>
+    <string name="errore_verifica_amicizia">Errore durante la verifica dell\'amicizia.</string>
+    <string name="errore_creazione_amicizia">Errore durante il tentativo di fare amicizia.</string>
+    <string name="errore_caricamento_profilo_utente">Errore durante il caricamento del profilo utente:</string>
+    <string name="errore_utente_non_autenticato">Utente non autenticato. Impossibile caricare il profilo.</string>
+    <string name="errore_caricamento_profilo_collega">Errore durante il recupero del profilo del collega.</string>
+    <string name="errore_caricamento_utente">Errore nel caricamento dell\'utente.</string>
+    <string name="errore_email_in_uso">L\'indirizzo email è già in uso</string>
+    <string name="errore_generico">Si è verificato un errore. Riprovare.</string>
+
 
 
 </resources>

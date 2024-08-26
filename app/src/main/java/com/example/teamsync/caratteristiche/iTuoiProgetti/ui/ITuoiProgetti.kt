@@ -2,6 +2,7 @@ package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -765,7 +766,8 @@ fun CreaProgettoDialog(
         AggiungiProgettoDialog(
             onDismissRequest = { mostraAggiungiProgetto = false },
             viewModelProgetto = viewModelProgetto ,
-            isDarkTheme = isDarkTheme
+            isDarkTheme = isDarkTheme,
+            context
         )
     }
 
@@ -789,7 +791,8 @@ fun CreaProgettoDialog(
 fun AggiungiProgettoDialog(
     onDismissRequest: () -> Unit,
     viewModelProgetto: ViewModelProgetto,
-    isDarkTheme: Boolean
+    isDarkTheme: Boolean,
+    contesto: Context
 ){
     var codiceProgetto by remember { mutableStateOf("") }
     val utenteId = viewModelProgetto.utenteCorrenteId.value
@@ -869,24 +872,5 @@ fun AggiungiProgettoDialog(
     )
 }
 
-/**
- * Anteprima della funzione ITuoiProgetti per scopi di sviluppo.
- */
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewITuoiProgetti(){
-    ITuoiProgetti(navController = rememberNavController(), ViewModelProgetto(RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente())), ViewModelUtente(
-        RepositoryUtente()
-    ))
-}
-
-/**
- * Anteprima della funzione AggiungiProgettoDialog per scopi di sviluppo.
- */
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewAggiungiProgetto(){
-    //AggiungiProgettoDialog()
-}
 
 

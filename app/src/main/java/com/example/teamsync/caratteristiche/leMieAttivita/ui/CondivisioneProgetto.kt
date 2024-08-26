@@ -95,7 +95,7 @@ fun CondividiProgettoDialog(
             Button(
                 onClick = {
                     codiceProgetto.value?.let {
-                        viewModelProgetto.condividiCodiceProgetto(contesto,it)
+                        viewModelProgetto.condividiCodiceProgetto(it)
                     }
                 },
                 colors = ButtonDefaults.buttonColors( containerColor = Red70,

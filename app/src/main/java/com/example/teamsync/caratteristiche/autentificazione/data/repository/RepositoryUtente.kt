@@ -1,5 +1,7 @@
 package com.example.teamsync.caratteristiche.autentificazione.data.repository
 
+import android.content.Context
+import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.autentificazione.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.autentificazione.data.model.SessoUtente
 import com.google.firebase.Firebase
@@ -15,7 +17,7 @@ import java.util.Date
 /**
  * Repository per gestire le operazioni relative alle attività.
  */
-class RepositoryUtente{
+class RepositoryUtente(val contesto: Context){
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -63,7 +65,7 @@ class RepositoryUtente{
 
         }catch (e: FirebaseAuthUserCollisionException){
             //l'email è già in uso
-            throw EmailAlreadyInUseException()
+            throw EmailAlreadyInUseException(contesto)
         }catch (e: Exception){
             // per tutti gli altri errori che possono verificarsi
             throw e
@@ -253,11 +255,11 @@ class RepositoryUtente{
                 utente.delete().await()
                 null
             }else{
-                "Utente non autentificato o user ID incorretto"
+                contesto.getString(R.string.errore_id_utente)
             }
 
         }catch (e: Exception){
-            "Errore: ${e.message}"
+            contesto.getString(R.string.errore_generico)
         }
 
     }
@@ -344,7 +346,7 @@ class RepositoryUtente{
 /**
  * Eccezione per l'email già in uso.
  */
-class EmailAlreadyInUseException : Exception("L'indirizzo email è già in uso")
+class EmailAlreadyInUseException(contesto: Context) : Exception(contesto.getString(R.string.errore_email_in_uso))
 
 
 

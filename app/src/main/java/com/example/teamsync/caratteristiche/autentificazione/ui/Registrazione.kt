@@ -647,5 +647,5 @@ fun Registrazione(navController: NavHostController, viewModelUtente: ViewModelUt
 @Preview
 @Composable
 fun PreviewRegistrazione() {
-    Registrazione(navController = (rememberNavController()), ViewModelUtente(RepositoryUtente()))
+    Registrazione(navController = (rememberNavController()), ViewModelUtente(RepositoryUtente(LocalContext.current), LocalContext.current))
 }

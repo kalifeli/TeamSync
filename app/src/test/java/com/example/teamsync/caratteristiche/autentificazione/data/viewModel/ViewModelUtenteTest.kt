@@ -1,7 +1,9 @@
 package com.example.teamsync.caratteristiche.autentificazione.data.viewModel
 
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.autentificazione.data.model.SessoUtente
 import com.example.teamsync.caratteristiche.autentificazione.data.repository.RepositoryUtente
 import com.google.firebase.auth.FirebaseUser
@@ -31,12 +33,14 @@ class ViewModelUtenteTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repositoryUtente: RepositoryUtente
     private lateinit var viewModelUtente: ViewModelUtente
+    private lateinit var contesto: Context
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        contesto = mockk(relaxed = true)
         repositoryUtente = mockk(relaxed = true)
-        viewModelUtente = ViewModelUtente(repositoryUtente)
+        viewModelUtente = ViewModelUtente(repositoryUtente, contesto)
     }
 
     @Test
@@ -93,7 +97,7 @@ class ViewModelUtenteTest {
         val nome = "Mario"
         val cognome = "Rossi"
         val email = "mario.rossi@esempio.com"
-        val dataDiNascita = SimpleDateFormat("dd/MM/yyyy").parse("25/08/2024")
+        val dataDiNascita = SimpleDateFormat("dd/MM/yyyy").parse("27/10/2024")
         val sesso = SessoUtente.UOMO
         val password = "password123"
         val confermaPassword = "password123"
@@ -114,6 +118,10 @@ class ViewModelUtenteTest {
         // Mock della funzione di validazione dell'email
         mockkObject(ViewModelUtente.EmailValidator)
         every { ViewModelUtente.EmailValidator.isValidEmail(email) } returns true
+
+        // Mock di eventuali risorse dal context
+        every { contesto.getString(any()) } returns "Per favore, inserisci una data di nascita valida."
+
 
         // Esecuzione del metodo di registrazione
         viewModelUtente.signUp(
@@ -160,6 +168,9 @@ class ViewModelUtenteTest {
         // Mock delle dipendenze
         mockkObject(ViewModelUtente.EmailValidator)
         every { ViewModelUtente.EmailValidator.isValidEmail(email) } returns false
+
+        // Mock di eventuali risorse dal context
+        every { contesto.getString(any()) } returns "L'indirizzo email inserito non è valido."
 
         // Esecuzione del metodo di reset della password
         viewModelUtente.resetPassword(email)

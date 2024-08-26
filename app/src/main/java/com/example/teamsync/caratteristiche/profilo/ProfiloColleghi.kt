@@ -1,4 +1,5 @@
 package com.example.teamsync.caratteristiche.profilo
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -237,7 +238,8 @@ fun ProfiloUtenteCliccato(
                 id = id,
                 idPersonaAutenticata = it.id,
                 userProfile = userProfile,
-                profiloCollega = profiloCollega
+                profiloCollega = profiloCollega,
+                context
             )
         }
     }
@@ -806,11 +808,12 @@ fun AddProjectDialog(
     id: String,
     idPersonaAutenticata: String,
     userProfile: ProfiloUtente?,
-    profiloCollega: ProfiloUtente?
+    profiloCollega: ProfiloUtente?,
+    context: Context
 ) {
-    val viewModelProgetto = remember { ViewModelProgetto(RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente())) }
-    val viewModel = remember { ViewModelUtente(RepositoryUtente()) }
-    val viewModelNotifiche = remember { ViewModelNotifiche(RepositoryNotifiche(), ViewModelUtente(RepositoryUtente())) }
+    val viewModelProgetto = remember { ViewModelProgetto(RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente(context), context), context) }
+    val viewModel = remember { ViewModelUtente(RepositoryUtente(context), context) }
+    val viewModelNotifiche = remember { ViewModelNotifiche(RepositoryNotifiche(), ViewModelUtente(RepositoryUtente(context), context), context) }
 
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     var isLoading by remember { mutableStateOf(true) }

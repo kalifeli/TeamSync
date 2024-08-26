@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.autentificazione.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.leMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRepository
@@ -190,19 +191,20 @@ class LeMieAttivitaViewModel(
         dataScad: Date,
         priorita: Priorita,
         sezione: Int,
-        dataScadenzaProgetto: Date
+        dataScadenzaProgetto: Date,
+        context: Context
     ) {
         _editAttivitaRiuscito.value = false
 
         // Validazione dell'input
-        if (!validateInput(titolo, dataScad, dataScadenzaProgetto)) {
+        if (!validateInput(titolo, dataScad, dataScadenzaProgetto,context)) {
             return
         }
 
         viewModelScope.launch {
             val todo = getTodoById(id)
             if (todo == null) {
-                setErroreEditTask("Errore: Attività non trovata.")
+                setErroreEditTask(context.getString(R.string.errore_recupero_task))
                 return@launch
             }
 
@@ -211,7 +213,7 @@ class LeMieAttivitaViewModel(
                 try {
                     uploadFile(fileUri)
                 } catch (e: Exception) {
-                    setErroreEditTask("Errore durante il caricamento del file: ${e.message}")
+                    setErroreEditTask(context.getString(R.string.errore_recupero_task))
                     return@launch
                 }
             } else {
@@ -229,13 +231,14 @@ class LeMieAttivitaViewModel(
                     sezione = sezione,
                     progetto = todo.progetto,
                     utenti = todo.utenti,
-                    fileUri = downloadUrl
+                    fileUri = downloadUrl,
+                    context
                 )
                 _editAttivitaRiuscito.value = true
                 resetErroreEditTask()  // Reset dell'errore in caso di successo
             } catch (e: Exception) {
                 _editAttivitaRiuscito.value = false
-                setErroreEditTask("Errore durante l'aggiornamento dell'attività: ${e.message}")
+                setErroreEditTask(context.getString(R.string.errore_generico_aggiornamento))
             }
         }
     }
@@ -252,18 +255,18 @@ class LeMieAttivitaViewModel(
      * @param dataScadenzaProgetto La data di scadenza del progetto associato all'attività. La data di scadenza dell'attività non può essere successiva a questa data.
      * @return `true` se tutti i campi di input sono validi, `false` altrimenti.
      */
-    private fun validateInput(titolo: String, dataScad: Date, dataScadenzaProgetto: Date): Boolean {
+    private fun validateInput(titolo: String, dataScad: Date, dataScadenzaProgetto: Date, context: Context): Boolean {
         return when {
             titolo.isBlank() -> {
-                setErroreEditTask("Errore: Il titolo dell'attività non può essere vuoto.")
+                setErroreEditTask(context.getString(R.string.errore_aggiungi_titolo_omesso))
                 false
             }
             isDateBeforeToday(dataScad) -> {
-                setErroreEditTask("Errore: La data di scadenza dell'attività non può essere precedente alla data odierna.")
+                setErroreEditTask(context.getString(R.string.data_scadenza_task_non_valida))
                 false
             }
             dataScad.after(dataScadenzaProgetto) -> {
-                setErroreEditTask("Errore: La data di scadenza dell'attività non può essere successiva alla data di scadenza del progetto.")
+                setErroreEditTask(context.getString(R.string.data_scadenza_task_oltre_progetto))
                 false
             }
             else -> true
@@ -316,16 +319,15 @@ class LeMieAttivitaViewModel(
         sezione: Int,
         progetto: String,
         utenti: List<String>,
-        fileUri: String?
+        fileUri: String?,
+        context: Context
     ) {
         if (titolo.isBlank()) {
-            setErroreEditTask("MODIFICA RIFIUTATA!!!: Il titolo non può essere omesso.")
-            Log.d("Errore Edit", "Errore Edit Task: " + "${erroreEditAttivita.value}")
-
+            setErroreEditTask(context.getString(R.string.errore_modifica_titolo_omesso))
             return
         }
         if (isDateBeforeToday(dataScad)) {
-            setErroreEditTask("MODIFICA RIFIUTATA!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
+            setErroreEditTask(context.getString(R.string.errore_dataScadenza_task_precedente_creazione))
             return
         }
         viewModelScope.launch {
@@ -537,18 +539,19 @@ class LeMieAttivitaViewModel(
         proprietario: String,
         progetto: String,
         sezione: Int,
-        dataScadenzaProgetto: Date
+        dataScadenzaProgetto: Date,
+        context: Context
     ) {
         if (titolo.isBlank()) {
-            setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: Il titolo non può essere omesso.")
+            setErroreAggiungiTask(context.getString(R.string.errore_aggiungi_titolo_omesso))
             return
         }
         if (isDateBeforeToday(dataScad)) {
-            setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: La data di scadenza non può essere precedente alla data di creazione della Task.")
+            setErroreAggiungiTask(context.getString(R.string.errore_aggiungi_data_precedente))
             return
         }
         if (dataScad.after(dataScadenzaProgetto)) {
-            setErroreAggiungiTask("AGGIUNGI RIFIUTATO!!!: La data di scadenza non può essere successiva alla data di scadenza del progetto.")
+            setErroreAggiungiTask(context.getString(R.string.errore_aggiungi_data_successiva))
             return
         }
 

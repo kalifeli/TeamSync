@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.leMieAttivita.data.viewModel
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.teamsync.caratteristiche.autentificazione.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.leMieAttivita.data.model.LeMieAttivita
@@ -7,6 +8,7 @@ import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRe
 import com.example.teamsync.util.Priorita
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +31,7 @@ class LeMieAttivitaViewModelTest {
     private lateinit var repositoryLeMieAttivita : ToDoRepository
     private lateinit var repositoryUtente: RepositoryUtente
     private lateinit var leMieAttivitaViewModel: LeMieAttivitaViewModel
+    private lateinit var contesto: Context
 
 
     @Before
@@ -37,6 +40,7 @@ class LeMieAttivitaViewModelTest {
         repositoryLeMieAttivita = mockk(relaxed = true)
         repositoryUtente = mockk(relaxed = true)
         leMieAttivitaViewModel = LeMieAttivitaViewModel(repositoryLeMieAttivita, repositoryUtente)
+        contesto = mockk(relaxed = true)
     }
 
     @Test
@@ -55,7 +59,7 @@ class LeMieAttivitaViewModelTest {
         coEvery { repositoryLeMieAttivita.addTodo(titolo, descrizione, dataScadenza, priorita, proprietarioID, progettoID) } returns Unit
 
         // Chiamata del metodo del viewModel
-        leMieAttivitaViewModel.addTodo(titolo, descrizione, dataScadenza, priorita, proprietarioID, progettoID, sezione, dataScadenzaProgetto)
+        leMieAttivitaViewModel.addTodo(titolo, descrizione, dataScadenza, priorita, proprietarioID, progettoID, sezione, dataScadenzaProgetto, contesto)
         advanceUntilIdle()
 
         //Verifica del comportamento
@@ -77,8 +81,10 @@ class LeMieAttivitaViewModelTest {
         // mock delle dipendenze
         coEvery { repositoryLeMieAttivita.addTodo(titolo, descrizione, dataScadenza, priorita, proprietarioID, progettoID) } returns Unit
 
+        // Mock di eventuali risorse dal context
+        every { contesto.getString(any()) } returns "AGGIUNGI RIFIUTATO!!!: Il titolo non può essere omesso."
         // Chiamata del metodo del viewModel
-        leMieAttivitaViewModel.addTodo(titolo, descrizione, dataScadenza, priorita, proprietarioID, progettoID, sezione, dataScadenzaProgetto)
+        leMieAttivitaViewModel.addTodo(titolo, descrizione, dataScadenza, priorita, proprietarioID, progettoID, sezione, dataScadenzaProgetto, contesto)
         advanceUntilIdle()
 
         //Verifica del comportamento

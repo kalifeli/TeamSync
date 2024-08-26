@@ -24,8 +24,10 @@ import java.util.Date
 class ViewModelProgetto(
     private val repositoryProgetto: RepositoryProgetto,
     private val repositoryLeMieAttivita : ToDoRepository,
-    viewModelUtente: ViewModelUtente
+    viewModelUtente: ViewModelUtente,
+    private val contesto: Context
 ) : ViewModel() {
+
     /**
      * Indica se l'aggiunta di un progetto è riuscita.
      */
@@ -49,14 +51,15 @@ class ViewModelProgetto(
     /**
      * Messaggio di errore per l'abbandono del progetto.
      */
-    var erroreAbbandonaProgetto = mutableStateOf<String?>(null)
-        private set
+    private val  _erroreAbbandonaProgetto = MutableLiveData<String?>(null)
+    val erroreAbbandonaProgetto: LiveData<String?> get() = _erroreAbbandonaProgetto
 
     /**
      * Indica se un progetto è stato abbandonato con successo.
      */
-    var abbandonaProgettoRiuscito = mutableStateOf(false)
-        private set
+    private val _abbandonaProgettoRiuscito = MutableLiveData(false)
+    val abbandonaProgettoRiuscito: LiveData<Boolean> get() = _abbandonaProgettoRiuscito
+
     /**
      * Lista dei progetti completati.
      */
@@ -153,7 +156,7 @@ class ViewModelProgetto(
      * @param contesto Il contesto da cui viene inviato l'Intent.
      * @param codiceProgetto Il codice del progetto da condividere.
      */
-    fun condividiCodiceProgetto(contesto: Context, codiceProgetto: String) {
+    fun condividiCodiceProgetto(codiceProgetto: String) {
         val messaggio = contesto.getString(R.string.messaggioCondividiProgetto, codiceProgetto)
         val inviaIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
@@ -186,18 +189,16 @@ class ViewModelProgetto(
         dataCreazione: Date
     ) {
         if (nome.isBlank()) {
-            _erroreModificaProgetto.value = "Per favore, inserisci il nome del progetto"
+            _erroreModificaProgetto.value = contesto.getString(R.string.errore_nome_progetto_vuoto)
             return
         }
         if (dataScadenza.before(dataCreazione)) {
-            _erroreModificaProgetto.value =
-                "La data di scadenza non può essere precedente alla data di creazione del progetto."
+            _erroreModificaProgetto.value = contesto.getString(R.string.errore_data_scadenza_invalid)
             return
         }
 
         if(dataConsegna.before(dataCreazione)){
-            _erroreModificaProgetto.value =
-                "La data di consegna non può essere precedente alla data di creazione del progetto."
+            _erroreModificaProgetto.value = contesto.getString(R.string.errore_data_consegna_invalid)
             return
         }
 
@@ -221,7 +222,7 @@ class ViewModelProgetto(
                     _erroreModificaProgetto.value = null
                 }
             } catch (e: Exception) {
-                _erroreModificaProgetto.value = "Errore durante l'aggiornamento del progetto"
+                _erroreModificaProgetto.value = contesto.getString(R.string.errore_aggiornamento_progetto)
             }
         }
     }
@@ -274,7 +275,7 @@ class ViewModelProgetto(
             }
             p.nome
         } catch (e: Exception) {
-            "Nome progetto non disponibile"
+            contesto.getString(R.string.errore_progetto_non_trovato)
         } finally {
             _caricaNome.value = false
         }
@@ -400,7 +401,7 @@ class ViewModelProgetto(
                     callback(progetti)
                 }
             } catch (e: Exception) {
-                erroreCaricamentoProgetto.value = "Errore nel caricamento dei progetti."
+                erroreCaricamentoProgetto.value = contesto.getString(R.string.errore_caricamento_progetti)
                 callback(emptyList()) // Callback con lista vuota in caso di errore
             } finally {
                 _isLoading.value = false
@@ -416,13 +417,13 @@ class ViewModelProgetto(
      */
     suspend fun getProgettiUtenteByIdUtente(
                 userId: String,
-                callback: (List<Progetto>, String?) -> Unit
+                callback: (List<Progetto>, String?) -> Unit,
     ) {
         try {
             val progettiUtente = repositoryProgetto.getProgettiUtente(userId)
             callback(progettiUtente, null)
         } catch (e: Exception) {
-            callback(emptyList(), "Errore durante il recupero dei progetti: ${e.message}")
+            callback(emptyList(), contesto.getString(R.string.errore_caricamento_progetti) )
         }
     }
 
@@ -443,16 +444,16 @@ class ViewModelProgetto(
         priorita: Priorita
     ) {
         if (nome.isBlank()) {
-            erroreAggiungiProgetto.value = "Per favore, inserisci il nome del progetto"
+            erroreAggiungiProgetto.value = contesto.getString(R.string.errore_nome_progetto_vuoto)
             return
         }
         if (dataScadenza.before(Date())) {
             erroreAggiungiProgetto.value =
-                "La data di scadenza non può essere precedente alla data di creazione del progetto."
+                contesto.getString(R.string.errore_data_scadenza_invalid)
             return
         }
         if(utenteCorrenteId.value.isNullOrEmpty()){
-            erroreAggiungiProgetto.value = "Utente corrente non trovato"
+            erroreAggiungiProgetto.value = contesto.getString(R.string.errore_utente_non_trovato)
             return
         }
         viewModelScope.launch {
@@ -475,7 +476,7 @@ class ViewModelProgetto(
                 erroreAggiungiProgetto.value = null
             } catch (e: Exception) {
                 aggiungiProgettoRiuscito.value = false
-                erroreAggiungiProgetto.value = "Si è verificato un errore durante la creazione del progetto. Riprovare."
+                erroreAggiungiProgetto.value = contesto.getString(R.string.errore_creazione_progetto)
             }finally {
                 _isLoading.value = false // finisce il caricamento
             }
@@ -502,15 +503,15 @@ class ViewModelProgetto(
                 } else if (progettoId == null) {
                     aggiungiProgettoRiuscito.value = false
                     erroreAggiungiProgetto.value =
-                        "Il codice inserito non è valido. Riprovare o contattare il creatore del progetto"
+                        contesto.getString(R.string.errore_codice_non_valido)
                 } else {
                     aggiungiProgettoRiuscito.value = false
-                    erroreAggiungiProgetto.value = "Fai già parte di questo progetto!"
+                    erroreAggiungiProgetto.value =  contesto.getString(R.string.errore_gia_partecipante)
                 }
             } catch (e: Exception) {
                 aggiungiProgettoRiuscito.value = false
                 erroreAggiungiProgetto.value =
-                    "Si è verificato un errore durante l'aggiunta di un progetto"
+                    contesto.getString(R.string.errore_aggiornamento_progetto)
             }
         }
     }
@@ -523,27 +524,33 @@ class ViewModelProgetto(
      */
     fun abbandonaProgetto(userId: String?, progettoId: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                repositoryProgetto.abbandonaProgetto(userId, progettoId) { vuoto ->
-                    if (vuoto) {
+                repositoryProgetto.abbandonaProgetto(userId, progettoId) { isProgettoVuoto ->
+                    if (isProgettoVuoto) {
                         eliminaNotifiche(progettoId)
-                        erroreAbbandonaProgetto.value = null
-                        abbandonaProgettoRiuscito.value = true
                     }
+                    _erroreAbbandonaProgetto.value = null
+                    _abbandonaProgettoRiuscito.value = true
+                    Log.d("ViewModel", "abbandonaProgettoRiuscito post-callback: ${_abbandonaProgettoRiuscito.value}")
                 }
             } catch (e: Exception) {
-                erroreAbbandonaProgetto.value = "Si è verificato un errore. Per favore riprovare"
-                abbandonaProgettoRiuscito.value = false
+                _erroreAbbandonaProgetto.value = contesto.getString(R.string.errore_abbandono_progetto)
+                _abbandonaProgettoRiuscito.value = false
+            }finally {
+                _isLoading.value = false
+                Log.d("ViewModel", "abbandonaProgettoRiuscito final value: ${_abbandonaProgettoRiuscito.value}")
             }
         }
     }
 
+
     fun resetAbbandonaProgettoRiuscito(){
-        abbandonaProgettoRiuscito.value = false
+        _abbandonaProgettoRiuscito.value = false
     }
 
     fun resetErroreAbbandonaProgetto(){
-        erroreAbbandonaProgetto.value = null
+        _erroreAbbandonaProgetto.value = null
     }
 
     /**

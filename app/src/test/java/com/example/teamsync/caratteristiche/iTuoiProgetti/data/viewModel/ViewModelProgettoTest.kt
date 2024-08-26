@@ -1,13 +1,14 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.data.viewModel
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.example.teamsync.caratteristiche.autentificazione.data.model.ProfiloUtente
-import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRepository
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
-import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
 import com.example.teamsync.caratteristiche.autentificazione.data.repository.RepositoryUtente
 import com.example.teamsync.caratteristiche.autentificazione.data.viewModel.ViewModelUtente
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
+import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
+import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRepository
 import com.example.teamsync.util.Priorita
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -39,6 +40,7 @@ class ViewModelProgettoTest {
     private lateinit var repositoryLeMieAttivita: ToDoRepository
     private lateinit var viewModelProgetto: ViewModelProgetto
     private lateinit var viewModelUtente: ViewModelUtente
+    private lateinit var context: Context
 
 
     @Before
@@ -47,6 +49,7 @@ class ViewModelProgettoTest {
         repositoryUtente = mockk(relaxed = true)
         repositoryProgetto = mockk(relaxed = true)
         repositoryLeMieAttivita = mockk(relaxed = true)
+        context = mockk(relaxed = true) // Mock del contesto
 
         // Mock del ViewModelUtente e il suo profilo utente
         viewModelUtente = mockk(relaxed = true)
@@ -55,7 +58,7 @@ class ViewModelProgettoTest {
         }
         every { viewModelUtente.userProfilo } returns MutableLiveData(mockUserProfile)
 
-        viewModelProgetto = ViewModelProgetto(repositoryProgetto, repositoryLeMieAttivita, viewModelUtente)
+        viewModelProgetto = ViewModelProgetto(repositoryProgetto, repositoryLeMieAttivita, viewModelUtente, context)
     }
 
 
@@ -71,6 +74,9 @@ class ViewModelProgettoTest {
         // Mock delle dipendenze
         coEvery { repositoryProgetto.generaCodiceProgetto() } returns codiceProgetto
         coEvery { repositoryProgetto.creaProgetto(any()) } returns "progettoId"
+
+        // Mock di eventuali risorse dal context
+        every { context.getString(any()) } returns "Mocked String"
 
         // Esecuzione del metodo per la creazione di un progetto
         viewModelProgetto.creaProgetto(nome, descrizione, dataScadenza!!, priorita)
@@ -95,6 +101,9 @@ class ViewModelProgettoTest {
         coEvery { repositoryProgetto.generaCodiceProgetto() } returns codiceProgetto
         coEvery { repositoryProgetto.creaProgetto(any()) } returns "progettoId"
 
+        // Mock della stringa di errore dal contesto
+        every { context.getString(any()) } returns "La data di scadenza non può essere precedente alla data di creazione del progetto."
+
         // Esecuzione del metodo per la creazione di un progetto
         viewModelProgetto.creaProgetto(nome, descrizione, dataScadenza!!, priorita)
         advanceUntilIdle()
@@ -110,16 +119,18 @@ class ViewModelProgettoTest {
         val progettoId = "Progetto1Id"
         val nome = "Progetto1 aggiornato"
         val descrizione = "descrizione Progetto1 aggiornata"
-        val dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse("15/08/2024")
+        val dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse("27/08/2024")
         val priorita = Priorita.ALTA
         val voto = 30
         val dataConsegna = Date()
+        val dataCreazione = SimpleDateFormat("dd/MM/yyyy").parse("15/03/2024")
 
         val progettoOriginale = Progetto(
             id = progettoId,
             nome =  "Progetto1",
             descrizione = "descrizione Progetto1",
             dataScadenza = dataScadenza!!,
+            dataCreazione = dataCreazione!!,
             priorita = priorita,
             codice = "ABC12345",
             partecipanti = listOf("user1")
@@ -130,7 +141,7 @@ class ViewModelProgettoTest {
         coEvery { repositoryProgetto.aggiornaProgetto(any()) } returns Unit
 
         // Esecuzione del metodo per aggiornare il progetto
-        viewModelProgetto.aggiornaProgetto(progettoId, nome, descrizione, dataScadenza, priorita, voto.toString(), dataConsegna)
+        viewModelProgetto.aggiornaProgetto(progettoId, nome, descrizione, dataScadenza, priorita, voto.toString(), dataConsegna, dataCreazione)
         advanceUntilIdle()
 
         // Verifica che il metodo per aggiornare il progetto nella repository sia stato chiamato
@@ -212,6 +223,9 @@ class ViewModelProgettoTest {
         // Mock delle dipendenze
         coEvery { repositoryProgetto.getProgettoIdByCodice(codiceErrato) } returns null
         coEvery { repositoryProgetto.getProgettiUtente(userId) } returns progettiUtente
+
+        // Mock della stringa di errore dal contesto
+        every { context.getString(any()) } returns "Il codice inserito non è valido. Riprovare o contattare il creatore del progetto"
 
         // Esecuzione del metodo per aggiungere il partecipante ad un progetto tramite codice
         viewModelProgetto.aggiungiPartecipanteConCodice(userId, codiceErrato)

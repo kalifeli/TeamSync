@@ -354,7 +354,7 @@ fun DeleteAccountDialog(
 @Composable
 fun PreviewImpostazioni() {
     Impostazioni(navController = rememberNavController(), viewModelUtente = ViewModelUtente(
-        RepositoryUtente()
+        RepositoryUtente(LocalContext.current), LocalContext.current
     ))
 }
 

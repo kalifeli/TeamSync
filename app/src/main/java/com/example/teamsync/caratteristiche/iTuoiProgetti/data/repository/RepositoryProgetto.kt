@@ -115,14 +115,20 @@ class RepositoryProgetto {
         try {
             val progettoRef = firestore.collection("progetti").document(progettoId)
             progettoRef.update("partecipanti", FieldValue.arrayRemove(userId)).await()
+
             val listaPartecipanti = getPartecipantiDelProgetto(progettoId)
+
             if (listaPartecipanti.isEmpty())
             {
+                // Se non ci sono più partecipanti, elimina il progetto
                 eliminaProgetto(progettoId)
-                callback(listaPartecipanti.isEmpty())
-
+                callback(true)
+            }else{
+                //Se ci sono ancora partecipanti, viene chiamata comunque la callback e impostata a false
+                callback(false)
             }
         } catch (e: Exception) {
+            callback(false)
             throw e
         }
     }

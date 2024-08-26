@@ -167,8 +167,9 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val caricamentoProgetto by viewmodelprogetto.isLoading.observeAsState()
     val caricamentoAttivita by viewModel.isLoading.observeAsState()
     val isConnected = remember { mutableStateOf(isInternetAvailable(contesto)) }
-    val erroreAbbandonaProgetto by viewmodelprogetto.erroreAbbandonaProgetto
-    val abbandonaProgettoRiuscito by viewmodelprogetto.abbandonaProgettoRiuscito
+    val erroreAbbandonaProgetto by viewmodelprogetto.erroreAbbandonaProgetto.observeAsState()
+    val abbandonaProgettoRiuscito by viewmodelprogetto.abbandonaProgettoRiuscito.observeAsState()
+    val isLoading by viewmodelprogetto.isLoading.observeAsState()
 
     val ordine by remember { mutableStateOf(preferences.getString("ordine_task", "creazione")) }
 
@@ -210,20 +211,23 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
         }
     }
 
-    LaunchedEffect(erroreAbbandonaProgetto){
-        if(!erroreAbbandonaProgetto.isNullOrEmpty()){
-            Toast.makeText(contesto, erroreAbbandonaProgetto, Toast.LENGTH_LONG).show()
+    LaunchedEffect(erroreAbbandonaProgetto) {
+        erroreAbbandonaProgetto?.let { errore ->
+            Toast.makeText(contesto, errore, Toast.LENGTH_LONG).show()
             viewmodelprogetto.resetErroreAbbandonaProgetto()
         }
     }
 
     LaunchedEffect(abbandonaProgettoRiuscito) {
-        if(abbandonaProgettoRiuscito){
+        if (abbandonaProgettoRiuscito == true) {
             mostraDialogAbbandono = false
-            navController.navigate(Schermate.ItuoiProgetti.route)
+            navController.navigate(Schermate.ItuoiProgetti.route) {
+                popUpTo(Schermate.ItuoiProgetti.route) { inclusive = true }
+            }
             viewmodelprogetto.resetAbbandonaProgettoRiuscito()
         }
     }
+
 
     // Comparatore per l'ordinamento delle attività
     val comparatore = Comparator<LeMieAttivita> { attivita1, attivita2 ->
@@ -296,7 +300,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     // Dialog per aggiungere una nuova attività
     if (addTodoDialog) {
         AddTodoDialog(
-            viewModel = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente()),
+            viewModel = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente(contesto)),
             onDismiss = { addTodoDialog = false },
             onSave = { newTodo ->
                 coroutineScope.launch {
@@ -310,7 +314,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                 it.id,
                                 idProg,
                                 sezione,
-                                it1.dataScadenza
+                                it1.dataScadenza,
+                                contesto
                             )
                         }
                     }
@@ -349,7 +354,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                         sezione,
                         idProg,
                         updatedItem.utenti,
-                        fileUri = fileUri
+                        fileUri = fileUri,
+                        contesto
                     )
                     // Non è più necessario gestire l'apertura o chiusura della dialog qui
                 },
@@ -960,7 +966,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
             AbbandonaProgettoDialog(
                 onDismissRequest = { mostraDialogAbbandono = false },
                 viewModelProgetto = viewmodelprogetto,
-                progettoId = idProg
+                progettoId = idProg,
+                isLoading!!
             )
         }
 
@@ -1509,7 +1516,8 @@ fun EditTodoDialog(
                             dataScad = updatedTodo.dataScadenza,
                             priorita = priorita,
                             sezione = 1,
-                            dataScadenzaProgetto = progetto.dataScadenza
+                            dataScadenzaProgetto = progetto.dataScadenza,
+                            context
                         )
 
                         for (p1 in updatedTodo.utenti) {
@@ -2190,13 +2198,15 @@ fun ProgressiProgettoCard(progress: Float, todoCompletate: Int, todoNonCompletat
  */
 @Composable
 fun AbbandonaProgettoDialog(
-    onDismissRequest : () -> Unit,
+    onDismissRequest: () -> Unit,
     viewModelProgetto: ViewModelProgetto,
-    progettoId: String
-){
+    progettoId: String,
+    isLoading: Boolean
+) {
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
-
     val userId = viewModelProgetto.utenteCorrenteId.value
+
+
     AlertDialog(
         text = {
             Text(
@@ -2208,25 +2218,40 @@ fun AbbandonaProgettoDialog(
                 textAlign = TextAlign.Center,
             )
         },
-        containerColor = if(isDarkTheme) Color.Black else Grey35,
+        containerColor = if (isDarkTheme) Color.Black else Grey35,
         textContentColor = if (isDarkTheme) White else Color.Black,
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = {
+            Log.d("AbbandonaProgettoDialog", "Dialog dismiss requested")
+            onDismissRequest()
+        },
         confirmButton = {
             Button(
                 onClick = {
-                    viewModelProgetto.abbandonaProgetto(userId,progettoId)
-                          },
+                    if (!isLoading) {
+                        Log.d("AbbandonaProgettoDialog", "Inizio abbandono progetto - ID Progetto: $progettoId")
+                        viewModelProgetto.abbandonaProgetto(userId, progettoId)
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(Red70),
             ) {
-                Text(
-                    text = stringResource(id = R.string.Abbandona)
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Grey50,
+                        trackColor = Red70,
+                        strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
+                    )
+                } else {
+                    Text(text = stringResource(id = R.string.Abbandona))
+                }
             }
         },
         dismissButton = {
             TextButton(
-                onClick = onDismissRequest
-            ){
+                onClick = {
+                    Log.d("AbbandonaProgettoDialog", "Dialog dismissed by user")
+                    onDismissRequest()
+                }
+            ) {
                 Text(
                     text = stringResource(id = R.string.annullaEdit),
                     color = if (isDarkTheme) White else Color.Black,
@@ -2234,6 +2259,5 @@ fun AbbandonaProgettoDialog(
             }
         }
     )
-
 }
 

@@ -185,8 +185,7 @@ fun Progetto(
                         nomeProgetto,
                         viewNotifiche,
                         sottoprovenienza,
-                        provenienza,
-                        context
+                        provenienza
                     )
                 }
             }
@@ -293,7 +292,6 @@ fun ListaColleghi(
     viewNotifiche: ViewModelNotifiche,
     sottoprovenienza : String,
     provenienza: String,
-    context: Context
 ) {
     val userProfile by viewModelUtente.userProfilo.observeAsState()
     val isLoading by viewModelProgetto.isLoading.observeAsState()
@@ -385,7 +383,7 @@ fun ListaColleghi(
                     .height(70.dp)
                     .padding(horizontal = 16.dp),
                 onClick = {
-                    viewModelProgetto.aggiungiPartecipanteAlProgetto(idProgetto, userProfile?.id ?: "")
+                    viewModelProgetto.aggiungiPartecipante(idProgetto, userProfile?.id ?: "")
                     for (p in partecipanti) {
                         if (p != userProfile?.id) {
                             val contenuto = userProfile?.nome + " " + (userProfile?.cognome

@@ -10,6 +10,7 @@ import com.example.teamsync.caratteristiche.autentificazione.data.viewModel.View
 import com.example.teamsync.caratteristiche.notifiche.data.model.Notifiche
 import com.example.teamsync.caratteristiche.notifiche.data.repository.RepositoryNotifiche
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 /**
  * ViewModel per gestire le operazioni relative alle notifiche.
@@ -62,7 +63,16 @@ class ViewModelNotifiche(
 
                 if (!userId.isNullOrEmpty()) {
                     val notifiche = repositoryNotifiche.getNotificheUtente(userId)
-                    notificheList.value = notifiche
+                    val linguaDiSistema = Locale.getDefault().language
+
+                    //Traduzione notifiche in base alla lingua di sistema
+
+                    val notificheTradotte = notifiche.map { notifica ->
+                        val contenutoTradotto = traduciNotifica(notifica.contenuto, linguaDiSistema)
+                        notifica.copy(contenuto = contenutoTradotto)
+                    }
+
+                    notificheList.value = notificheTradotte
                     erroreLetturaNotifiche.value = null
                 } else {
                     erroreLetturaNotifiche.value = context.getString(R.string.errore_id_utente)
@@ -140,6 +150,39 @@ class ViewModelNotifiche(
             }
         }
     }
+
+    private fun traduciNotifica(contenuto: String, linguaDiSistema: String): String {
+        return if (linguaDiSistema == "it") {
+            contenuto // Se la lingua è italiana, non c'è bisogno di tradurre
+        } else {
+            when (linguaDiSistema) {
+                "en" -> {
+                    when {
+                        contenuto.contains("ti ha inviato una richiesta di amicizia") -> {
+                            contenuto.replace("ti ha inviato una richiesta di amicizia", "has sent you a friend request")
+                        }
+                        contenuto.contains("ha accettato la tua richiesta di amicizia") -> {
+                            contenuto.replace("ha accettato la tua richiesta di amicizia", "has accepted your friend request")
+                        }
+                        contenuto.contains("ha modificato la vostra task") -> {
+                            contenuto.replace("ha modificato la vostra task", "has modified your task")
+                                .replace("del progetto:", "of the project:")
+                        }
+                        contenuto.contains("è entrato nel progetto") -> {
+                            contenuto.replace("è entrato nel progetto", "has joined the project")
+                        }
+                        contenuto.contains(" ti ha invitato in un progetto") -> {
+                            contenuto.replace(" ti ha invitato in un progetto", " invited you to a project")
+                        }
+                        else -> contenuto // Restituisce il contenuto originale se non corrisponde a nessuno dei casi
+                    }
+                }
+
+                else -> contenuto // Se la lingua non è supportata, restituisce il contenuto originale
+            }
+        }
+    }
+
 
     /**
      * Cambia lo stato di una notifica specifica a "accettato".

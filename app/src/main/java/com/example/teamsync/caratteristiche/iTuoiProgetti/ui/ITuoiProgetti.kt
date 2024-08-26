@@ -766,8 +766,7 @@ fun CreaProgettoDialog(
         AggiungiProgettoDialog(
             onDismissRequest = { mostraAggiungiProgetto = false },
             viewModelProgetto = viewModelProgetto ,
-            isDarkTheme = isDarkTheme,
-            context
+            isDarkTheme = isDarkTheme
         )
     }
 
@@ -792,7 +791,6 @@ fun AggiungiProgettoDialog(
     onDismissRequest: () -> Unit,
     viewModelProgetto: ViewModelProgetto,
     isDarkTheme: Boolean,
-    contesto: Context
 ){
     var codiceProgetto by remember { mutableStateOf("") }
     val utenteId = viewModelProgetto.utenteCorrenteId.value

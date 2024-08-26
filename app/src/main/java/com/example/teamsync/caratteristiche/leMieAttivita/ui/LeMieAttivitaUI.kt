@@ -203,8 +203,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 
             if (progettoId != null) {
                 partecipanti.value = viewmodelprogetto.getListaPartecipanti(progettoId)
-                // Log della lista dei partecipanti
-                Log.d("PartecipantiLog", "Partecipanti: $partecipanti")
             } else {
                 Log.d("PartecipantiLog", "Nessuna attività trovata")
             }
@@ -291,7 +289,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     val erroreAggiungiTask by viewModel.erroreAggiungiAttivita.observeAsState()
     LaunchedEffect(erroreAggiungiTask) {
         erroreAggiungiTask?.let { message ->
-            Log.d("LeMieAttivitaUI", "Showing Toast with message: $message")
             Toast.makeText(contesto, message, Toast.LENGTH_LONG).show()
             viewModel.resetErroreAggiungiTask()
         }
@@ -371,7 +368,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
 
     // Dialog per completare un'attività
     if (dialogComplete && currentTodoItem.value != null) {
-        Log.d("Controllo Sessione per il completeDialog", "Il valore della variabile 'sezione' è: $sezione")
         CompleteDialog(
             sezione,
             onDismiss = { dialogComplete = false },
@@ -1804,13 +1800,10 @@ fun AddTodoDialog(
         }
     )
 
-
     val erroreAggiungiTask by viewModel.erroreAggiungiAttivita.observeAsState()
-    Log.d("LeMieAttivitaUI", "Current error message: $erroreAggiungiTask")
 
     LaunchedEffect(erroreAggiungiTask) {
         erroreAggiungiTask?.let { message ->
-            Log.d("LeMieAttivitaUI", "Showing Toast with message: $message")
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             viewModel.resetErroreAggiungiTask()
         }
@@ -2221,14 +2214,12 @@ fun AbbandonaProgettoDialog(
         containerColor = if (isDarkTheme) Color.Black else Grey35,
         textContentColor = if (isDarkTheme) White else Color.Black,
         onDismissRequest = {
-            Log.d("AbbandonaProgettoDialog", "Dialog dismiss requested")
             onDismissRequest()
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (!isLoading) {
-                        Log.d("AbbandonaProgettoDialog", "Inizio abbandono progetto - ID Progetto: $progettoId")
                         viewModelProgetto.abbandonaProgetto(userId, progettoId)
                     }
                 },
@@ -2248,7 +2239,6 @@ fun AbbandonaProgettoDialog(
         dismissButton = {
             TextButton(
                 onClick = {
-                    Log.d("AbbandonaProgettoDialog", "Dialog dismissed by user")
                     onDismissRequest()
                 }
             ) {

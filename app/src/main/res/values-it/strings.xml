@@ -348,6 +348,14 @@
     <string name="errore_caricamento_utente">Errore nel caricamento dell\'utente.</string>
     <string name="errore_email_in_uso">L\'indirizzo email è già in uso</string>
     <string name="errore_generico">Si è verificato un errore. Riprovare.</string>
+    <string name="caricamento_profilo">Caricamento del profilo in corso…</string>
+    <string name="notifiche_cancellate_successo">Notifiche cancellate con successo!</string>
+    <string name="nessuna_nuova_notifica">Non hai nuove notifiche da leggere!</string>
+
+    <string name="task_completed_notification">%1$s %2$s ha completato una task del progetto: %3$s</string>
+
+
+
 
 
 

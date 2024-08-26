@@ -343,5 +343,10 @@
     <string name="errore_caricamento_utente">Error loading user.</string>
     <string name="errore_email_in_uso"> The email address is already in use </string>
     <string name="errore_generico"> An error occurred. Please try again.</string>
+    <string name="caricamento_profilo"> Loading profile… </string>
+    <string name="notifiche_cancellate_successo">Notifications successfully cleared!</string>
+    <string name="nessuna_nuova_notifica"> You have no new notifications to read!</string>
+
+    <string name="task_completed_notification">%1$s %2$s has completed a task for the project: %3$s</string>
 
 </resources>

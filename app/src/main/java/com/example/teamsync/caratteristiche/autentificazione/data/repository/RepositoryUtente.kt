@@ -1,6 +1,7 @@
 package com.example.teamsync.caratteristiche.autentificazione.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.teamsync.R
 import com.example.teamsync.caratteristiche.autentificazione.data.model.ProfiloUtente
 import com.example.teamsync.caratteristiche.autentificazione.data.model.SessoUtente
@@ -8,6 +9,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -202,7 +204,6 @@ class RepositoryUtente(val contesto: Context){
                     utentiList.add(nomeUtente)
                 }
             }
-
             utentiList
         } catch (e: Exception) {
             emptyList()
@@ -242,26 +243,47 @@ class RepositoryUtente(val contesto: Context){
      * @param userId L'ID dell'utente di cui si vuole eliminare l'account.
      * @return Una stringa contenente un messaggio di errore in caso di fallimento, oppure `null` se l'eliminazione ha successo.
      */
-
     suspend fun eliminaAccount(userId: String): String? {
         return try {
-            // step 1: Eliminazione dei dati dell'utente da Firestore
+            // Step 1: Eliminazione dei dati dell'utente da Firestore
             firestore.collection("utenti").document(userId)
                 .delete().await()
 
-            // step 2: Eliminazione dell'utente da Firebase Authentification
+            // Step 2: Rimozione dell'utente dalle task a cui partecipava
+            val taskQuery = firestore.collection("Todo")
+                .whereArrayContains("utenti", userId)
+                .get().await()
+
+            for (taskDoc in taskQuery.documents) {
+                // Rimuove l'utente dall'array di partecipanti
+                val utentiAggiornati = (taskDoc.get("utenti") as? List<String>)?.filter { it != userId } ?: emptyList()
+
+                // Se non ci sono più utenti, elimina la task
+                if (utentiAggiornati.isEmpty()) {
+                    firestore.collection("Todo").document(taskDoc.id).delete().await()
+                    Log.d("Firestore", "Task ${taskDoc.id} eliminata perché senza partecipanti")
+                } else {
+                    // Altrimenti, aggiorna la task con la nuova lista di utenti
+                    firestore.collection("Todo").document(taskDoc.id)
+                        .update("utenti", utentiAggiornati)
+                        .await()
+                    Log.d("Firestore", "Task ${taskDoc.id} aggiornata con nuovi partecipanti")
+                }
+            }
+
+            // Step 3: Eliminazione dell'utente da Firebase Authentication
             val utente = auth.currentUser
-            if(utente != null && utente.uid == userId){
+            if (utente != null && utente.uid == userId) {
                 utente.delete().await()
                 null
-            }else{
+            } else {
                 contesto.getString(R.string.errore_id_utente)
             }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
+            Log.e("Firestore", "Errore durante l'eliminazione dell'account o delle task: ${e.message}")
             contesto.getString(R.string.errore_generico)
         }
-
     }
 
     /**

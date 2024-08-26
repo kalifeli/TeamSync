@@ -14,6 +14,8 @@ import com.example.teamsync.caratteristiche.iTuoiProgetti.data.model.Progetto
 import com.example.teamsync.caratteristiche.iTuoiProgetti.data.repository.RepositoryProgetto
 import com.example.teamsync.caratteristiche.leMieAttivita.data.repository.ToDoRepository
 import com.example.teamsync.util.Priorita
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -697,20 +699,23 @@ class ViewModelProgetto(
      * @param progettoId L'ID del progetto.
      * @param userId L'ID dell'utente da aggiungere.
      */
-    fun aggiungiPartecipanteAlProgetto(progettoId: String, userId: String) {
-        viewModelScope.launch {
-            try {
-                repositoryProgetto.aggiungiPartecipante(progettoId, userId)
-                cambiaListaPartecipanti.value = true
-            } catch (e: Exception) {
-                Log.e(
-                    "ViewModelProgetto",
-                    "Errore durante l'aggiunta del partecipante al progetto",
-                    e
-                )
-            }
+    fun aggiungiPartecipante(progettoId: String, userId: String) {
+        // Assicurati che progettoId sia correttamente valorizzato e che il documento esista
+        if (progettoId.isNotEmpty()) {
+            val progettoReference = FirebaseFirestore.getInstance().collection("progetti").document(progettoId)
+
+            progettoReference.update("partecipanti", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener {
+                    Log.d("RepositoryProgetto", "Utente $userId aggiunto con successo al progetto $progettoId")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("RepositoryProgetto", "Errore nell'aggiungere l'utente al progetto: ${e.message}")
+                }
+        } else {
+            Log.e("RepositoryProgetto", "Errore: progettoId è vuoto o nullo")
         }
     }
+
 
     fun resetDatiProgetti() {
         _progetti.value = emptyList()

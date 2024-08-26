@@ -89,7 +89,7 @@ fun NotificationScreen(
         if (userProfile != null) {
             notificheModel.fetchNotifiche()
         } else {
-            Toast.makeText(context, "Caricamento del profilo utente in corso...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.caricamento_profilo), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -110,7 +110,7 @@ fun NotificationScreen(
     LaunchedEffect(eliminazioneNotificheStato) {
         if(eliminazioneNotificheStato){
             notificheModel.fetchNotifiche()
-            Toast.makeText(context, "Notifiche cancellate con successo!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.notifiche_cancellate_successo), Toast.LENGTH_LONG).show()
             notificheModel.resetEliminazioneNotificheStato()
         }
     }
@@ -125,7 +125,7 @@ fun NotificationScreen(
     LaunchedEffect(letturaNotificheStato) {
         if(letturaNotificheStato && !notificheList.any { !it.aperto }){
             notificheModel.fetchNotifiche()
-            Toast.makeText(context, "Non hai nuove notifiche da leggere!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.nessuna_nuova_notifica), Toast.LENGTH_LONG).show()
             notificheModel.resetLetturaNotificheStato()
         }else{
             notificheModel.fetchNotifiche()
@@ -533,7 +533,7 @@ fun gestisciClickNotifca(navController: NavHostController, notifica: Notifiche, 
 fun gestisciCheckNotifica(navController: NavHostController, notifica: Notifiche, userProfile: ProfiloUtente, vmNotifiche: ViewModelNotifiche, viewmodelProgetto: ViewModelProgetto, viewModelUtente: ViewModelUtente, listap: List<String>?, nomeProgetto: String) {
     if (notifica.tipo == "Richiesta_Progetto") {
         vmNotifiche.cambiastatoAccettatoNotifica(notifica.id)
-        viewmodelProgetto.aggiungiPartecipanteAlProgetto(notifica.progettoId, userProfile.id)
+        viewmodelProgetto.aggiungiPartecipante(notifica.progettoId, userProfile.id)
 
         listap?.forEach { p ->
             if (p != userProfile.id) {

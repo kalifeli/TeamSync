@@ -1198,7 +1198,6 @@ fun TodoItem(
  * @param progettoNome Nome del progetto associato all'attività.
  * @param userProfile Profilo dell'utente corrente.
  */
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
@@ -1466,7 +1465,7 @@ fun EditTodoDialog(
 
                 // Pulsante per selezionare un file
                 Button(
-                    onClick = { permissionLauncher.launch(Manifest.permission.READ_MEDIA_VIDEO) },
+                    onClick = { permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isDarkTheme) Grey70 else Grey50
                     )

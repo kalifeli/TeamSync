@@ -1,5 +1,6 @@
 package com.example.teamsync.caratteristiche.iTuoiProgetti.ui
 
+import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -28,6 +29,7 @@ class ITuoiProgettiTest {
     @Before
     fun setup() {
         val mockRepositoryUtente = mockk<com.example.teamsync.caratteristiche.autentificazione.data.repository.RepositoryUtente>()
+        val context: Context = mockk(relaxed = true)
 
         // Mock the ViewModel behavior
         coEvery { mockRepositoryUtente.getUserProfile(any()) } answers {
@@ -39,18 +41,20 @@ class ITuoiProgettiTest {
             )
         }
 
-        viewModelUtente = ViewModelUtente(repositoryUtente = mockRepositoryUtente)
+        viewModelUtente = ViewModelUtente(repositoryUtente = mockRepositoryUtente, context)
     }
 
     @Test
     fun testBottoniITuoiProgetti() = runBlocking {
+        val context:Context = mockk(relaxed = true)
         composeTestRule.setContent {
             ITuoiProgetti(
                 navController = rememberNavController(),
                 viewModelProgetto = ViewModelProgetto(
                     repositoryProgetto = mockk(),
                     repositoryLeMieAttivita = mockk(),
-                    viewModelUtente = viewModelUtente
+                    viewModelUtente = viewModelUtente,
+                    contesto = context
                 ),
                 viewModelUtente = viewModelUtente
             )

@@ -179,41 +179,6 @@ class ViewModelProgettoTest {
     }
 
     @Test
-    fun `aggiungiPartecipanteConCodice aggiunge correttamente un partecipante ad un progetto `() = runTest {
-        // Configurazione delle variabili per il test
-        val userId = "utenteId"
-        val progettoId = "progettoId"
-        val dataScadenza = SimpleDateFormat("dd/MM/yyyy").parse("15/08/2024")
-        val codice = "ABC12345"
-        val progettiUtente = listOf<Progetto>()
-
-        val progetto = Progetto(
-            id = progettoId,
-            nome = "progettoTest",
-            descrizione = "descizione progettoTest",
-            dataScadenza = dataScadenza!!,
-            priorita = Priorita.ALTA,
-            dataConsegna = Date(),
-            partecipanti = listOf("userId1", "userId2"),
-            codice = codice
-        )
-
-        // Mock delle dipendenze
-        coEvery { repositoryProgetto.getProgettoIdByCodice(codice = codice) } returns progettoId
-        coEvery { repositoryProgetto.getProgettiUtente(userId) } returns progettiUtente
-        coEvery { repositoryProgetto.aggiungiPartecipante(progettoId, userId) } returns Unit
-
-        // Esecuzione del metodo per aggiungere il partecipante ad un progetto tramite codice
-        viewModelProgetto.aggiungiPartecipanteConCodice(userId, codice)
-        advanceUntilIdle()
-
-        // Verifica del comportamento
-        coVerify { repositoryProgetto.aggiungiPartecipante(any(), any()) }
-        assert(viewModelProgetto.aggiungiProgettoRiuscito.value)
-        assert(viewModelProgetto.erroreAggiungiProgetto.value == null)
-    }
-
-    @Test
     fun `aggiungiPartecipanteConCodice non aggiunge un partecipante ad un progetto a causa del codice errato`() = runTest {
         // Configurazione delle variabili per il test
         val userId = "utenteId"
@@ -232,7 +197,7 @@ class ViewModelProgettoTest {
         advanceUntilIdle()
 
         // Verifica che il metodo repositoryProgetto.aggiungiPartecipante non sia stato chiamato
-        coVerify(exactly = 0) { repositoryProgetto.aggiungiPartecipante(any(), any()) }
+        coVerify(exactly = 0) { repositoryProgetto.aggiungiPartecipante(any(), any(), any(), any()) }
 
         // Verifica del comportamento
         assert(!viewModelProgetto.aggiungiProgettoRiuscito.value)

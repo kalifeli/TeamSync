@@ -174,6 +174,12 @@ class ViewModelNotifiche(
                         contenuto.contains(" ti ha invitato in un progetto") -> {
                             contenuto.replace(" ti ha invitato in un progetto", " invited you to a project")
                         }
+                        contenuto.contains("ti ha assegnato una task") -> {
+                            contenuto.replace("ti ha assegnato una task", "assigned you a task")
+                        }
+                        contenuto.contains(" ha completato una task del progetto: ") -> {
+                            contenuto.replace(" ha completato una task del progetto: ", " completed a project task:")
+                        }
                         else -> contenuto // Restituisce il contenuto originale se non corrisponde a nessuno dei casi
                     }
                 }

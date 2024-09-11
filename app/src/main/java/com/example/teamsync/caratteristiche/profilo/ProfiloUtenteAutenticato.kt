@@ -318,7 +318,6 @@ fun StatBox(number: String, label: String) {
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(text = number, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = if(isDarkTheme) Color.White else Color.Black)
         Text(text = label, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = if(isDarkTheme) Color.White else Color.Black)
     }

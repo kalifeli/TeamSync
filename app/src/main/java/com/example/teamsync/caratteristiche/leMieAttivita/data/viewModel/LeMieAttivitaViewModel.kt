@@ -1,6 +1,7 @@
 package com.example.teamsync.caratteristiche.leMieAttivita.data.viewModel
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -29,7 +30,7 @@ import kotlin.coroutines.suspendCoroutine
 
 
 class LeMieAttivitaViewModel(
-    private val repositoryLeMieAttivita: ToDoRepository, repositoryUtente : RepositoryUtente
+    private val repositoryLeMieAttivita: ToDoRepository, repositoryUtente : RepositoryUtente, private val contesto : Context
 ) : ViewModel() {
 
     private val utenteId = repositoryUtente.getUtenteAttualeID()
@@ -53,10 +54,7 @@ class LeMieAttivitaViewModel(
     val attivitaTotali: LiveData<Int> = _attivitaTotali
 
     private val _fileUri = MutableLiveData<Uri?>()
-    val fileUri: LiveData<Uri?> get() = _fileUri // DA TOGLIERE
 
-    private val _uploadResult = MutableLiveData<String?>()
-    val uploadResult: LiveData<String?> get() = _uploadResult
 
 
     /**
@@ -159,19 +157,11 @@ class LeMieAttivitaViewModel(
     }
 
 
-    /**
-     * Legge il contenuto di un file dato il suo URI.
-     *
-     * @param context Il contesto dell'applicazione.
-     * @param uri L'URI del file.
-     * @return Il contenuto del file.
-     */
-    suspend fun readFileContent(context: Context, uri: Uri): String? {
-        return withContext(Dispatchers.IO) {
-            context.contentResolver.openInputStream(uri)?.bufferedReader().use { reader ->
-                reader?.readText()
-            }
+    fun visualizzaFile(fileUrl : String?){
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(fileUrl)
         }
+        contesto.startActivity(intent)
     }
 
     /**
@@ -197,23 +187,30 @@ class LeMieAttivitaViewModel(
         _editAttivitaRiuscito.value = false
 
         // Validazione dell'input
-        if (!validateInput(titolo, dataScad, dataScadenzaProgetto,context)) {
+        if (!validateInput(titolo, dataScad, dataScadenzaProgetto, context)) {
             return
         }
+
+        // Inizia il caricamento
+        _isLoading.value = true
 
         viewModelScope.launch {
             val todo = getTodoById(id)
             if (todo == null) {
                 setErroreEditTask(context.getString(R.string.errore_recupero_task))
+                _isLoading.value = false
                 return@launch
             }
 
+            // Tentativo di caricamento del file
             val fileUri = _fileUri.value
             val downloadUrl = if (fileUri != null) {
                 try {
-                    uploadFile(fileUri)
+                    // Qui è necessario attendere il caricamento del file
+                    repositoryLeMieAttivita.uploadFile(fileUri)
                 } catch (e: Exception) {
-                    setErroreEditTask(context.getString(R.string.errore_recupero_task))
+                    setErroreEditTask(context.getString(R.string.errore_caricamento_file))
+                    _isLoading.value = false
                     return@launch
                 }
             } else {
@@ -232,16 +229,23 @@ class LeMieAttivitaViewModel(
                     progetto = todo.progetto,
                     utenti = todo.utenti,
                     fileUri = downloadUrl,
-                    context
+                    context = context
                 )
+
+                // Se tutto è andato a buon fine
                 _editAttivitaRiuscito.value = true
-                resetErroreEditTask()  // Reset dell'errore in caso di successo
+                resetErroreEditTask()
+
             } catch (e: Exception) {
                 _editAttivitaRiuscito.value = false
                 setErroreEditTask(context.getString(R.string.errore_generico_aggiornamento))
+            } finally {
+                // Ferma il caricamento solo alla fine di tutto
+                _isLoading.value = false
             }
         }
     }
+
 
     /**
      * Valida i campi di input per l'aggiornamento di un'attività.
@@ -279,21 +283,7 @@ class LeMieAttivitaViewModel(
     }
 
 
-    /**
-     * Carica un file su Firebase Storage e restituisce l'URL di download.
-     *
-     * @param uri L'URI del file da caricare.
-     * @return L'URL di download del file caricato.
-     * @throws Exception Se si verifica un errore durante il caricamento del file.
-     */
-    private suspend fun uploadFile(uri: Uri): String {
-        return withContext(Dispatchers.IO) {
-            val storageReference = FirebaseStorage.getInstance().reference.child("files/${UUID.randomUUID()}")
-            val uploadTask = storageReference.putFile(uri)
-            uploadTask.await()  // Attendi il completamento dell'upload
-            storageReference.downloadUrl.await().toString()  // Ottieni l'URL di download
-        }
-    }
+
 
 
 

@@ -1,11 +1,16 @@
 package com.example.teamsync.caratteristiche.leMieAttivita.data.repository
 
+import android.net.Uri
 import android.util.Log
 import com.example.teamsync.caratteristiche.leMieAttivita.data.model.LeMieAttivita
 import com.example.teamsync.util.Priorita
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.Date
+import java.util.UUID
 
 /**
  * Repository per gestire le operazioni relative alle attività.
@@ -41,6 +46,23 @@ class ToDoRepository {
             utenti = listOf(utenti),
         )
         database.collection("Todo").add(leMieAttivita).await()
+    }
+
+
+    /**
+     * Carica un file su Firebase Storage e restituisce l'URL di download.
+     *
+     * @param uri L'URI del file da caricare.
+     * @return L'URL di download del file caricato.
+     * @throws Exception Se si verifica un errore durante il caricamento del file.
+     */
+    suspend fun uploadFile(uri: Uri): String {
+        return withContext(Dispatchers.IO) {
+            val storageReference = FirebaseStorage.getInstance().reference.child("files/${UUID.randomUUID()}")
+            val uploadTask = storageReference.putFile(uri)
+            uploadTask.await()  // Attendi il completamento dell'upload
+            storageReference.downloadUrl.await().toString()  // Ottieni l'URL di download
+        }
     }
 
     /**

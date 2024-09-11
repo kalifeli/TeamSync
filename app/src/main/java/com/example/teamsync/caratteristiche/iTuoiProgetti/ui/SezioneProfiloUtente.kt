@@ -176,7 +176,6 @@ fun ImmagineProfiloUtente(imageUrl: String?, defaultImage: Int, modifier: Modifi
 @Composable
 fun PreviewImmagineProfiloUtente(){
     //ImmagineProfiloUtente()
-
 }
 
 /**

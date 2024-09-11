@@ -90,7 +90,6 @@ import java.util.Locale
  * @param viewModel Il ViewModel associato alla gestione del profilo utente.
  * @param navController Il NavHostController utilizzato per la navigazione tra le schermate.
  */
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostController) {
@@ -562,20 +561,36 @@ fun UserProfileScreen(viewModel: ViewModelUtente, navController: NavHostControll
                             onClick = {
                                 showMenu = false
                                 when {
-                                    ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.READ_MEDIA_IMAGES
-                                    ) == PackageManager.PERMISSION_GRANTED -> {
-                                        launcher.launch("image/*")
+                                    // Per Android 13 e versioni successive (API 33+)
+                                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                                        if (ContextCompat.checkSelfPermission(
+                                                context,
+                                                Manifest.permission.READ_MEDIA_IMAGES
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            launcher.launch("image/*")
+                                        } else {
+                                            permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                                        }
                                     }
 
+                                    // Per Android 12 e versioni precedenti (API 32 e inferiori)
                                     else -> {
-                                        permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                                        if (ContextCompat.checkSelfPermission(
+                                                context,
+                                                Manifest.permission.READ_EXTERNAL_STORAGE
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            launcher.launch("image/*")
+                                        } else {
+                                            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                        }
                                     }
                                 }
                             },
                             modifier = Modifier.background(Grey20)
                         )
+
                         DropdownMenuItem(
                             text = { Text(stringResource(id = R.string.rimuoviImmagine)) },
                             onClick = {

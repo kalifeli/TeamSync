@@ -61,7 +61,7 @@ fun NavGraph(){
     val navController = rememberNavController()
     val viewModelUtente = ViewModelUtente(RepositoryUtente(contesto), contesto)
     val viewModelProgetto = ViewModelProgetto(RepositoryProgetto(), ToDoRepository(), ViewModelUtente(RepositoryUtente(contesto), contesto), contesto)
-    val viewModelLeMieAttivita = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente(contesto))
+    val viewModelLeMieAttivita = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente(contesto),contesto)
     val viewModelNotifiche = ViewModelNotifiche(RepositoryNotifiche(), viewModelUtente, contesto)
     val terminiCondizioniViewModel = TerminiCondizioniViewModel(RepositoryTerms())
     val faqViewModel = FaqViewModel(RepositoryFaq())

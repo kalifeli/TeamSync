@@ -297,7 +297,7 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
     // Dialog per aggiungere una nuova attività
     if (addTodoDialog) {
         AddTodoDialog(
-            viewModel = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente(contesto)),
+            viewModel = LeMieAttivitaViewModel(ToDoRepository(), RepositoryUtente(contesto), contesto),
             onDismiss = { addTodoDialog = false },
             onSave = { newTodo ->
                 coroutineScope.launch {
@@ -337,24 +337,6 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                 todoItem = currentTodoItem.value!!,
                 onDismiss = {
                     openDialog = false
-                },
-                onSave = { updatedItem ->
-                    // Questa parte può essere semplificata ora
-                    val fileUri = viewModel.uploadResult.value
-
-                    viewModel.updateTodo(
-                        id = updatedItem.id ?: "",
-                        titolo = updatedItem.titolo,
-                        descrizione = updatedItem.descrizione,
-                        dataScad = updatedItem.dataScadenza,
-                        priorita = updatedItem.priorita,
-                        sezione,
-                        idProg,
-                        updatedItem.utenti,
-                        fileUri = fileUri,
-                        contesto
-                    )
-                    // Non è più necessario gestire l'apertura o chiusura della dialog qui
                 },
                 navController = navController,
                 progettoNome = progettoNome.value,
@@ -738,7 +720,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -766,7 +749,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -789,7 +773,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -819,7 +804,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -842,7 +828,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -865,7 +852,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -894,7 +882,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -919,7 +908,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
                                 }
@@ -942,7 +932,8 @@ fun LeMieAttivitaUI(navController: NavHostController, viewModel: LeMieAttivitaVi
                                                 dialogComplete = true
                                             },
                                             viewModelUtente,
-                                            userProfile = utente
+                                            userProfile = utente,
+                                            viewModel
                                         )
                                     }
 
@@ -997,7 +988,8 @@ fun TodoItem(
     onEdit: (LeMieAttivita) -> Unit,
     onComplete: (LeMieAttivita) -> Unit,
     viewModelUtente: ViewModelUtente,
-    userProfile: ProfiloUtente?
+    userProfile: ProfiloUtente?,
+    viewModel: LeMieAttivitaViewModel
 ) {
     var dialogDelete by remember { mutableStateOf(false) }
     var dialogExpanded by remember { mutableStateOf(false) }
@@ -1181,7 +1173,7 @@ fun TodoItem(
 
         // Dialog espanso per visualizzare i dettagli dell'attività
         if (dialogExpanded) {
-            ExpandedDialog(item = item, onDismiss = { dialogExpanded = false }, viewModelUtente)
+            ExpandedDialog(item = item, onDismiss = { dialogExpanded = false }, viewModelUtente, viewModel)
         }
 }
 
@@ -1191,7 +1183,6 @@ fun TodoItem(
  *
  * @param todoItem L'attività da modificare.
  * @param onDismiss Funzione da chiamare quando il dialogo viene chiuso.
- * @param onSave Funzione da chiamare quando l'attività viene salvata.
  * @param navController Controller di navigazione per spostarsi tra le schermate.
  * @param viewModel ViewModel per la gestione delle attività.
  * @param viewModelNotifiche ViewModel per la gestione delle notifiche.
@@ -1202,7 +1193,6 @@ fun TodoItem(
 fun EditTodoDialog(
     todoItem: LeMieAttivita,
     onDismiss: () -> Unit,
-    onSave: (LeMieAttivita) -> Unit,
     navController: NavHostController,
     viewModel: LeMieAttivitaViewModel,
     viewModelNotifiche: ViewModelNotifiche,
@@ -1217,17 +1207,14 @@ fun EditTodoDialog(
     val context = LocalContext.current
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    var fileContent by remember { mutableStateOf<String?>(null) }
-    var caricamentoFile by remember { mutableStateOf(false) } // stato per il caricamento del file
+    var caricamentoFile by remember { mutableStateOf(false) }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
     val maxCharsTitolo = 50
     val maxCharsDescrizione = 1000
-
     val erroreEditTask by viewModel.erroreEditAttivita.observeAsState()
     val editRiuscito by viewModel.editAttivitaRiuscito.observeAsState()
-
+    val isLoading by viewModel.isLoading.observeAsState()
     var expanded by remember { mutableStateOf(false) }
-
     val calendar = Calendar.getInstance()
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     var dataScadenzaStr = sdf.format(dataScadenza)
@@ -1242,7 +1229,6 @@ fun EditTodoDialog(
         calendar.get(Calendar.MONTH),
         calendar.get(Calendar.DAY_OF_MONTH)
     )
-
     // Gestione degli errori senza chiudere la dialog
     LaunchedEffect(erroreEditTask) {
         erroreEditTask?.let { message ->
@@ -1250,7 +1236,6 @@ fun EditTodoDialog(
             viewModel.resetErroreEditTask()
         }
     }
-
     // Osserva il successo dell'operazione di salvataggio per chiudere la dialog
     LaunchedEffect(editRiuscito) {
         if (editRiuscito == true) {
@@ -1258,25 +1243,13 @@ fun EditTodoDialog(
             viewModel.resetEditAttivitaRiuscito()
         }
     }
-
     // Launcher per selezionare un file
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             selectedFileUri = it
             viewModel.setFileUri(it)
-            caricamentoFile = true // Inizia il caricamento del file
-            coroutineScope.launch {
-                try {
-                    fileContent = viewModel.readFileContent(context, it)
-                    caricamentoFile = false // Fine del caricamento del file
-                }catch (e: Exception) {
-                    caricamentoFile = false // Fine del caricamento in caso di errore
-                    Toast.makeText(context, "Errore durante il caricamento del file: ${e.message}", Toast.LENGTH_LONG ).show()
-                }
-            }
         }
     }
-
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             launcher.launch("*/*")
@@ -1284,8 +1257,6 @@ fun EditTodoDialog(
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
     }
-
-
     // Dialog di modifica dell'attività
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1325,7 +1296,6 @@ fun EditTodoDialog(
                         .align(Alignment.End)
                         .padding(end = 8.dp)
                 )
-
                 // Campo di input della descrizione
                 OutlinedTextField(
                     value = descrizione,
@@ -1357,7 +1327,6 @@ fun EditTodoDialog(
                         .align(Alignment.End)
                         .padding(end = 8.dp)
                 )
-
                 // Campo di input della data di scadenza
                 OutlinedTextField(
                     value = dataScadenzaStr,
@@ -1391,7 +1360,6 @@ fun EditTodoDialog(
                     textStyle = TextStyle(fontSize = 18.sp, color = if(isDarkTheme) White else Color.Black),
                     placeholder = { Text("dd/MM/yyyy") }
                 )
-
                 // Campo di input della priorità
                 Box(modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
@@ -1448,7 +1416,6 @@ fun EditTodoDialog(
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(p.nomeTradotto() , color = if (isDarkTheme) White else Color.Black)
-
                                     }
                                 },
                                 onClick = {
@@ -1460,27 +1427,30 @@ fun EditTodoDialog(
                         }
                     }
                 }
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 // Pulsante per selezionare un file
                 Button(
-                    onClick = { permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) },
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            // Se la versione è 33 (Android 13) o superiore
+                            permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES) // Permesso per Android 13+
+                        } else {
+                            // Se la versione è inferiore a 33 (Android 12 e precedenti)
+                            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) // Permesso per Android 12-
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isDarkTheme) Grey70 else Grey50
                     )
                 ) {
                     Text(stringResource(id = R.string.selFile), color = if (isDarkTheme) White else Color.Black)
                 }
-
                 if(caricamentoFile){
                     CircularProgressIndicator(color = Red70, modifier = Modifier.padding(top = 8.dp))
                 }else  if (selectedFileUri != null) {
                     Text("File Selezionato: ${selectedFileUri!!.lastPathSegment}", color = if (isDarkTheme) White else Color.Black)
                 }
-
                 Spacer(modifier = Modifier.width(8.dp))
-
                 // Pulsante per delegare
                 Button(
                     onClick = {
@@ -1496,6 +1466,7 @@ fun EditTodoDialog(
             Button(
                 colors = ButtonDefaults.buttonColors( containerColor = Red70,
                     contentColor = Color.White),
+                enabled = isLoading != true,
                 onClick = {
                     val updatedTodo = todoItem.copy(
                         titolo = titolo,
@@ -1504,6 +1475,7 @@ fun EditTodoDialog(
                         priorita = priorita,
                     )
                     coroutineScope.launch {
+                        caricamentoFile = true
                         viewModel.uploadFileAndSaveTodo(
                             id = updatedTodo.id ?: "",
                             titolo = updatedTodo.titolo,
@@ -1514,22 +1486,24 @@ fun EditTodoDialog(
                             dataScadenzaProgetto = progetto.dataScadenza,
                             context
                         )
-
                         for (p1 in updatedTodo.utenti) {
                             if (p1 != userProfile?.id) {
                                 val contenuto = "${userProfile?.nome ?: " "} ${userProfile?.cognome ?: " "} ha modificato la vostra task: ${updatedTodo.titolo} del progetto: $progettoNome"
                                 viewModelNotifiche.creaNotifica(userProfile?.id ?: " ", p1, "Modifica_Task", contenuto, updatedTodo.progetto)
                             }
                         }
+                        caricamentoFile = false
                     }
-                    onSave(updatedTodo)
-                },
+                  },
             ) {
-
-                Text(
-                    text = stringResource(id = R.string.salvaEdit),
-                    style = TextStyle(color = Color.White )
-                )
+                if(isLoading == true || caricamentoFile){
+                    CircularProgressIndicator(color = Red70, modifier = Modifier.padding(top = 8.dp))
+                }else{
+                    Text(
+                        text = stringResource(id = R.string.salvaEdit),
+                        style = TextStyle(color = Color.White )
+                    )
+                }
             }
         },
         dismissButton = {
@@ -1899,7 +1873,8 @@ fun CompleteDialog(
 fun ExpandedDialog(
     item: LeMieAttivita,
     onDismiss: () -> Unit,
-    viewModelUtente: ViewModelUtente
+    viewModelUtente: ViewModelUtente,
+    viewModel: LeMieAttivitaViewModel
 ) {
     var listaUtenti by remember { mutableStateOf("") }
     val isDarkTheme = ThemePreferences.getTheme(LocalContext.current)
@@ -2043,10 +2018,7 @@ fun ExpandedDialog(
                     if (item.fileUri != null) {
                         Button(
                             onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW).apply {
-                                    data = Uri.parse(item.fileUri)
-                                }
-                                context.startActivity(intent)
+                                viewModel.visualizzaFile(item.fileUri)
                             },
                             modifier = Modifier.padding(16.dp)
                         ) {
